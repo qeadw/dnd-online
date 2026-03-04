@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&D Online</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>D&D Online</h1>
+    </header>
+
+    <main>
+        <section class="dice-roller">
+            <h2>Dice Roller</h2>
+            <div class="dice-buttons">
+                <button onclick="rollDice(4)">d4</button>
+                <button onclick="rollDice(6)">d6</button>
+                <button onclick="rollDice(8)">d8</button>
+                <button onclick="rollDice(10)">d10</button>
+                <button onclick="rollDice(12)">d12</button>
+                <button onclick="rollDice(20)">d20</button>
+                <button onclick="rollDice(100)">d100</button>
+            </div>
+            <div class="custom-roll">
+                <input type="number" id="numDice" value="1" min="1" max="20">
+                <span>d</span>
+                <input type="number" id="diceType" value="20" min="1" max="100">
+                <span>+</span>
+                <input type="number" id="modifier" value="0">
+                <button onclick="customRoll()">Roll</button>
+            </div>
+            <div class="roll-result" id="rollResult">
+                <p>Click a die to roll!</p>
+            </div>
+            <div class="roll-history" id="rollHistory"></div>
+        </section>
+
+        <section class="initiative-tracker">
+            <h2>Initiative Tracker</h2>
+            <div class="add-character">
+                <input type="text" id="charName" placeholder="Character name">
+                <input type="number" id="charInit" placeholder="Initiative">
+                <button onclick="addToInitiative()">Add</button>
+            </div>
+            <ul id="initiativeList"></ul>
+            <button onclick="clearInitiative()" class="clear-btn">Clear All</button>
+            <button onclick="nextTurn()" class="next-btn">Next Turn</button>
+        </section>
+
+        <section class="character-sheet">
+            <h2>Quick Character Reference</h2>
+            <div class="stats-grid">
+                <div class="stat">
+                    <label>STR</label>
+                    <input type="number" id="str" value="10">
+                    <span class="modifier" id="strMod">+0</span>
+                </div>
+                <div class="stat">
+                    <label>DEX</label>
+                    <input type="number" id="dex" value="10">
+                    <span class="modifier" id="dexMod">+0</span>
+                </div>
+                <div class="stat">
+                    <label>CON</label>
+                    <input type="number" id="con" value="10">
+                    <span class="modifier" id="conMod">+0</span>
+                </div>
+                <div class="stat">
+                    <label>INT</label>
+                    <input type="number" id="int" value="10">
+                    <span class="modifier" id="intMod">+0</span>
+                </div>
+                <div class="stat">
+                    <label>WIS</label>
+                    <input type="number" id="wis" value="10">
+                    <span class="modifier" id="wisMod">+0</span>
+                </div>
+                <div class="stat">
+                    <label>CHA</label>
+                    <input type="number" id="cha" value="10">
+                    <span class="modifier" id="chaMod">+0</span>
+                </div>
+            </div>
+            <div class="hp-tracker">
+                <label>HP:</label>
+                <input type="number" id="currentHp" value="10"> /
+                <input type="number" id="maxHp" value="10">
+            </div>
+        </section>
+
+        <section class="notes">
+            <h2>Session Notes</h2>
+            <textarea id="sessionNotes" placeholder="Take notes here..."></textarea>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
