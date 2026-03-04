@@ -24,6 +24,33 @@ header h1 {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
+.main-nav {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.nav-link {
+    color: #aaa;
+    text-decoration: none;
+    padding: 10px 25px;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.nav-link:hover {
+    color: #c9a227;
+    border-color: rgba(201, 162, 39, 0.5);
+}
+
+.nav-link.active {
+    color: #c9a227;
+    background: rgba(201, 162, 39, 0.2);
+    border-color: #c9a227;
+}
+
 main {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
