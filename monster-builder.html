@@ -1,0 +1,2183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monster Builder - D&D Online</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Monster Builder Layout */
+        .builder-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Form Panel */
+        .form-panel {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(228, 161, 27, 0.3);
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .form-panel h3 {
+            color: #e4a11b;
+            border-bottom: 2px solid #e4a11b;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            margin-top: 0;
+        }
+
+        /* Preview Panel */
+        .preview-panel {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(228, 161, 27, 0.3);
+            position: sticky;
+            top: 20px;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .preview-panel h3 {
+            color: #e4a11b;
+            border-bottom: 2px solid #e4a11b;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            margin-top: 0;
+        }
+
+        /* Form Sections */
+        .form-section {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+        }
+
+        .form-section h4 {
+            color: #e4a11b;
+            margin: 0 0 15px 0;
+            font-size: 1rem;
+            border-bottom: 1px solid #444;
+            padding-bottom: 8px;
+        }
+
+        /* Form Grid */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            color: #ccc;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 8px 12px;
+            background: #222;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #e4a11b;
+            box-shadow: 0 0 0 2px rgba(228, 161, 27, 0.2);
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-group input[type="number"] {
+            width: 80px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* Ability Scores Grid */
+        .ability-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            text-align: center;
+        }
+
+        .ability-input {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            background: #222;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #333;
+        }
+
+        .ability-input label {
+            color: #e4a11b;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .ability-input input {
+            width: 60px;
+            text-align: center;
+            padding: 6px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .ability-input .modifier {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        /* Speed Grid */
+        .speed-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+        }
+
+        .speed-input {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .speed-input label {
+            color: #ccc;
+            font-size: 0.85rem;
+        }
+
+        .speed-input input {
+            padding: 6px 8px;
+            background: #222;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        /* Checkbox Groups */
+        .checkbox-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .checkbox-grid label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            background: #333;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #ccc;
+            transition: background 0.2s;
+        }
+
+        .checkbox-grid label:hover {
+            background: #444;
+        }
+
+        .checkbox-grid input[type="checkbox"] {
+            accent-color: #e4a11b;
+        }
+
+        /* Multi-select styling */
+        .multi-select {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 10px;
+            background: #222;
+            border: 1px solid #444;
+            border-radius: 4px;
+            min-height: 40px;
+        }
+
+        .multi-select .tag {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            background: #444;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #fff;
+        }
+
+        .multi-select .tag button {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .multi-select-dropdown {
+            position: relative;
+        }
+
+        .multi-select-dropdown select {
+            width: 100%;
+            padding: 8px;
+            background: #222;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        /* Skill Proficiency Item */
+        .skill-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            background: #333;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .skill-item select {
+            padding: 4px 8px;
+            background: #222;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 0.85rem;
+        }
+
+        .skill-item button {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        /* Dynamic List Items (Traits, Actions, etc.) */
+        .dynamic-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .dynamic-item {
+            background: #222;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #333;
+        }
+
+        .dynamic-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .dynamic-item-header input {
+            flex: 1;
+            padding: 8px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: bold;
+        }
+
+        .dynamic-item-header button {
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 0.85rem;
+        }
+
+        .dynamic-item textarea {
+            width: 100%;
+            min-height: 60px;
+            padding: 8px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 0.9rem;
+            resize: vertical;
+        }
+
+        /* Attack Details */
+        .attack-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #333;
+        }
+
+        .attack-details .form-group input,
+        .attack-details .form-group select {
+            padding: 6px 8px;
+            font-size: 0.85rem;
+        }
+
+        /* Add Button */
+        .add-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 10px;
+            background: #333;
+            border: 2px dashed #555;
+            border-radius: 6px;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .add-btn:hover {
+            background: #444;
+            border-color: #e4a11b;
+            color: #e4a11b;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #444;
+        }
+
+        .action-buttons button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #e4a11b;
+            color: #1a1a1a;
+        }
+
+        .btn-primary:hover {
+            background: #c4891b;
+        }
+
+        .btn-secondary {
+            background: #444;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #555;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: #fff;
+        }
+
+        .btn-success:hover {
+            background: #219a52;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        /* File Input */
+        .file-input-wrapper {
+            position: relative;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        /* Legendary Actions Toggle */
+        .legendary-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .legendary-toggle label {
+            color: #ccc;
+            font-size: 0.95rem;
+        }
+
+        /* Stat Block Preview Styles */
+        .stat-block-preview {
+            background: linear-gradient(to bottom, #e8d4b0, #f5e7c6);
+            color: #1a1a1a;
+            padding: 20px;
+            border-radius: 0;
+            border: 3px solid #c9a227;
+            font-family: 'Libre Baskerville', 'Georgia', serif;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-block-preview .stat-header {
+            border-bottom: 2px solid #922610;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .stat-block-preview .monster-name {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #922610;
+            margin: 0;
+            font-family: 'Libre Baskerville', 'Georgia', serif;
+        }
+
+        .stat-block-preview .monster-type {
+            font-style: italic;
+            font-size: 0.95rem;
+            color: #333;
+            margin: 5px 0 0 0;
+        }
+
+        .stat-block-preview .stat-divider {
+            height: 3px;
+            background: linear-gradient(to right, #922610, #c9a227, #922610);
+            margin: 10px 0;
+        }
+
+        .stat-block-preview .stat-line {
+            margin: 5px 0;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .stat-block-preview .stat-line strong {
+            color: #922610;
+        }
+
+        .stat-block-preview .abilities-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 5px;
+            text-align: center;
+            margin: 10px 0;
+            padding: 10px 0;
+            border-top: 1px solid #922610;
+            border-bottom: 1px solid #922610;
+        }
+
+        .stat-block-preview .ability {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-block-preview .ability-name {
+            font-weight: bold;
+            color: #922610;
+            font-size: 0.85rem;
+        }
+
+        .stat-block-preview .ability-value {
+            font-size: 0.9rem;
+        }
+
+        .stat-block-preview .section-title {
+            font-size: 1.2rem;
+            color: #922610;
+            border-bottom: 1px solid #922610;
+            margin: 15px 0 10px 0;
+            padding-bottom: 5px;
+        }
+
+        .stat-block-preview .trait,
+        .stat-block-preview .action-item,
+        .stat-block-preview .reaction-item,
+        .stat-block-preview .legendary-item {
+            margin: 10px 0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .stat-block-preview .trait-name,
+        .stat-block-preview .action-name {
+            font-weight: bold;
+            font-style: italic;
+        }
+
+        .stat-block-preview .legendary-intro {
+            font-style: italic;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        /* Empty State */
+        .empty-preview {
+            text-align: center;
+            color: #888;
+            padding: 40px;
+        }
+
+        /* Senses Grid */
+        .senses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .sense-input {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sense-input label {
+            color: #ccc;
+            font-size: 0.9rem;
+            min-width: 100px;
+        }
+
+        .sense-input input {
+            width: 60px;
+            padding: 6px;
+            background: #222;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #fff;
+            text-align: center;
+        }
+
+        .sense-input span {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        /* CR and XP */
+        .cr-xp-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .xp-display {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        /* Hover checkbox */
+        .hover-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .hover-option label {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .builder-container {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-panel {
+                position: static;
+                max-height: none;
+            }
+
+            .form-panel {
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .ability-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .stat-block-preview .abilities-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons button {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .ability-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stat-block-preview .abilities-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .builder-container {
+                padding: 10px;
+            }
+        }
+
+        /* Saved Monsters List */
+        .saved-monsters {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #444;
+        }
+
+        .saved-monsters h4 {
+            color: #e4a11b;
+            margin: 0 0 15px 0;
+        }
+
+        .saved-monster-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #333;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .saved-monster-item span {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .saved-monster-item .monster-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .saved-monster-item button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to content</a>
+    <header>
+        <h1>Monster Builder</h1>
+        <nav class="main-nav">
+            <a href="index.html" class="nav-link">Game Tools</a>
+            <a href="character-creator.html" class="nav-link">Character Creator</a>
+            <a href="characters.html" class="nav-link">My Characters</a>
+            <a href="spells.html" class="nav-link">Spells</a>
+            <a href="monsters.html" class="nav-link">Monsters</a>
+            <a href="monster-builder.html" class="nav-link active">Monster Builder</a>
+            <a href="combat.html" class="nav-link">Combat</a>
+            <a href="inventory.html" class="nav-link">Inventory</a>
+        </nav>
+    </header>
+
+    <main class="builder-container" id="main">
+        <!-- Form Panel -->
+        <div class="form-panel">
+            <h3>Create Custom Monster</h3>
+
+            <!-- Basic Info Section -->
+            <div class="form-section">
+                <h4>Basic Information</h4>
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="monsterName">Name *</label>
+                        <input type="text" id="monsterName" placeholder="e.g., Shadow Wyrm" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="monsterSize">Size</label>
+                        <select id="monsterSize">
+                            <option value="Tiny">Tiny</option>
+                            <option value="Small">Small</option>
+                            <option value="Medium" selected>Medium</option>
+                            <option value="Large">Large</option>
+                            <option value="Huge">Huge</option>
+                            <option value="Gargantuan">Gargantuan</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="monsterType">Type</label>
+                        <select id="monsterType">
+                            <option value="Aberration">Aberration</option>
+                            <option value="Beast">Beast</option>
+                            <option value="Celestial">Celestial</option>
+                            <option value="Construct">Construct</option>
+                            <option value="Dragon">Dragon</option>
+                            <option value="Elemental">Elemental</option>
+                            <option value="Fey">Fey</option>
+                            <option value="Fiend">Fiend</option>
+                            <option value="Giant">Giant</option>
+                            <option value="Humanoid" selected>Humanoid</option>
+                            <option value="Monstrosity">Monstrosity</option>
+                            <option value="Ooze">Ooze</option>
+                            <option value="Plant">Plant</option>
+                            <option value="Undead">Undead</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="monsterSubtype">Subtype (optional)</label>
+                        <input type="text" id="monsterSubtype" placeholder="e.g., shapechanger">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="monsterAlignment">Alignment</label>
+                        <select id="monsterAlignment">
+                            <option value="lawful good">Lawful Good</option>
+                            <option value="neutral good">Neutral Good</option>
+                            <option value="chaotic good">Chaotic Good</option>
+                            <option value="lawful neutral">Lawful Neutral</option>
+                            <option value="neutral">Neutral</option>
+                            <option value="chaotic neutral">Chaotic Neutral</option>
+                            <option value="lawful evil">Lawful Evil</option>
+                            <option value="neutral evil">Neutral Evil</option>
+                            <option value="chaotic evil">Chaotic Evil</option>
+                            <option value="unaligned" selected>Unaligned</option>
+                            <option value="any alignment">Any Alignment</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Combat Stats Section -->
+            <div class="form-section">
+                <h4>Combat Statistics</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="monsterAC">Armor Class</label>
+                        <input type="number" id="monsterAC" value="10" min="1" max="30">
+                    </div>
+                    <div class="form-group">
+                        <label for="monsterACType">Armor Type</label>
+                        <input type="text" id="monsterACType" placeholder="e.g., natural armor">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="monsterHitDice">Hit Dice</label>
+                        <input type="text" id="monsterHitDice" placeholder="e.g., 8d8+16">
+                    </div>
+                    <div class="form-group">
+                        <label for="monsterHP">Hit Points</label>
+                        <input type="number" id="monsterHP" value="0" min="0">
+                        <small style="color: #888; font-size: 0.8rem;">Auto-calculated from hit dice</small>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="manualHP"> Manual HP
+                        </label>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label style="color: #ccc; grid-column: 1 / -1;">Speed</label>
+                </div>
+                <div class="speed-grid">
+                    <div class="speed-input">
+                        <label for="speedWalk">Walk</label>
+                        <input type="number" id="speedWalk" value="30" min="0"> ft.
+                    </div>
+                    <div class="speed-input">
+                        <label for="speedFly">Fly</label>
+                        <input type="number" id="speedFly" value="0" min="0"> ft.
+                    </div>
+                    <div class="speed-input">
+                        <label for="speedSwim">Swim</label>
+                        <input type="number" id="speedSwim" value="0" min="0"> ft.
+                    </div>
+                    <div class="speed-input">
+                        <label for="speedClimb">Climb</label>
+                        <input type="number" id="speedClimb" value="0" min="0"> ft.
+                    </div>
+                    <div class="speed-input">
+                        <label for="speedBurrow">Burrow</label>
+                        <input type="number" id="speedBurrow" value="0" min="0"> ft.
+                    </div>
+                </div>
+                <div class="hover-option">
+                    <input type="checkbox" id="canHover">
+                    <label for="canHover">Can Hover (requires fly speed)</label>
+                </div>
+            </div>
+
+            <!-- Ability Scores Section -->
+            <div class="form-section">
+                <h4>Ability Scores</h4>
+                <div class="ability-grid">
+                    <div class="ability-input">
+                        <label for="abilityStr">STR</label>
+                        <input type="number" id="abilityStr" value="10" min="1" max="30">
+                        <span class="modifier" id="modStr">(+0)</span>
+                    </div>
+                    <div class="ability-input">
+                        <label for="abilityDex">DEX</label>
+                        <input type="number" id="abilityDex" value="10" min="1" max="30">
+                        <span class="modifier" id="modDex">(+0)</span>
+                    </div>
+                    <div class="ability-input">
+                        <label for="abilityCon">CON</label>
+                        <input type="number" id="abilityCon" value="10" min="1" max="30">
+                        <span class="modifier" id="modCon">(+0)</span>
+                    </div>
+                    <div class="ability-input">
+                        <label for="abilityInt">INT</label>
+                        <input type="number" id="abilityInt" value="10" min="1" max="30">
+                        <span class="modifier" id="modInt">(+0)</span>
+                    </div>
+                    <div class="ability-input">
+                        <label for="abilityWis">WIS</label>
+                        <input type="number" id="abilityWis" value="10" min="1" max="30">
+                        <span class="modifier" id="modWis">(+0)</span>
+                    </div>
+                    <div class="ability-input">
+                        <label for="abilityCha">CHA</label>
+                        <input type="number" id="abilityCha" value="10" min="1" max="30">
+                        <span class="modifier" id="modCha">(+0)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Proficiencies Section -->
+            <div class="form-section">
+                <h4>Proficiencies</h4>
+                <div class="form-row">
+                    <label style="color: #ccc; grid-column: 1 / -1;">Saving Throws</label>
+                </div>
+                <div class="checkbox-grid" id="savingThrowsGroup">
+                    <label><input type="checkbox" value="str"> STR</label>
+                    <label><input type="checkbox" value="dex"> DEX</label>
+                    <label><input type="checkbox" value="con"> CON</label>
+                    <label><input type="checkbox" value="int"> INT</label>
+                    <label><input type="checkbox" value="wis"> WIS</label>
+                    <label><input type="checkbox" value="cha"> CHA</label>
+                </div>
+
+                <div class="form-row" style="margin-top: 15px;">
+                    <label style="color: #ccc; grid-column: 1 / -1;">Skills</label>
+                </div>
+                <div id="skillsList" class="dynamic-list"></div>
+                <button type="button" class="add-btn" onclick="addSkill()">+ Add Skill</button>
+            </div>
+
+            <!-- Defenses Section -->
+            <div class="form-section">
+                <h4>Defenses</h4>
+
+                <div class="form-group">
+                    <label>Damage Vulnerabilities</label>
+                    <div id="damageVulnerabilities" class="multi-select"></div>
+                    <select onchange="addDamageType('damageVulnerabilities', this.value); this.value='';">
+                        <option value="">+ Add vulnerability...</option>
+                        <option value="acid">Acid</option>
+                        <option value="bludgeoning">Bludgeoning</option>
+                        <option value="cold">Cold</option>
+                        <option value="fire">Fire</option>
+                        <option value="force">Force</option>
+                        <option value="lightning">Lightning</option>
+                        <option value="necrotic">Necrotic</option>
+                        <option value="piercing">Piercing</option>
+                        <option value="poison">Poison</option>
+                        <option value="psychic">Psychic</option>
+                        <option value="radiant">Radiant</option>
+                        <option value="slashing">Slashing</option>
+                        <option value="thunder">Thunder</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Damage Resistances</label>
+                    <div id="damageResistances" class="multi-select"></div>
+                    <select onchange="addDamageType('damageResistances', this.value); this.value='';">
+                        <option value="">+ Add resistance...</option>
+                        <option value="acid">Acid</option>
+                        <option value="bludgeoning">Bludgeoning</option>
+                        <option value="cold">Cold</option>
+                        <option value="fire">Fire</option>
+                        <option value="force">Force</option>
+                        <option value="lightning">Lightning</option>
+                        <option value="necrotic">Necrotic</option>
+                        <option value="piercing">Piercing</option>
+                        <option value="poison">Poison</option>
+                        <option value="psychic">Psychic</option>
+                        <option value="radiant">Radiant</option>
+                        <option value="slashing">Slashing</option>
+                        <option value="thunder">Thunder</option>
+                        <option value="bludgeoning, piercing, and slashing from nonmagical attacks">Nonmagical B/P/S</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Damage Immunities</label>
+                    <div id="damageImmunities" class="multi-select"></div>
+                    <select onchange="addDamageType('damageImmunities', this.value); this.value='';">
+                        <option value="">+ Add immunity...</option>
+                        <option value="acid">Acid</option>
+                        <option value="bludgeoning">Bludgeoning</option>
+                        <option value="cold">Cold</option>
+                        <option value="fire">Fire</option>
+                        <option value="force">Force</option>
+                        <option value="lightning">Lightning</option>
+                        <option value="necrotic">Necrotic</option>
+                        <option value="piercing">Piercing</option>
+                        <option value="poison">Poison</option>
+                        <option value="psychic">Psychic</option>
+                        <option value="radiant">Radiant</option>
+                        <option value="slashing">Slashing</option>
+                        <option value="thunder">Thunder</option>
+                        <option value="bludgeoning, piercing, and slashing from nonmagical attacks">Nonmagical B/P/S</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Condition Immunities</label>
+                    <div id="conditionImmunities" class="multi-select"></div>
+                    <select onchange="addCondition('conditionImmunities', this.value); this.value='';">
+                        <option value="">+ Add condition immunity...</option>
+                        <option value="blinded">Blinded</option>
+                        <option value="charmed">Charmed</option>
+                        <option value="deafened">Deafened</option>
+                        <option value="exhaustion">Exhaustion</option>
+                        <option value="frightened">Frightened</option>
+                        <option value="grappled">Grappled</option>
+                        <option value="incapacitated">Incapacitated</option>
+                        <option value="invisible">Invisible</option>
+                        <option value="paralyzed">Paralyzed</option>
+                        <option value="petrified">Petrified</option>
+                        <option value="poisoned">Poisoned</option>
+                        <option value="prone">Prone</option>
+                        <option value="restrained">Restrained</option>
+                        <option value="stunned">Stunned</option>
+                        <option value="unconscious">Unconscious</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Senses Section -->
+            <div class="form-section">
+                <h4>Senses</h4>
+                <div class="senses-grid">
+                    <div class="sense-input">
+                        <label for="senseDarkvision">Darkvision</label>
+                        <input type="number" id="senseDarkvision" value="0" min="0"> <span>ft.</span>
+                    </div>
+                    <div class="sense-input">
+                        <label for="senseBlindsight">Blindsight</label>
+                        <input type="number" id="senseBlindsight" value="0" min="0"> <span>ft.</span>
+                    </div>
+                    <div class="sense-input">
+                        <label for="senseTremorsense">Tremorsense</label>
+                        <input type="number" id="senseTremorsense" value="0" min="0"> <span>ft.</span>
+                    </div>
+                    <div class="sense-input">
+                        <label for="senseTruesight">Truesight</label>
+                        <input type="number" id="senseTruesight" value="0" min="0"> <span>ft.</span>
+                    </div>
+                </div>
+                <div class="form-row" style="margin-top: 10px;">
+                    <div class="form-group">
+                        <label for="passivePerception">Passive Perception</label>
+                        <input type="number" id="passivePerception" value="10" readonly>
+                        <small style="color: #888; font-size: 0.8rem;">Auto-calculated: 10 + Wisdom mod + Perception</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Languages Section -->
+            <div class="form-section">
+                <h4>Languages</h4>
+                <div class="form-group">
+                    <label for="monsterLanguages">Languages</label>
+                    <input type="text" id="monsterLanguages" placeholder="e.g., Common, Draconic, telepathy 120 ft.">
+                </div>
+            </div>
+
+            <!-- Challenge Rating Section -->
+            <div class="form-section">
+                <h4>Challenge Rating</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="monsterCR">Challenge Rating</label>
+                        <select id="monsterCR">
+                            <option value="0">0 (10 XP)</option>
+                            <option value="1/8">1/8 (25 XP)</option>
+                            <option value="1/4">1/4 (50 XP)</option>
+                            <option value="1/2">1/2 (100 XP)</option>
+                            <option value="1" selected>1 (200 XP)</option>
+                            <option value="2">2 (450 XP)</option>
+                            <option value="3">3 (700 XP)</option>
+                            <option value="4">4 (1,100 XP)</option>
+                            <option value="5">5 (1,800 XP)</option>
+                            <option value="6">6 (2,300 XP)</option>
+                            <option value="7">7 (2,900 XP)</option>
+                            <option value="8">8 (3,900 XP)</option>
+                            <option value="9">9 (5,000 XP)</option>
+                            <option value="10">10 (5,900 XP)</option>
+                            <option value="11">11 (7,200 XP)</option>
+                            <option value="12">12 (8,400 XP)</option>
+                            <option value="13">13 (10,000 XP)</option>
+                            <option value="14">14 (11,500 XP)</option>
+                            <option value="15">15 (13,000 XP)</option>
+                            <option value="16">16 (15,000 XP)</option>
+                            <option value="17">17 (18,000 XP)</option>
+                            <option value="18">18 (20,000 XP)</option>
+                            <option value="19">19 (22,000 XP)</option>
+                            <option value="20">20 (25,000 XP)</option>
+                            <option value="21">21 (33,000 XP)</option>
+                            <option value="22">22 (41,000 XP)</option>
+                            <option value="23">23 (50,000 XP)</option>
+                            <option value="24">24 (62,000 XP)</option>
+                            <option value="25">25 (75,000 XP)</option>
+                            <option value="26">26 (90,000 XP)</option>
+                            <option value="27">27 (105,000 XP)</option>
+                            <option value="28">28 (120,000 XP)</option>
+                            <option value="29">29 (135,000 XP)</option>
+                            <option value="30">30 (155,000 XP)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>XP</label>
+                        <span id="xpDisplay" class="xp-display">200 XP</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Traits Section -->
+            <div class="form-section">
+                <h4>Traits</h4>
+                <div id="traitsList" class="dynamic-list"></div>
+                <button type="button" class="add-btn" onclick="addTrait()">+ Add Trait</button>
+            </div>
+
+            <!-- Actions Section -->
+            <div class="form-section">
+                <h4>Actions</h4>
+                <div id="actionsList" class="dynamic-list"></div>
+                <button type="button" class="add-btn" onclick="addAction()">+ Add Action</button>
+            </div>
+
+            <!-- Reactions Section -->
+            <div class="form-section">
+                <h4>Reactions</h4>
+                <div id="reactionsList" class="dynamic-list"></div>
+                <button type="button" class="add-btn" onclick="addReaction()">+ Add Reaction</button>
+            </div>
+
+            <!-- Legendary Actions Section -->
+            <div class="form-section">
+                <h4>Legendary Actions</h4>
+                <div class="legendary-toggle">
+                    <input type="checkbox" id="hasLegendaryActions">
+                    <label for="hasLegendaryActions">This monster has legendary actions</label>
+                </div>
+                <div id="legendaryActionsContainer" style="display: none;">
+                    <div class="form-group">
+                        <label for="legendaryActionsCount">Legendary Actions per Round</label>
+                        <input type="number" id="legendaryActionsCount" value="3" min="1" max="5">
+                    </div>
+                    <div id="legendaryActionsList" class="dynamic-list" style="margin-top: 15px;"></div>
+                    <button type="button" class="add-btn" onclick="addLegendaryAction()">+ Add Legendary Action</button>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button type="button" class="btn-primary" onclick="saveMonster()">Save to Browser</button>
+                <button type="button" class="btn-success" onclick="addToMonstersDB()">Add to Monsters</button>
+                <button type="button" class="btn-secondary" onclick="exportJSON()">Export JSON</button>
+                <button type="button" class="btn-secondary file-input-wrapper">
+                    Import JSON
+                    <input type="file" accept=".json" onchange="importJSON(event)">
+                </button>
+                <button type="button" class="btn-danger" onclick="clearForm()">Clear Form</button>
+            </div>
+
+            <!-- Saved Monsters -->
+            <div class="saved-monsters">
+                <h4>Saved Custom Monsters</h4>
+                <div id="savedMonstersList"></div>
+            </div>
+        </div>
+
+        <!-- Preview Panel -->
+        <div class="preview-panel">
+            <h3>Live Preview</h3>
+            <div id="statBlockPreview">
+                <div class="empty-preview">
+                    <p>Enter monster details to see the stat block preview</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="data/monsters.js"></script>
+    <script>
+        // CR to XP mapping
+        const CR_XP = {
+            "0": 10, "1/8": 25, "1/4": 50, "1/2": 100,
+            "1": 200, "2": 450, "3": 700, "4": 1100, "5": 1800,
+            "6": 2300, "7": 2900, "8": 3900, "9": 5000, "10": 5900,
+            "11": 7200, "12": 8400, "13": 10000, "14": 11500, "15": 13000,
+            "16": 15000, "17": 18000, "18": 20000, "19": 22000, "20": 25000,
+            "21": 33000, "22": 41000, "23": 50000, "24": 62000, "25": 75000,
+            "26": 90000, "27": 105000, "28": 120000, "29": 135000, "30": 155000
+        };
+
+        // CR to Proficiency Bonus mapping
+        const CR_PROF = {
+            "0": 2, "1/8": 2, "1/4": 2, "1/2": 2,
+            "1": 2, "2": 2, "3": 2, "4": 2, "5": 3,
+            "6": 3, "7": 3, "8": 3, "9": 4, "10": 4,
+            "11": 4, "12": 4, "13": 5, "14": 5, "15": 5,
+            "16": 5, "17": 6, "18": 6, "19": 6, "20": 6,
+            "21": 7, "22": 7, "23": 7, "24": 7, "25": 8,
+            "26": 8, "27": 8, "28": 8, "29": 9, "30": 9
+        };
+
+        // Skills and their associated abilities
+        const SKILLS = {
+            "Acrobatics": "dex",
+            "Animal Handling": "wis",
+            "Arcana": "int",
+            "Athletics": "str",
+            "Deception": "cha",
+            "History": "int",
+            "Insight": "wis",
+            "Intimidation": "cha",
+            "Investigation": "int",
+            "Medicine": "wis",
+            "Nature": "int",
+            "Perception": "wis",
+            "Performance": "cha",
+            "Persuasion": "cha",
+            "Religion": "int",
+            "Sleight of Hand": "dex",
+            "Stealth": "dex",
+            "Survival": "wis"
+        };
+
+        // Counters for dynamic lists
+        let skillCounter = 0;
+        let traitCounter = 0;
+        let actionCounter = 0;
+        let reactionCounter = 0;
+        let legendaryCounter = 0;
+
+        // Utility Functions
+        function getModifier(score) {
+            return Math.floor((score - 10) / 2);
+        }
+
+        function formatModifier(mod) {
+            return mod >= 0 ? `+${mod}` : `${mod}`;
+        }
+
+        function calculateHP(hitDice) {
+            const match = hitDice.match(/(\d+)d(\d+)([+-]\d+)?/i);
+            if (!match) return 0;
+
+            const numDice = parseInt(match[1]);
+            const dieSize = parseInt(match[2]);
+            const modifier = match[3] ? parseInt(match[3]) : 0;
+
+            const avgRoll = (dieSize + 1) / 2;
+            return Math.floor(numDice * avgRoll + modifier);
+        }
+
+        function getProficiencyBonus() {
+            const cr = document.getElementById('monsterCR').value;
+            return CR_PROF[cr] || 2;
+        }
+
+        // Update Functions
+        function updateModifiers() {
+            const abilities = ['Str', 'Dex', 'Con', 'Int', 'Wis', 'Cha'];
+            abilities.forEach(ability => {
+                const score = parseInt(document.getElementById(`ability${ability}`).value) || 10;
+                const mod = getModifier(score);
+                document.getElementById(`mod${ability}`).textContent = `(${formatModifier(mod)})`;
+            });
+            updatePassivePerception();
+            updatePreview();
+        }
+
+        function updateHP() {
+            const manualHP = document.getElementById('manualHP').checked;
+            const hpInput = document.getElementById('monsterHP');
+
+            if (!manualHP) {
+                const hitDice = document.getElementById('monsterHitDice').value;
+                const calculatedHP = calculateHP(hitDice);
+                hpInput.value = calculatedHP;
+                hpInput.readOnly = true;
+            } else {
+                hpInput.readOnly = false;
+            }
+            updatePreview();
+        }
+
+        function updateXP() {
+            const cr = document.getElementById('monsterCR').value;
+            const xp = CR_XP[cr] || 0;
+            document.getElementById('xpDisplay').textContent = `${xp.toLocaleString()} XP`;
+            updatePassivePerception();
+            updatePreview();
+        }
+
+        function updatePassivePerception() {
+            const wis = parseInt(document.getElementById('abilityWis').value) || 10;
+            const wisMod = getModifier(wis);
+            const profBonus = getProficiencyBonus();
+
+            // Check if perception skill is added with proficiency
+            let perceptionBonus = 0;
+            document.querySelectorAll('#skillsList .skill-item').forEach(item => {
+                const skillSelect = item.querySelector('select:first-of-type');
+                const profSelect = item.querySelector('select:last-of-type');
+                if (skillSelect.value === 'Perception') {
+                    if (profSelect.value === 'proficient') {
+                        perceptionBonus = profBonus;
+                    } else if (profSelect.value === 'expertise') {
+                        perceptionBonus = profBonus * 2;
+                    }
+                }
+            });
+
+            const passive = 10 + wisMod + perceptionBonus;
+            document.getElementById('passivePerception').value = passive;
+        }
+
+        // Dynamic List Functions
+        function addSkill() {
+            const skillsList = document.getElementById('skillsList');
+            const skillId = `skill-${skillCounter++}`;
+
+            const skillItem = document.createElement('div');
+            skillItem.className = 'skill-item';
+            skillItem.id = skillId;
+            skillItem.innerHTML = `
+                <select onchange="updatePreview(); updatePassivePerception();">
+                    ${Object.keys(SKILLS).map(s => `<option value="${s}">${s}</option>`).join('')}
+                </select>
+                <select onchange="updatePreview(); updatePassivePerception();">
+                    <option value="proficient">Proficient</option>
+                    <option value="expertise">Expertise</option>
+                </select>
+                <button onclick="removeItem('${skillId}')" title="Remove skill">&times;</button>
+            `;
+
+            skillsList.appendChild(skillItem);
+            updatePreview();
+        }
+
+        function addTrait() {
+            const traitsList = document.getElementById('traitsList');
+            const traitId = `trait-${traitCounter++}`;
+
+            const traitItem = document.createElement('div');
+            traitItem.className = 'dynamic-item';
+            traitItem.id = traitId;
+            traitItem.innerHTML = `
+                <div class="dynamic-item-header">
+                    <input type="text" placeholder="Trait Name" oninput="updatePreview()">
+                    <button onclick="removeItem('${traitId}')">Remove</button>
+                </div>
+                <textarea placeholder="Trait description..." oninput="updatePreview()"></textarea>
+            `;
+
+            traitsList.appendChild(traitItem);
+            updatePreview();
+        }
+
+        function addAction() {
+            const actionsList = document.getElementById('actionsList');
+            const actionId = `action-${actionCounter++}`;
+
+            const actionItem = document.createElement('div');
+            actionItem.className = 'dynamic-item';
+            actionItem.id = actionId;
+            actionItem.innerHTML = `
+                <div class="dynamic-item-header">
+                    <input type="text" placeholder="Action Name" oninput="updatePreview()">
+                    <button onclick="removeItem('${actionId}')">Remove</button>
+                </div>
+                <textarea placeholder="Action description..." oninput="updatePreview()"></textarea>
+                <div class="attack-details">
+                    <div class="form-group">
+                        <label>Attack Type</label>
+                        <select>
+                            <option value="">None</option>
+                            <option value="melee">Melee</option>
+                            <option value="ranged">Ranged</option>
+                            <option value="melee-ranged">Melee or Ranged</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>To Hit</label>
+                        <input type="text" placeholder="+5">
+                    </div>
+                    <div class="form-group">
+                        <label>Reach/Range</label>
+                        <input type="text" placeholder="5 ft.">
+                    </div>
+                    <div class="form-group">
+                        <label>Damage</label>
+                        <input type="text" placeholder="1d8+3">
+                    </div>
+                    <div class="form-group">
+                        <label>Damage Type</label>
+                        <select>
+                            <option value="">-</option>
+                            <option value="bludgeoning">Bludgeoning</option>
+                            <option value="piercing">Piercing</option>
+                            <option value="slashing">Slashing</option>
+                            <option value="acid">Acid</option>
+                            <option value="cold">Cold</option>
+                            <option value="fire">Fire</option>
+                            <option value="force">Force</option>
+                            <option value="lightning">Lightning</option>
+                            <option value="necrotic">Necrotic</option>
+                            <option value="poison">Poison</option>
+                            <option value="psychic">Psychic</option>
+                            <option value="radiant">Radiant</option>
+                            <option value="thunder">Thunder</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+
+            actionsList.appendChild(actionItem);
+            updatePreview();
+        }
+
+        function addReaction() {
+            const reactionsList = document.getElementById('reactionsList');
+            const reactionId = `reaction-${reactionCounter++}`;
+
+            const reactionItem = document.createElement('div');
+            reactionItem.className = 'dynamic-item';
+            reactionItem.id = reactionId;
+            reactionItem.innerHTML = `
+                <div class="dynamic-item-header">
+                    <input type="text" placeholder="Reaction Name" oninput="updatePreview()">
+                    <button onclick="removeItem('${reactionId}')">Remove</button>
+                </div>
+                <textarea placeholder="Reaction description..." oninput="updatePreview()"></textarea>
+            `;
+
+            reactionsList.appendChild(reactionItem);
+            updatePreview();
+        }
+
+        function addLegendaryAction() {
+            const legendaryList = document.getElementById('legendaryActionsList');
+            const legendaryId = `legendary-${legendaryCounter++}`;
+
+            const legendaryItem = document.createElement('div');
+            legendaryItem.className = 'dynamic-item';
+            legendaryItem.id = legendaryId;
+            legendaryItem.innerHTML = `
+                <div class="dynamic-item-header">
+                    <input type="text" placeholder="Legendary Action Name" oninput="updatePreview()">
+                    <button onclick="removeItem('${legendaryId}')">Remove</button>
+                </div>
+                <div class="form-row" style="margin-bottom: 10px;">
+                    <div class="form-group">
+                        <label>Cost</label>
+                        <select oninput="updatePreview()">
+                            <option value="1">1 Action</option>
+                            <option value="2">2 Actions</option>
+                            <option value="3">3 Actions</option>
+                        </select>
+                    </div>
+                </div>
+                <textarea placeholder="Legendary action description..." oninput="updatePreview()"></textarea>
+            `;
+
+            legendaryList.appendChild(legendaryItem);
+            updatePreview();
+        }
+
+        function removeItem(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.remove();
+                updatePreview();
+                updatePassivePerception();
+            }
+        }
+
+        // Multi-select functions
+        function addDamageType(containerId, value) {
+            if (!value) return;
+
+            const container = document.getElementById(containerId);
+            const existingTags = container.querySelectorAll('.tag');
+
+            // Check if already exists
+            for (let tag of existingTags) {
+                if (tag.dataset.value === value) return;
+            }
+
+            const tag = document.createElement('span');
+            tag.className = 'tag';
+            tag.dataset.value = value;
+            tag.innerHTML = `${value} <button onclick="this.parentElement.remove(); updatePreview();">&times;</button>`;
+            container.appendChild(tag);
+            updatePreview();
+        }
+
+        function addCondition(containerId, value) {
+            addDamageType(containerId, value); // Same logic
+        }
+
+        // Get monster data from form
+        function getMonsterData() {
+            const data = {
+                name: document.getElementById('monsterName').value || 'Unnamed Monster',
+                size: document.getElementById('monsterSize').value,
+                type: document.getElementById('monsterType').value,
+                subtype: document.getElementById('monsterSubtype').value || null,
+                alignment: document.getElementById('monsterAlignment').value,
+                ac: parseInt(document.getElementById('monsterAC').value) || 10,
+                acType: document.getElementById('monsterACType').value || null,
+                hp: parseInt(document.getElementById('monsterHP').value) || 0,
+                hitDice: document.getElementById('monsterHitDice').value || '',
+                speed: {
+                    walk: parseInt(document.getElementById('speedWalk').value) || 0
+                },
+                abilities: {
+                    str: parseInt(document.getElementById('abilityStr').value) || 10,
+                    dex: parseInt(document.getElementById('abilityDex').value) || 10,
+                    con: parseInt(document.getElementById('abilityCon').value) || 10,
+                    int: parseInt(document.getElementById('abilityInt').value) || 10,
+                    wis: parseInt(document.getElementById('abilityWis').value) || 10,
+                    cha: parseInt(document.getElementById('abilityCha').value) || 10
+                },
+                cr: document.getElementById('monsterCR').value,
+                xp: CR_XP[document.getElementById('monsterCR').value] || 0
+            };
+
+            // Speed types
+            const flySpeed = parseInt(document.getElementById('speedFly').value) || 0;
+            if (flySpeed > 0) {
+                data.speed.fly = flySpeed;
+                if (document.getElementById('canHover').checked) {
+                    data.speed.hover = true;
+                }
+            }
+
+            const swimSpeed = parseInt(document.getElementById('speedSwim').value) || 0;
+            if (swimSpeed > 0) data.speed.swim = swimSpeed;
+
+            const climbSpeed = parseInt(document.getElementById('speedClimb').value) || 0;
+            if (climbSpeed > 0) data.speed.climb = climbSpeed;
+
+            const burrowSpeed = parseInt(document.getElementById('speedBurrow').value) || 0;
+            if (burrowSpeed > 0) data.speed.burrow = burrowSpeed;
+
+            // Saving Throws
+            const savingThrows = {};
+            document.querySelectorAll('#savingThrowsGroup input:checked').forEach(cb => {
+                const ability = cb.value;
+                const score = data.abilities[ability];
+                const mod = getModifier(score);
+                const profBonus = getProficiencyBonus();
+                savingThrows[ability] = mod + profBonus;
+            });
+            if (Object.keys(savingThrows).length > 0) {
+                data.savingThrows = savingThrows;
+            }
+
+            // Skills
+            const skills = {};
+            document.querySelectorAll('#skillsList .skill-item').forEach(item => {
+                const skillSelect = item.querySelector('select:first-of-type');
+                const profSelect = item.querySelector('select:last-of-type');
+                const skillName = skillSelect.value;
+                const ability = SKILLS[skillName];
+                const abilityScore = data.abilities[ability];
+                const mod = getModifier(abilityScore);
+                const profBonus = getProficiencyBonus();
+                const multiplier = profSelect.value === 'expertise' ? 2 : 1;
+                skills[skillName.toLowerCase().replace(/ /g, '')] = mod + (profBonus * multiplier);
+            });
+            if (Object.keys(skills).length > 0) {
+                data.skills = skills;
+            }
+
+            // Damage types
+            const damageVulnerabilities = [];
+            document.querySelectorAll('#damageVulnerabilities .tag').forEach(tag => {
+                damageVulnerabilities.push(tag.dataset.value);
+            });
+            if (damageVulnerabilities.length > 0) {
+                data.damageVulnerabilities = damageVulnerabilities;
+            }
+
+            const damageResistances = [];
+            document.querySelectorAll('#damageResistances .tag').forEach(tag => {
+                damageResistances.push(tag.dataset.value);
+            });
+            if (damageResistances.length > 0) {
+                data.damageResistances = damageResistances;
+            }
+
+            const damageImmunities = [];
+            document.querySelectorAll('#damageImmunities .tag').forEach(tag => {
+                damageImmunities.push(tag.dataset.value);
+            });
+            if (damageImmunities.length > 0) {
+                data.damageImmunities = damageImmunities;
+            }
+
+            const conditionImmunities = [];
+            document.querySelectorAll('#conditionImmunities .tag').forEach(tag => {
+                conditionImmunities.push(tag.dataset.value);
+            });
+            if (conditionImmunities.length > 0) {
+                data.conditionImmunities = conditionImmunities;
+            }
+
+            // Senses
+            const senses = [];
+            const darkvision = parseInt(document.getElementById('senseDarkvision').value) || 0;
+            if (darkvision > 0) senses.push(`darkvision ${darkvision} ft.`);
+
+            const blindsight = parseInt(document.getElementById('senseBlindsight').value) || 0;
+            if (blindsight > 0) senses.push(`blindsight ${blindsight} ft.`);
+
+            const tremorsense = parseInt(document.getElementById('senseTremorsense').value) || 0;
+            if (tremorsense > 0) senses.push(`tremorsense ${tremorsense} ft.`);
+
+            const truesight = parseInt(document.getElementById('senseTruesight').value) || 0;
+            if (truesight > 0) senses.push(`truesight ${truesight} ft.`);
+
+            const passivePerception = parseInt(document.getElementById('passivePerception').value) || 10;
+            senses.push(`passive Perception ${passivePerception}`);
+
+            data.senses = senses;
+
+            // Languages
+            const languages = document.getElementById('monsterLanguages').value;
+            data.languages = languages ? languages.split(',').map(l => l.trim()) : [];
+
+            // Traits
+            const traits = [];
+            document.querySelectorAll('#traitsList .dynamic-item').forEach(item => {
+                const name = item.querySelector('input').value;
+                const description = item.querySelector('textarea').value;
+                if (name || description) {
+                    traits.push({ name: name || 'Unnamed Trait', description: description || '' });
+                }
+            });
+            if (traits.length > 0) {
+                data.traits = traits;
+            }
+
+            // Actions
+            const actions = [];
+            document.querySelectorAll('#actionsList .dynamic-item').forEach(item => {
+                const name = item.querySelector('.dynamic-item-header input').value;
+                const description = item.querySelector('textarea').value;
+                if (name || description) {
+                    actions.push({ name: name || 'Unnamed Action', description: description || '' });
+                }
+            });
+            if (actions.length > 0) {
+                data.actions = actions;
+            }
+
+            // Reactions
+            const reactions = [];
+            document.querySelectorAll('#reactionsList .dynamic-item').forEach(item => {
+                const name = item.querySelector('input').value;
+                const description = item.querySelector('textarea').value;
+                if (name || description) {
+                    reactions.push({ name: name || 'Unnamed Reaction', description: description || '' });
+                }
+            });
+            if (reactions.length > 0) {
+                data.reactions = reactions;
+            }
+
+            // Legendary Actions
+            if (document.getElementById('hasLegendaryActions').checked) {
+                const legendaryActions = [];
+                document.querySelectorAll('#legendaryActionsList .dynamic-item').forEach(item => {
+                    const name = item.querySelector('.dynamic-item-header input').value;
+                    const cost = item.querySelector('select').value;
+                    const description = item.querySelector('textarea').value;
+                    if (name || description) {
+                        let displayName = name || 'Unnamed';
+                        if (parseInt(cost) > 1) {
+                            displayName += ` (Costs ${cost} Actions)`;
+                        }
+                        legendaryActions.push({
+                            name: displayName,
+                            description: description || ''
+                        });
+                    }
+                });
+                if (legendaryActions.length > 0) {
+                    data.legendaryActions = legendaryActions;
+                    data.legendaryActionsCount = parseInt(document.getElementById('legendaryActionsCount').value) || 3;
+                }
+            }
+
+            return data;
+        }
+
+        // Update Preview
+        function updatePreview() {
+            const data = getMonsterData();
+            const preview = document.getElementById('statBlockPreview');
+
+            if (!data.name || data.name === 'Unnamed Monster') {
+                preview.innerHTML = '<div class="empty-preview"><p>Enter monster details to see the stat block preview</p></div>';
+                return;
+            }
+
+            const typeLine = data.subtype
+                ? `${data.size} ${data.type.toLowerCase()} (${data.subtype}), ${data.alignment}`
+                : `${data.size} ${data.type.toLowerCase()}, ${data.alignment}`;
+
+            const acText = data.acType ? `${data.ac} (${data.acType})` : data.ac;
+
+            // Format speed
+            const speedParts = [];
+            if (data.speed.walk) speedParts.push(`${data.speed.walk} ft.`);
+            if (data.speed.fly) speedParts.push(`fly ${data.speed.fly} ft.${data.speed.hover ? ' (hover)' : ''}`);
+            if (data.speed.swim) speedParts.push(`swim ${data.speed.swim} ft.`);
+            if (data.speed.climb) speedParts.push(`climb ${data.speed.climb} ft.`);
+            if (data.speed.burrow) speedParts.push(`burrow ${data.speed.burrow} ft.`);
+            const speedText = speedParts.join(', ');
+
+            // Format saving throws
+            let savesText = '';
+            if (data.savingThrows) {
+                const saveNames = { str: 'Str', dex: 'Dex', con: 'Con', int: 'Int', wis: 'Wis', cha: 'Cha' };
+                savesText = Object.entries(data.savingThrows)
+                    .map(([ability, value]) => `${saveNames[ability]} ${formatModifier(value)}`)
+                    .join(', ');
+            }
+
+            // Format skills
+            let skillsText = '';
+            if (data.skills) {
+                const skillNames = {
+                    acrobatics: 'Acrobatics', animalhandling: 'Animal Handling', arcana: 'Arcana',
+                    athletics: 'Athletics', deception: 'Deception', history: 'History',
+                    insight: 'Insight', intimidation: 'Intimidation', investigation: 'Investigation',
+                    medicine: 'Medicine', nature: 'Nature', perception: 'Perception',
+                    performance: 'Performance', persuasion: 'Persuasion', religion: 'Religion',
+                    sleightofhand: 'Sleight of Hand', stealth: 'Stealth', survival: 'Survival'
+                };
+                skillsText = Object.entries(data.skills)
+                    .map(([skill, value]) => `${skillNames[skill] || skill} ${formatModifier(value)}`)
+                    .join(', ');
+            }
+
+            let html = `
+                <div class="stat-block-preview">
+                    <div class="stat-header">
+                        <h2 class="monster-name">${data.name}</h2>
+                        <p class="monster-type">${typeLine}</p>
+                    </div>
+
+                    <div class="stat-divider"></div>
+
+                    <p class="stat-line"><strong>Armor Class</strong> ${acText}</p>
+                    <p class="stat-line"><strong>Hit Points</strong> ${data.hp}${data.hitDice ? ` (${data.hitDice})` : ''}</p>
+                    <p class="stat-line"><strong>Speed</strong> ${speedText}</p>
+
+                    <div class="abilities-grid">
+                        <div class="ability">
+                            <span class="ability-name">STR</span>
+                            <span class="ability-value">${data.abilities.str} (${formatModifier(getModifier(data.abilities.str))})</span>
+                        </div>
+                        <div class="ability">
+                            <span class="ability-name">DEX</span>
+                            <span class="ability-value">${data.abilities.dex} (${formatModifier(getModifier(data.abilities.dex))})</span>
+                        </div>
+                        <div class="ability">
+                            <span class="ability-name">CON</span>
+                            <span class="ability-value">${data.abilities.con} (${formatModifier(getModifier(data.abilities.con))})</span>
+                        </div>
+                        <div class="ability">
+                            <span class="ability-name">INT</span>
+                            <span class="ability-value">${data.abilities.int} (${formatModifier(getModifier(data.abilities.int))})</span>
+                        </div>
+                        <div class="ability">
+                            <span class="ability-name">WIS</span>
+                            <span class="ability-value">${data.abilities.wis} (${formatModifier(getModifier(data.abilities.wis))})</span>
+                        </div>
+                        <div class="ability">
+                            <span class="ability-name">CHA</span>
+                            <span class="ability-value">${data.abilities.cha} (${formatModifier(getModifier(data.abilities.cha))})</span>
+                        </div>
+                    </div>
+
+                    ${savesText ? `<p class="stat-line"><strong>Saving Throws</strong> ${savesText}</p>` : ''}
+                    ${skillsText ? `<p class="stat-line"><strong>Skills</strong> ${skillsText}</p>` : ''}
+                    ${data.damageVulnerabilities ? `<p class="stat-line"><strong>Damage Vulnerabilities</strong> ${data.damageVulnerabilities.join(', ')}</p>` : ''}
+                    ${data.damageResistances ? `<p class="stat-line"><strong>Damage Resistances</strong> ${data.damageResistances.join(', ')}</p>` : ''}
+                    ${data.damageImmunities ? `<p class="stat-line"><strong>Damage Immunities</strong> ${data.damageImmunities.join(', ')}</p>` : ''}
+                    ${data.conditionImmunities ? `<p class="stat-line"><strong>Condition Immunities</strong> ${data.conditionImmunities.join(', ')}</p>` : ''}
+                    <p class="stat-line"><strong>Senses</strong> ${data.senses.join(', ')}</p>
+                    <p class="stat-line"><strong>Languages</strong> ${data.languages.length > 0 ? data.languages.join(', ') : '\u2014'}</p>
+                    <p class="stat-line"><strong>Challenge</strong> ${data.cr} (${data.xp.toLocaleString()} XP)</p>
+
+                    <div class="stat-divider"></div>
+            `;
+
+            // Traits
+            if (data.traits && data.traits.length > 0) {
+                data.traits.forEach(trait => {
+                    html += `<p class="trait"><span class="trait-name">${trait.name}.</span> ${trait.description}</p>`;
+                });
+            }
+
+            // Actions
+            if (data.actions && data.actions.length > 0) {
+                html += `<h3 class="section-title">Actions</h3>`;
+                data.actions.forEach(action => {
+                    html += `<p class="action-item"><span class="action-name">${action.name}.</span> ${action.description}</p>`;
+                });
+            }
+
+            // Reactions
+            if (data.reactions && data.reactions.length > 0) {
+                html += `<h3 class="section-title">Reactions</h3>`;
+                data.reactions.forEach(reaction => {
+                    html += `<p class="reaction-item"><span class="action-name">${reaction.name}.</span> ${reaction.description}</p>`;
+                });
+            }
+
+            // Legendary Actions
+            if (data.legendaryActions && data.legendaryActions.length > 0) {
+                const count = data.legendaryActionsCount || 3;
+                html += `
+                    <h3 class="section-title">Legendary Actions</h3>
+                    <p class="legendary-intro">The ${data.name.toLowerCase()} can take ${count} legendary action${count !== 1 ? 's' : ''}, choosing from the options below. Only one legendary action option can be used at a time and only at the end of another creature's turn. The ${data.name.toLowerCase()} regains spent legendary actions at the start of its turn.</p>
+                `;
+                data.legendaryActions.forEach(la => {
+                    html += `<p class="legendary-item"><span class="action-name">${la.name}.</span> ${la.description}</p>`;
+                });
+            }
+
+            html += '</div>';
+            preview.innerHTML = html;
+        }
+
+        // Save/Load Functions
+        function saveMonster() {
+            const data = getMonsterData();
+            if (!data.name || data.name === 'Unnamed Monster') {
+                alert('Please enter a monster name before saving.');
+                return;
+            }
+
+            const savedMonsters = JSON.parse(localStorage.getItem('customMonsters') || '{}');
+            const key = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            savedMonsters[key] = data;
+            localStorage.setItem('customMonsters', JSON.stringify(savedMonsters));
+
+            alert(`"${data.name}" has been saved to your browser!`);
+            loadSavedMonsters();
+        }
+
+        function loadSavedMonsters() {
+            const savedMonsters = JSON.parse(localStorage.getItem('customMonsters') || '{}');
+            const container = document.getElementById('savedMonstersList');
+
+            if (Object.keys(savedMonsters).length === 0) {
+                container.innerHTML = '<p style="color: #888;">No saved monsters yet.</p>';
+                return;
+            }
+
+            container.innerHTML = Object.entries(savedMonsters).map(([key, monster]) => `
+                <div class="saved-monster-item">
+                    <span>${monster.name} (CR ${monster.cr})</span>
+                    <div class="monster-actions">
+                        <button class="btn-secondary" onclick="loadMonster('${key}')">Load</button>
+                        <button class="btn-danger" onclick="deleteMonster('${key}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadMonster(key) {
+            const savedMonsters = JSON.parse(localStorage.getItem('customMonsters') || '{}');
+            const monster = savedMonsters[key];
+            if (!monster) return;
+
+            // Populate form with monster data
+            document.getElementById('monsterName').value = monster.name || '';
+            document.getElementById('monsterSize').value = monster.size || 'Medium';
+            document.getElementById('monsterType').value = monster.type || 'Humanoid';
+            document.getElementById('monsterSubtype').value = monster.subtype || '';
+            document.getElementById('monsterAlignment').value = monster.alignment || 'unaligned';
+            document.getElementById('monsterAC').value = monster.ac || 10;
+            document.getElementById('monsterACType').value = monster.acType || '';
+            document.getElementById('monsterHitDice').value = monster.hitDice || '';
+            document.getElementById('monsterHP').value = monster.hp || 0;
+
+            // Speed
+            document.getElementById('speedWalk').value = monster.speed?.walk || 0;
+            document.getElementById('speedFly').value = monster.speed?.fly || 0;
+            document.getElementById('speedSwim').value = monster.speed?.swim || 0;
+            document.getElementById('speedClimb').value = monster.speed?.climb || 0;
+            document.getElementById('speedBurrow').value = monster.speed?.burrow || 0;
+            document.getElementById('canHover').checked = monster.speed?.hover || false;
+
+            // Abilities
+            document.getElementById('abilityStr').value = monster.abilities?.str || 10;
+            document.getElementById('abilityDex').value = monster.abilities?.dex || 10;
+            document.getElementById('abilityCon').value = monster.abilities?.con || 10;
+            document.getElementById('abilityInt').value = monster.abilities?.int || 10;
+            document.getElementById('abilityWis').value = monster.abilities?.wis || 10;
+            document.getElementById('abilityCha').value = monster.abilities?.cha || 10;
+
+            // CR
+            document.getElementById('monsterCR').value = monster.cr || '1';
+
+            // Senses
+            monster.senses?.forEach(sense => {
+                if (sense.includes('darkvision')) {
+                    const match = sense.match(/(\d+)/);
+                    if (match) document.getElementById('senseDarkvision').value = match[1];
+                }
+                if (sense.includes('blindsight')) {
+                    const match = sense.match(/(\d+)/);
+                    if (match) document.getElementById('senseBlindsight').value = match[1];
+                }
+                if (sense.includes('tremorsense')) {
+                    const match = sense.match(/(\d+)/);
+                    if (match) document.getElementById('senseTremorsense').value = match[1];
+                }
+                if (sense.includes('truesight')) {
+                    const match = sense.match(/(\d+)/);
+                    if (match) document.getElementById('senseTruesight').value = match[1];
+                }
+            });
+
+            // Languages
+            document.getElementById('monsterLanguages').value = monster.languages?.join(', ') || '';
+
+            // Clear and rebuild dynamic lists
+            document.getElementById('skillsList').innerHTML = '';
+            document.getElementById('traitsList').innerHTML = '';
+            document.getElementById('actionsList').innerHTML = '';
+            document.getElementById('reactionsList').innerHTML = '';
+            document.getElementById('legendaryActionsList').innerHTML = '';
+
+            // Clear multi-selects
+            document.getElementById('damageVulnerabilities').innerHTML = '';
+            document.getElementById('damageResistances').innerHTML = '';
+            document.getElementById('damageImmunities').innerHTML = '';
+            document.getElementById('conditionImmunities').innerHTML = '';
+
+            // Rebuild damage types
+            monster.damageVulnerabilities?.forEach(d => addDamageType('damageVulnerabilities', d));
+            monster.damageResistances?.forEach(d => addDamageType('damageResistances', d));
+            monster.damageImmunities?.forEach(d => addDamageType('damageImmunities', d));
+            monster.conditionImmunities?.forEach(c => addCondition('conditionImmunities', c));
+
+            // Traits
+            monster.traits?.forEach(trait => {
+                addTrait();
+                const lastTrait = document.querySelector('#traitsList .dynamic-item:last-child');
+                lastTrait.querySelector('input').value = trait.name;
+                lastTrait.querySelector('textarea').value = trait.description;
+            });
+
+            // Actions
+            monster.actions?.forEach(action => {
+                addAction();
+                const lastAction = document.querySelector('#actionsList .dynamic-item:last-child');
+                lastAction.querySelector('.dynamic-item-header input').value = action.name;
+                lastAction.querySelector('textarea').value = action.description;
+            });
+
+            // Reactions
+            monster.reactions?.forEach(reaction => {
+                addReaction();
+                const lastReaction = document.querySelector('#reactionsList .dynamic-item:last-child');
+                lastReaction.querySelector('input').value = reaction.name;
+                lastReaction.querySelector('textarea').value = reaction.description;
+            });
+
+            // Legendary Actions
+            if (monster.legendaryActions && monster.legendaryActions.length > 0) {
+                document.getElementById('hasLegendaryActions').checked = true;
+                document.getElementById('legendaryActionsContainer').style.display = 'block';
+                document.getElementById('legendaryActionsCount').value = monster.legendaryActionsCount || 3;
+
+                monster.legendaryActions.forEach(la => {
+                    addLegendaryAction();
+                    const lastLA = document.querySelector('#legendaryActionsList .dynamic-item:last-child');
+                    lastLA.querySelector('.dynamic-item-header input').value = la.name.replace(/ \(Costs \d Actions?\)/, '');
+                    lastLA.querySelector('textarea').value = la.description;
+
+                    // Extract cost from name
+                    const costMatch = la.name.match(/Costs (\d) Actions?/);
+                    if (costMatch) {
+                        lastLA.querySelector('select').value = costMatch[1];
+                    }
+                });
+            }
+
+            updateModifiers();
+            updateHP();
+            updateXP();
+            updatePreview();
+        }
+
+        function deleteMonster(key) {
+            if (!confirm('Are you sure you want to delete this monster?')) return;
+
+            const savedMonsters = JSON.parse(localStorage.getItem('customMonsters') || '{}');
+            delete savedMonsters[key];
+            localStorage.setItem('customMonsters', JSON.stringify(savedMonsters));
+            loadSavedMonsters();
+        }
+
+        function addToMonstersDB() {
+            const data = getMonsterData();
+            if (!data.name || data.name === 'Unnamed Monster') {
+                alert('Please enter a monster name first.');
+                return;
+            }
+
+            // Save to localStorage as a custom monster for the monsters page
+            const customMonstersDB = JSON.parse(localStorage.getItem('customMonstersDB') || '{}');
+            const key = 'custom-' + data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            customMonstersDB[key] = data;
+            localStorage.setItem('customMonstersDB', JSON.stringify(customMonstersDB));
+
+            alert(`"${data.name}" has been added to the monster database! You can view it on the Monsters page.`);
+        }
+
+        function exportJSON() {
+            const data = getMonsterData();
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+
+                    // Save to localStorage and load
+                    const key = data.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'imported';
+                    const savedMonsters = JSON.parse(localStorage.getItem('customMonsters') || '{}');
+                    savedMonsters[key] = data;
+                    localStorage.setItem('customMonsters', JSON.stringify(savedMonsters));
+
+                    loadMonster(key);
+                    loadSavedMonsters();
+
+                    alert(`"${data.name}" has been imported successfully!`);
+                } catch (error) {
+                    alert('Error importing JSON: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // Reset file input
+        }
+
+        function clearForm() {
+            if (!confirm('Are you sure you want to clear the form?')) return;
+
+            document.getElementById('monsterName').value = '';
+            document.getElementById('monsterSize').value = 'Medium';
+            document.getElementById('monsterType').value = 'Humanoid';
+            document.getElementById('monsterSubtype').value = '';
+            document.getElementById('monsterAlignment').value = 'unaligned';
+            document.getElementById('monsterAC').value = 10;
+            document.getElementById('monsterACType').value = '';
+            document.getElementById('monsterHitDice').value = '';
+            document.getElementById('monsterHP').value = 0;
+            document.getElementById('manualHP').checked = false;
+
+            document.getElementById('speedWalk').value = 30;
+            document.getElementById('speedFly').value = 0;
+            document.getElementById('speedSwim').value = 0;
+            document.getElementById('speedClimb').value = 0;
+            document.getElementById('speedBurrow').value = 0;
+            document.getElementById('canHover').checked = false;
+
+            document.getElementById('abilityStr').value = 10;
+            document.getElementById('abilityDex').value = 10;
+            document.getElementById('abilityCon').value = 10;
+            document.getElementById('abilityInt').value = 10;
+            document.getElementById('abilityWis').value = 10;
+            document.getElementById('abilityCha').value = 10;
+
+            document.getElementById('monsterCR').value = '1';
+
+            document.getElementById('senseDarkvision').value = 0;
+            document.getElementById('senseBlindsight').value = 0;
+            document.getElementById('senseTremorsense').value = 0;
+            document.getElementById('senseTruesight').value = 0;
+
+            document.getElementById('monsterLanguages').value = '';
+
+            // Clear checkboxes
+            document.querySelectorAll('#savingThrowsGroup input').forEach(cb => cb.checked = false);
+
+            // Clear dynamic lists
+            document.getElementById('skillsList').innerHTML = '';
+            document.getElementById('traitsList').innerHTML = '';
+            document.getElementById('actionsList').innerHTML = '';
+            document.getElementById('reactionsList').innerHTML = '';
+            document.getElementById('legendaryActionsList').innerHTML = '';
+
+            // Clear multi-selects
+            document.getElementById('damageVulnerabilities').innerHTML = '';
+            document.getElementById('damageResistances').innerHTML = '';
+            document.getElementById('damageImmunities').innerHTML = '';
+            document.getElementById('conditionImmunities').innerHTML = '';
+
+            // Reset legendary actions
+            document.getElementById('hasLegendaryActions').checked = false;
+            document.getElementById('legendaryActionsContainer').style.display = 'none';
+
+            updateModifiers();
+            updateXP();
+            updatePreview();
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ability score inputs
+            ['Str', 'Dex', 'Con', 'Int', 'Wis', 'Cha'].forEach(ability => {
+                document.getElementById(`ability${ability}`).addEventListener('input', updateModifiers);
+            });
+
+            // Hit dice and HP
+            document.getElementById('monsterHitDice').addEventListener('input', updateHP);
+            document.getElementById('manualHP').addEventListener('change', updateHP);
+
+            // CR and XP
+            document.getElementById('monsterCR').addEventListener('change', updateXP);
+
+            // Legendary actions toggle
+            document.getElementById('hasLegendaryActions').addEventListener('change', function() {
+                document.getElementById('legendaryActionsContainer').style.display =
+                    this.checked ? 'block' : 'none';
+                updatePreview();
+            });
+
+            // All inputs update preview
+            document.querySelectorAll('input, select, textarea').forEach(element => {
+                element.addEventListener('input', updatePreview);
+                element.addEventListener('change', updatePreview);
+            });
+
+            // Initial setup
+            updateModifiers();
+            updateXP();
+            loadSavedMonsters();
+            updatePreview();
+        });
+    </script>
+</body>
+</html>

@@ -23,7 +23,7 @@ const CLASSES = {
             1: [
                 {
                     name: "Rage",
-                    description: "In battle, you fight with primal ferocity. On your turn, you can enter a rage as a bonus action. While raging, you gain: advantage on Strength checks and Strength saving throws, bonus damage on melee weapon attacks using Strength, and resistance to bludgeoning, piercing, and slashing damage. You can rage a number of times equal to your proficiency bonus per long rest."
+                    description: "In battle, you fight with primal ferocity. On your turn, you can enter a rage as a bonus action. While raging, you gain: advantage on Strength checks and Strength saving throws, +2 bonus damage on melee weapon attacks using Strength (increases to +3 at 9th level, +4 at 16th level), and resistance to bludgeoning, piercing, and slashing damage. Your rage lasts for 1 minute and ends early if you are knocked unconscious or if your turn ends and you haven't attacked a hostile creature or taken damage since your last turn. You can rage 2 times per long rest (increases at higher levels)."
                 },
                 {
                     name: "Unarmored Defense",
@@ -43,7 +43,17 @@ const CLASSES = {
             3: [
                 {
                     name: "Primal Path",
-                    description: "You choose a path that shapes the nature of your rage: Path of the Berserker or Path of the Totem Warrior."
+                    description: "You choose a path that shapes the nature of your rage: Path of the Berserker or Path of the Totem Warrior. Your choice grants you features at 3rd level and again at 6th, 10th, and 14th levels."
+                },
+                {
+                    name: "Rage (3 uses)",
+                    description: "You can now rage 3 times per long rest."
+                }
+            ],
+            4: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
                 }
             ],
             5: [
@@ -56,22 +66,70 @@ const CLASSES = {
                     description: "Your speed increases by 10 feet while you aren't wearing heavy armor."
                 }
             ],
+            6: [
+                {
+                    name: "Primal Path Feature",
+                    description: "You gain a feature from your Primal Path."
+                },
+                {
+                    name: "Rage (4 uses)",
+                    description: "You can now rage 4 times per long rest."
+                }
+            ],
             7: [
                 {
                     name: "Feral Instinct",
                     description: "Your instincts are so honed that you have advantage on initiative rolls. Additionally, if you are surprised at the beginning of combat and aren't incapacitated, you can act normally on your first turn, but only if you enter your rage before doing anything else on that turn."
                 }
             ],
+            8: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
+                }
+            ],
             9: [
                 {
-                    name: "Brutal Critical",
-                    description: "You can roll one additional weapon damage die when determining the extra damage for a critical hit with a melee attack. This increases to two additional dice at 13th level and three additional dice at 17th level."
+                    name: "Brutal Critical (1 die)",
+                    description: "You can roll one additional weapon damage die when determining the extra damage for a critical hit with a melee attack."
+                },
+                {
+                    name: "Rage Damage (+3)",
+                    description: "Your rage damage bonus increases to +3."
+                }
+            ],
+            10: [
+                {
+                    name: "Primal Path Feature",
+                    description: "You gain a feature from your Primal Path."
                 }
             ],
             11: [
                 {
                     name: "Relentless Rage",
-                    description: "Your rage can keep you fighting despite grievous wounds. If you drop to 0 hit points while you're raging and don't die outright, you can make a DC 10 Constitution saving throw. If you succeed, you drop to 1 hit point instead."
+                    description: "Your rage can keep you fighting despite grievous wounds. If you drop to 0 hit points while you're raging and don't die outright, you can make a DC 10 Constitution saving throw. If you succeed, you drop to 1 hit point instead. Each time you use this feature after the first, the DC increases by 5. When you finish a short or long rest, the DC resets to 10."
+                }
+            ],
+            12: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
+                },
+                {
+                    name: "Rage (5 uses)",
+                    description: "You can now rage 5 times per long rest."
+                }
+            ],
+            13: [
+                {
+                    name: "Brutal Critical (2 dice)",
+                    description: "You can roll two additional weapon damage dice when determining the extra damage for a critical hit with a melee attack."
+                }
+            ],
+            14: [
+                {
+                    name: "Primal Path Feature",
+                    description: "You gain a feature from your Primal Path."
                 }
             ],
             15: [
@@ -80,23 +138,53 @@ const CLASSES = {
                     description: "Your rage is so fierce that it ends early only if you fall unconscious or if you choose to end it."
                 }
             ],
+            16: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
+                },
+                {
+                    name: "Rage Damage (+4)",
+                    description: "Your rage damage bonus increases to +4."
+                }
+            ],
+            17: [
+                {
+                    name: "Brutal Critical (3 dice)",
+                    description: "You can roll three additional weapon damage dice when determining the extra damage for a critical hit with a melee attack."
+                },
+                {
+                    name: "Rage (6 uses)",
+                    description: "You can now rage 6 times per long rest."
+                }
+            ],
             18: [
                 {
                     name: "Indomitable Might",
                     description: "If your total for a Strength check is less than your Strength score, you can use that score in place of the total."
                 }
             ],
+            19: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
+                }
+            ],
             20: [
                 {
                     name: "Primal Champion",
                     description: "You embody the power of the wilds. Your Strength and Constitution scores increase by 4. Your maximum for those scores is now 24."
+                },
+                {
+                    name: "Unlimited Rage",
+                    description: "You can rage an unlimited number of times."
                 }
             ]
         },
         subclasses: {
             berserker: {
                 name: "Path of the Berserker",
-                description: "For some barbarians, rage is a means to an end—that end being violence.",
+                description: "For some barbarians, rage is a means to an end—that end being violence. The Path of the Berserker is a path of untrammeled fury, slick with blood.",
                 features: {
                     3: [{
                         name: "Frenzy",
@@ -108,11 +196,39 @@ const CLASSES = {
                     }],
                     10: [{
                         name: "Intimidating Presence",
-                        description: "You can use your action to frighten someone with your menacing presence."
+                        description: "You can use your action to frighten someone with your menacing presence. When you do so, choose one creature that you can see within 30 feet of you. If the creature can see or hear you, it must succeed on a Wisdom saving throw (DC equal to 8 + your proficiency bonus + your Charisma modifier) or be frightened of you until the end of your next turn. On subsequent turns, you can use your action to extend the duration of this effect on the frightened creature until the end of your next turn. This effect ends if the creature ends its turn out of line of sight or more than 60 feet away from you."
                     }],
                     14: [{
                         name: "Retaliation",
                         description: "When you take damage from a creature that is within 5 feet of you, you can use your reaction to make a melee weapon attack against that creature."
+                    }]
+                }
+            },
+            totemWarrior: {
+                name: "Path of the Totem Warrior",
+                description: "The Path of the Totem Warrior is a spiritual journey, as the barbarian accepts a spirit animal as guide, protector, and inspiration.",
+                features: {
+                    3: [
+                        {
+                            name: "Spirit Seeker",
+                            description: "Yours is a path that seeks attunement with the natural world, giving you a kinship with beasts. You gain the ability to cast the Beast Sense and Speak with Animals spells, but only as rituals."
+                        },
+                        {
+                            name: "Totem Spirit",
+                            description: "You choose a totem spirit and gain its feature. You must make or acquire a physical totem object that incorporates fur or feathers, claws, teeth, or bones of the totem animal. Bear: While raging, you have resistance to all damage except psychic damage. Eagle: While raging and not wearing heavy armor, other creatures have disadvantage on opportunity attack rolls against you, and you can use the Dash action as a bonus action. Wolf: While raging, your friends have advantage on melee attack rolls against any creature within 5 feet of you that is hostile to you."
+                        }
+                    ],
+                    6: [{
+                        name: "Aspect of the Beast",
+                        description: "You gain a magical benefit based on the totem animal of your choice. Bear: You gain the might of a bear. Your carrying capacity (including maximum load and maximum lift) is doubled, and you have advantage on Strength checks made to push, pull, lift, or break objects. Eagle: You gain the eyesight of an eagle. You can see up to 1 mile away with no difficulty, able to discern even fine details as though looking at something no more than 100 feet away from you. Additionally, dim light doesn't impose disadvantage on your Wisdom (Perception) checks. Wolf: You gain the hunting sensibilities of a wolf. You can track other creatures while traveling at a fast pace, and you can move stealthily while traveling at a normal pace."
+                    }],
+                    10: [{
+                        name: "Spirit Walker",
+                        description: "You can cast the Commune with Nature spell, but only as a ritual. When you do so, a spiritual version of one of the animals you chose for Totem Spirit or Aspect of the Beast appears to you to convey the information you seek."
+                    }],
+                    14: [{
+                        name: "Totemic Attunement",
+                        description: "You gain a magical benefit based on a totem animal of your choice. Bear: While raging, any creature within 5 feet of you that's hostile to you has disadvantage on attack rolls against targets other than you or another character with this feature. An enemy is immune to this effect if it can't see or hear you or if it can't be frightened. Eagle: While raging, you have a flying speed equal to your current walking speed. This benefit works only in short bursts; you fall if you end your turn in the air and nothing else is holding you aloft. Wolf: While raging, you can use a bonus action on your turn to knock a Large or smaller creature prone when you hit it with a melee weapon attack."
                     }]
                 }
             }
@@ -413,42 +529,136 @@ const CLASSES = {
             1: [
                 {
                     name: "Fighting Style",
-                    description: "You adopt a particular style of fighting as your specialty: Archery, Defense, Dueling, Great Weapon Fighting, Protection, or Two-Weapon Fighting."
+                    description: "You adopt a particular style of fighting as your specialty. Archery: +2 bonus to attack rolls with ranged weapons. Defense: +1 bonus to AC while wearing armor. Dueling: +2 bonus to damage rolls when wielding a melee weapon in one hand and no other weapons. Great Weapon Fighting: Reroll 1s and 2s on damage dice for two-handed weapons. Protection: Use reaction to impose disadvantage on attack against ally within 5 feet. Two-Weapon Fighting: Add ability modifier to the damage of the second attack."
                 },
                 {
                     name: "Second Wind",
-                    description: "You have a limited well of stamina that you can draw on. On your turn, you can use a bonus action to regain hit points equal to 1d10 + your fighter level."
+                    description: "You have a limited well of stamina that you can draw on to protect yourself from harm. On your turn, you can use a bonus action to regain hit points equal to 1d10 + your fighter level. Once you use this feature, you must finish a short or long rest before you can use it again."
                 }
             ],
             2: [
                 {
                     name: "Action Surge",
-                    description: "You can push yourself beyond your normal limits for a moment. On your turn, you can take one additional action."
+                    description: "You can push yourself beyond your normal limits for a moment. On your turn, you can take one additional action on top of your regular action and a possible bonus action. Once you use this feature, you must finish a short or long rest before you can use it again. Starting at 17th level, you can use it twice before a rest, but only once on the same turn."
                 }
             ],
             3: [
                 {
                     name: "Martial Archetype",
-                    description: "You choose an archetype that you strive to emulate in your combat styles and techniques: Champion, Battle Master, or Eldritch Knight."
+                    description: "You choose an archetype that you strive to emulate in your combat styles and techniques: Champion, Battle Master, or Eldritch Knight. Your choice grants you features at 3rd level and again at 7th, 10th, 15th, and 18th level."
+                }
+            ],
+            4: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
                 }
             ],
             5: [
                 {
                     name: "Extra Attack",
-                    description: "You can attack twice, instead of once, whenever you take the Attack action on your turn. The number of attacks increases to three at 11th level and four at 20th level."
+                    description: "You can attack twice, instead of once, whenever you take the Attack action on your turn."
+                }
+            ],
+            6: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
+                }
+            ],
+            7: [
+                {
+                    name: "Martial Archetype Feature",
+                    description: "You gain a feature from your Martial Archetype."
+                }
+            ],
+            8: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
                 }
             ],
             9: [
                 {
-                    name: "Indomitable",
-                    description: "You can reroll a saving throw that you fail. If you do so, you must use the new roll. You can use this feature twice between long rests starting at 13th level and three times between long rests starting at 17th level."
+                    name: "Indomitable (1 use)",
+                    description: "You can reroll a saving throw that you fail. If you do so, you must use the new roll, and you can't use this feature again until you finish a long rest."
+                }
+            ],
+            10: [
+                {
+                    name: "Martial Archetype Feature",
+                    description: "You gain a feature from your Martial Archetype."
+                }
+            ],
+            11: [
+                {
+                    name: "Extra Attack (2)",
+                    description: "You can attack three times, instead of twice, whenever you take the Attack action on your turn."
+                }
+            ],
+            12: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
+                }
+            ],
+            13: [
+                {
+                    name: "Indomitable (2 uses)",
+                    description: "You can use Indomitable twice between long rests."
+                }
+            ],
+            14: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
+                }
+            ],
+            15: [
+                {
+                    name: "Martial Archetype Feature",
+                    description: "You gain a feature from your Martial Archetype."
+                }
+            ],
+            16: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
+                }
+            ],
+            17: [
+                {
+                    name: "Action Surge (2 uses)",
+                    description: "You can use Action Surge twice before a rest, but only once on the same turn."
+                },
+                {
+                    name: "Indomitable (3 uses)",
+                    description: "You can use Indomitable three times between long rests."
+                }
+            ],
+            18: [
+                {
+                    name: "Martial Archetype Feature",
+                    description: "You gain a feature from your Martial Archetype."
+                }
+            ],
+            19: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
+                }
+            ],
+            20: [
+                {
+                    name: "Extra Attack (3)",
+                    description: "You can attack four times, instead of three, whenever you take the Attack action on your turn."
                 }
             ]
         },
         subclasses: {
             champion: {
                 name: "Champion",
-                description: "The archetypal Champion focuses on the development of raw physical power honed to deadly perfection.",
+                description: "The archetypal Champion focuses on the development of raw physical power honed to deadly perfection. Those who model themselves on this archetype combine rigorous training with physical excellence to deal devastating blows.",
                 features: {
                     3: [{
                         name: "Improved Critical",
@@ -456,7 +666,7 @@ const CLASSES = {
                     }],
                     7: [{
                         name: "Remarkable Athlete",
-                        description: "You can add half your proficiency bonus to any Strength, Dexterity, or Constitution check you make that doesn't already use your proficiency bonus."
+                        description: "You can add half your proficiency bonus (round up) to any Strength, Dexterity, or Constitution check you make that doesn't already use your proficiency bonus. In addition, when you make a running long jump, the distance you can cover increases by a number of feet equal to your Strength modifier."
                     }],
                     10: [{
                         name: "Additional Fighting Style",
@@ -468,7 +678,69 @@ const CLASSES = {
                     }],
                     18: [{
                         name: "Survivor",
-                        description: "You attain the pinnacle of resilience in battle. At the start of each of your turns, you regain hit points equal to 5 + your Constitution modifier if you have no more than half of your hit points left."
+                        description: "You attain the pinnacle of resilience in battle. At the start of each of your turns, you regain hit points equal to 5 + your Constitution modifier if you have no more than half of your hit points left. You don't gain this benefit if you have 0 hit points."
+                    }]
+                }
+            },
+            battleMaster: {
+                name: "Battle Master",
+                description: "Those who emulate the archetypal Battle Master employ martial techniques passed down through generations. A Battle Master uses superiority dice to fuel special maneuvers that grant tactical advantages in combat.",
+                features: {
+                    3: [
+                        {
+                            name: "Combat Superiority",
+                            description: "You learn three maneuvers of your choice. You can use only one maneuver per attack. You have four superiority dice, which are d8s. A superiority die is expended when you use it. You regain all expended superiority dice when you finish a short or long rest. You gain another superiority die at 7th level and one more at 15th level."
+                        },
+                        {
+                            name: "Student of War",
+                            description: "You gain proficiency with one type of artisan's tools of your choice."
+                        },
+                        {
+                            name: "Maneuvers",
+                            description: "Choose from: Commander's Strike, Disarming Attack, Distracting Strike, Evasive Footwork, Feinting Attack, Goading Attack, Lunging Attack, Maneuvering Attack, Menacing Attack, Parry, Precision Attack, Pushing Attack, Rally, Riposte, Sweeping Attack, Trip Attack. You learn two additional maneuvers at 7th, 10th, and 15th level."
+                        }
+                    ],
+                    7: [
+                        {
+                            name: "Know Your Enemy",
+                            description: "If you spend at least 1 minute observing or interacting with another creature outside combat, you can learn certain information about its capabilities compared to your own. The DM tells you if the creature is your equal, superior, or inferior in regard to two of the following characteristics of your choice: Strength score, Dexterity score, Constitution score, Armor Class, current hit points, total class levels (if any), fighter class levels (if any)."
+                        },
+                        {
+                            name: "Additional Maneuvers",
+                            description: "You learn two additional maneuvers of your choice."
+                        },
+                        {
+                            name: "Superiority Dice (5d8)",
+                            description: "You gain another superiority die (5 total)."
+                        }
+                    ],
+                    10: [
+                        {
+                            name: "Improved Combat Superiority (d10)",
+                            description: "Your superiority dice turn into d10s."
+                        },
+                        {
+                            name: "Additional Maneuvers",
+                            description: "You learn two additional maneuvers of your choice."
+                        }
+                    ],
+                    15: [
+                        {
+                            name: "Relentless",
+                            description: "When you roll initiative and have no superiority dice remaining, you regain one superiority die."
+                        },
+                        {
+                            name: "Additional Maneuvers",
+                            description: "You learn two additional maneuvers of your choice."
+                        },
+                        {
+                            name: "Superiority Dice (6d10)",
+                            description: "You gain another superiority die (6 total)."
+                        }
+                    ],
+                    18: [{
+                        name: "Improved Combat Superiority (d12)",
+                        description: "Your superiority dice turn into d12s."
                     }]
                 }
             }
@@ -842,45 +1114,111 @@ const CLASSES = {
             1: [
                 {
                     name: "Expertise",
-                    description: "Choose two of your skill proficiencies, or one of your skill proficiencies and your proficiency with thieves' tools. Your proficiency bonus is doubled for any ability check you make that uses either of the chosen proficiencies."
+                    description: "Choose two of your skill proficiencies, or one of your skill proficiencies and your proficiency with thieves' tools. Your proficiency bonus is doubled for any ability check you make that uses either of the chosen proficiencies. At 6th level, you can choose two more proficiencies to gain this benefit."
                 },
                 {
-                    name: "Sneak Attack",
-                    description: "You know how to strike subtly and exploit a foe's distraction. Once per turn, you can deal extra 1d6 damage to one creature you hit with an attack if you have advantage or an ally is within 5 feet of the target."
+                    name: "Sneak Attack (1d6)",
+                    description: "You know how to strike subtly and exploit a foe's distraction. Once per turn, you can deal an extra 1d6 damage to one creature you hit with an attack if you have advantage on the attack roll. The attack must use a finesse or a ranged weapon. You don't need advantage if another enemy of the target is within 5 feet of it, that enemy isn't incapacitated, and you don't have disadvantage. The extra damage increases as you gain levels (see Sneak Attack progression)."
                 },
                 {
                     name: "Thieves' Cant",
-                    description: "During your rogue training you learned thieves' cant, a secret mix of dialect, jargon, and code."
+                    description: "During your rogue training you learned thieves' cant, a secret mix of dialect, jargon, and code that allows you to hide messages in seemingly normal conversation. Only another creature that knows thieves' cant understands such messages. It takes four times longer to convey such a message than it does to speak the same idea plainly."
                 }
             ],
             2: [
                 {
                     name: "Cunning Action",
-                    description: "Your quick thinking and agility allow you to move and act quickly. You can take a bonus action on each of your turns to take the Dash, Disengage, or Hide action."
+                    description: "Your quick thinking and agility allow you to move and act quickly. You can take a bonus action on each of your turns in combat. This action can be used only to take the Dash, Disengage, or Hide action."
                 }
             ],
             3: [
                 {
                     name: "Roguish Archetype",
-                    description: "You choose an archetype that you emulate: Thief, Assassin, or Arcane Trickster."
+                    description: "You choose an archetype that you emulate in the exercise of your rogue abilities: Thief, Assassin, or Arcane Trickster. Your choice grants you features at 3rd level and again at 9th, 13th, and 17th level."
+                },
+                {
+                    name: "Sneak Attack (2d6)",
+                    description: "Your Sneak Attack damage increases to 2d6."
+                }
+            ],
+            4: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
                 }
             ],
             5: [
                 {
                     name: "Uncanny Dodge",
                     description: "When an attacker that you can see hits you with an attack, you can use your reaction to halve the attack's damage against you."
+                },
+                {
+                    name: "Sneak Attack (3d6)",
+                    description: "Your Sneak Attack damage increases to 3d6."
+                }
+            ],
+            6: [
+                {
+                    name: "Expertise (2 more)",
+                    description: "Choose two more of your skill proficiencies, or one of your skill proficiencies and your proficiency with thieves' tools. Your proficiency bonus is doubled for any ability check you make that uses either of the chosen proficiencies."
                 }
             ],
             7: [
                 {
                     name: "Evasion",
-                    description: "When you are subjected to an effect that allows you to make a Dexterity saving throw to take only half damage, you instead take no damage if you succeed, and only half damage if you fail."
+                    description: "When you are subjected to an effect that allows you to make a Dexterity saving throw to take only half damage, you instead take no damage if you succeed on the saving throw, and only half damage if you fail."
+                },
+                {
+                    name: "Sneak Attack (4d6)",
+                    description: "Your Sneak Attack damage increases to 4d6."
+                }
+            ],
+            8: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
+                }
+            ],
+            9: [
+                {
+                    name: "Roguish Archetype Feature",
+                    description: "You gain a feature from your Roguish Archetype."
+                },
+                {
+                    name: "Sneak Attack (5d6)",
+                    description: "Your Sneak Attack damage increases to 5d6."
+                }
+            ],
+            10: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
                 }
             ],
             11: [
                 {
                     name: "Reliable Talent",
                     description: "You have refined your chosen skills until they approach perfection. Whenever you make an ability check that lets you add your proficiency bonus, you can treat a d20 roll of 9 or lower as a 10."
+                },
+                {
+                    name: "Sneak Attack (6d6)",
+                    description: "Your Sneak Attack damage increases to 6d6."
+                }
+            ],
+            12: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
+                }
+            ],
+            13: [
+                {
+                    name: "Roguish Archetype Feature",
+                    description: "You gain a feature from your Roguish Archetype."
+                },
+                {
+                    name: "Sneak Attack (7d6)",
+                    description: "Your Sneak Attack damage increases to 7d6."
                 }
             ],
             14: [
@@ -893,6 +1231,26 @@ const CLASSES = {
                 {
                     name: "Slippery Mind",
                     description: "You have acquired greater mental strength. You gain proficiency in Wisdom saving throws."
+                },
+                {
+                    name: "Sneak Attack (8d6)",
+                    description: "Your Sneak Attack damage increases to 8d6."
+                }
+            ],
+            16: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
+                }
+            ],
+            17: [
+                {
+                    name: "Roguish Archetype Feature",
+                    description: "You gain a feature from your Roguish Archetype."
+                },
+                {
+                    name: "Sneak Attack (9d6)",
+                    description: "Your Sneak Attack damage increases to 9d6."
                 }
             ],
             18: [
@@ -901,17 +1259,27 @@ const CLASSES = {
                     description: "You are so evasive that attackers rarely gain the upper hand against you. No attack roll has advantage against you while you aren't incapacitated."
                 }
             ],
+            19: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
+                },
+                {
+                    name: "Sneak Attack (10d6)",
+                    description: "Your Sneak Attack damage increases to 10d6."
+                }
+            ],
             20: [
                 {
                     name: "Stroke of Luck",
-                    description: "You have an uncanny knack for succeeding when you need to. If your attack misses a target within range, you can turn the miss into a hit."
+                    description: "You have an uncanny knack for succeeding when you need to. If your attack misses a target within range, you can turn the miss into a hit. Alternatively, if you fail an ability check, you can treat the d20 roll as a 20. Once you use this feature, you can't use it again until you finish a short or long rest."
                 }
             ]
         },
         subclasses: {
             thief: {
                 name: "Thief",
-                description: "You hone your skills in the larcenous arts. Burglars, bandits, cutpurses, and other criminals typically follow this archetype.",
+                description: "You hone your skills in the larcenous arts. Burglars, bandits, cutpurses, and other criminals typically follow this archetype, but so do rogues who prefer to think of themselves as professional treasure seekers, explorers, delvers, and investigators.",
                 features: {
                     3: [
                         {
@@ -920,7 +1288,7 @@ const CLASSES = {
                         },
                         {
                             name: "Second-Story Work",
-                            description: "You gain the ability to climb faster than normal; climbing no longer costs you extra movement."
+                            description: "You gain the ability to climb faster than normal; climbing no longer costs you extra movement. In addition, when you make a running jump, the distance you cover increases by a number of feet equal to your Dexterity modifier."
                         }
                     ],
                     9: [{
@@ -929,11 +1297,39 @@ const CLASSES = {
                     }],
                     13: [{
                         name: "Use Magic Device",
-                        description: "You have learned enough about the workings of magic that you can improvise the use of items even when they are not intended for you."
+                        description: "You have learned enough about the workings of magic that you can improvise the use of items even when they are not intended for you. You ignore all class, race, and level requirements on the use of magic items."
                     }],
                     17: [{
                         name: "Thief's Reflexes",
-                        description: "You have become adept at laying ambushes and quickly escaping danger. You can take two turns during the first round of any combat."
+                        description: "You have become adept at laying ambushes and quickly escaping danger. You can take two turns during the first round of any combat. You take your first turn at your normal initiative and your second turn at your initiative minus 10. You can't use this feature when you are surprised."
+                    }]
+                }
+            },
+            assassin: {
+                name: "Assassin",
+                description: "You focus your training on the grim art of death. Those who adhere to this archetype are diverse: hired killers, spies, bounty hunters, and even specially anointed priests trained to exterminate the enemies of their deity.",
+                features: {
+                    3: [
+                        {
+                            name: "Bonus Proficiencies",
+                            description: "You gain proficiency with the disguise kit and the poisoner's kit."
+                        },
+                        {
+                            name: "Assassinate",
+                            description: "You are at your deadliest when you get the drop on your enemies. You have advantage on attack rolls against any creature that hasn't taken a turn in the combat yet. In addition, any hit you score against a creature that is surprised is a critical hit."
+                        }
+                    ],
+                    9: [{
+                        name: "Infiltration Expertise",
+                        description: "You can unfailingly create false identities for yourself. You must spend seven days and 25 gp to establish the history, profession, and affiliations for an identity. You can't establish an identity that belongs to someone else. Thereafter, if you adopt the new identity as a disguise, other creatures believe you to be that person until given an obvious reason not to."
+                    }],
+                    13: [{
+                        name: "Impostor",
+                        description: "You gain the ability to unerringly mimic another person's speech, writing, and behavior. You must spend at least three hours studying these three components of the person's behavior, listening to speech, examining handwriting, and observing mannerisms. Your ruse is indiscernible to the casual observer. If a wary creature suspects something is amiss, you have advantage on any Charisma (Deception) check you make to avoid detection."
+                    }],
+                    17: [{
+                        name: "Death Strike",
+                        description: "You become a master of instant death. When you attack and hit a creature that is surprised, it must make a Constitution saving throw (DC 8 + your Dexterity modifier + your proficiency bonus). On a failed save, double the damage of your attack against the creature."
                     }]
                 }
             }
@@ -1118,36 +1514,132 @@ const CLASSES = {
             1: [
                 {
                     name: "Spellcasting",
-                    description: "As a student of arcane magic, you have a spellbook containing spells that show the first glimmerings of your true power."
+                    description: "As a student of arcane magic, you have a spellbook containing spells that show the first glimmerings of your true power. Intelligence is your spellcasting ability for your wizard spells. You learn spells by copying them into your spellbook. At 1st level, you have a spellbook containing six 1st-level wizard spells of your choice. Each time you gain a wizard level, you add two wizard spells of your choice to your spellbook for free."
                 },
                 {
                     name: "Arcane Recovery",
-                    description: "You have learned to regain some of your magical energy by studying your spellbook. Once per day when you finish a short rest, you can choose expended spell slots to recover."
+                    description: "You have learned to regain some of your magical energy by studying your spellbook. Once per day when you finish a short rest, you can choose expended spell slots to recover. The spell slots can have a combined level that is equal to or less than half your wizard level (rounded up), and none of the slots can be 6th level or higher."
                 }
             ],
             2: [
                 {
                     name: "Arcane Tradition",
-                    description: "You choose an arcane tradition, shaping your practice of magic: School of Abjuration, Conjuration, Divination, Enchantment, Evocation, Illusion, Necromancy, or Transmutation."
+                    description: "You choose an arcane tradition, shaping your practice of magic through one of eight schools: Abjuration, Conjuration, Divination, Enchantment, Evocation, Illusion, Necromancy, or Transmutation. Your choice grants you features at 2nd level and again at 6th, 10th, and 14th level."
+                }
+            ],
+            3: [
+                {
+                    name: "2nd-Level Spells",
+                    description: "You can now prepare and cast 2nd-level wizard spells. You gain two 2nd-level spell slots."
+                }
+            ],
+            4: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
+                }
+            ],
+            5: [
+                {
+                    name: "3rd-Level Spells",
+                    description: "You can now prepare and cast 3rd-level wizard spells. You gain two 3rd-level spell slots."
+                }
+            ],
+            6: [
+                {
+                    name: "Arcane Tradition Feature",
+                    description: "You gain a feature from your Arcane Tradition."
+                }
+            ],
+            7: [
+                {
+                    name: "4th-Level Spells",
+                    description: "You can now prepare and cast 4th-level wizard spells. You gain one 4th-level spell slot."
+                }
+            ],
+            8: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
+                }
+            ],
+            9: [
+                {
+                    name: "5th-Level Spells",
+                    description: "You can now prepare and cast 5th-level wizard spells. You gain one 5th-level spell slot."
+                }
+            ],
+            10: [
+                {
+                    name: "Arcane Tradition Feature",
+                    description: "You gain a feature from your Arcane Tradition."
+                }
+            ],
+            11: [
+                {
+                    name: "6th-Level Spells",
+                    description: "You can now prepare and cast 6th-level wizard spells. You gain one 6th-level spell slot."
+                }
+            ],
+            12: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
+                }
+            ],
+            13: [
+                {
+                    name: "7th-Level Spells",
+                    description: "You can now prepare and cast 7th-level wizard spells. You gain one 7th-level spell slot."
+                }
+            ],
+            14: [
+                {
+                    name: "Arcane Tradition Feature",
+                    description: "You gain a feature from your Arcane Tradition."
+                }
+            ],
+            15: [
+                {
+                    name: "8th-Level Spells",
+                    description: "You can now prepare and cast 8th-level wizard spells. You gain one 8th-level spell slot."
+                }
+            ],
+            16: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
+                }
+            ],
+            17: [
+                {
+                    name: "9th-Level Spells",
+                    description: "You can now prepare and cast 9th-level wizard spells. You gain one 9th-level spell slot."
                 }
             ],
             18: [
                 {
                     name: "Spell Mastery",
-                    description: "You have achieved such mastery over certain spells that you can cast them at will. Choose a 1st-level wizard spell and a 2nd-level wizard spell. You can cast those spells at their lowest level without expending a spell slot."
+                    description: "You have achieved such mastery over certain spells that you can cast them at will. Choose a 1st-level wizard spell and a 2nd-level wizard spell that are in your spellbook. You can cast those spells at their lowest level without expending a spell slot when you have them prepared. If you want to cast either spell at a higher level, you must expend a spell slot as normal. By spending 8 hours in study, you can exchange one or both of the spells you chose for different spells of the same levels."
+                }
+            ],
+            19: [
+                {
+                    name: "Ability Score Improvement",
+                    description: "You can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can't increase an ability score above 20 using this feature."
                 }
             ],
             20: [
                 {
                     name: "Signature Spells",
-                    description: "You gain mastery over two powerful spells and can cast them with little effort. Choose two 3rd-level wizard spells in your spellbook as your signature spells."
+                    description: "You gain mastery over two powerful spells and can cast them with little effort. Choose two 3rd-level wizard spells in your spellbook as your signature spells. You always have these spells prepared, they don't count against the number of spells you have prepared, and you can cast each of them once at 3rd level without expending a spell slot. When you do so, you can't do so again until you finish a short or long rest. If you want to cast either spell at a higher level, you must expend a spell slot as normal."
                 }
             ]
         },
         subclasses: {
             evocation: {
                 name: "School of Evocation",
-                description: "You focus your study on magic that creates powerful elemental effects.",
+                description: "You focus your study on magic that creates powerful elemental effects such as bitter cold, searing flame, rolling thunder, crackling lightning, and burning acid. Some evokers find employment in military forces, serving as artillery to blast enemy armies from afar.",
                 features: {
                     2: [
                         {
@@ -1156,12 +1648,12 @@ const CLASSES = {
                         },
                         {
                             name: "Sculpt Spells",
-                            description: "You can create pockets of relative safety within the effects of your evocation spells."
+                            description: "You can create pockets of relative safety within the effects of your evocation spells. When you cast an evocation spell that affects other creatures that you can see, you can choose a number of them equal to 1 + the spell's level. The chosen creatures automatically succeed on their saving throws against the spell, and they take no damage if they would normally take half damage on a successful save."
                         }
                     ],
                     6: [{
                         name: "Potent Cantrip",
-                        description: "Your damaging cantrips affect even creatures that avoid the brunt of the effect."
+                        description: "Your damaging cantrips affect even creatures that avoid the brunt of the effect. When a creature succeeds on a saving throw against your cantrip, the creature takes half the cantrip's damage (if any) but suffers no additional effect from the cantrip."
                     }],
                     10: [{
                         name: "Empowered Evocation",
@@ -1169,7 +1661,35 @@ const CLASSES = {
                     }],
                     14: [{
                         name: "Overchannel",
-                        description: "You can increase the power of your simpler spells. When you cast a wizard spell of 1st through 5th level that deals damage, you can deal maximum damage with that spell."
+                        description: "You can increase the power of your simpler spells. When you cast a wizard spell of 1st through 5th level that deals damage, you can deal maximum damage with that spell. The first time you do so, you suffer no adverse effect. If you use this feature again before you finish a long rest, you take 2d12 necrotic damage for each level of the spell, immediately after you cast it. Each time you use this feature again before finishing a long rest, the necrotic damage per spell level increases by 1d12. This damage ignores resistance and immunity."
+                    }]
+                }
+            },
+            abjuration: {
+                name: "School of Abjuration",
+                description: "The School of Abjuration emphasizes magic that blocks, banishes, or protects. Detractors of this school say that its tradition is about denial, negation rather than positive assertion. You understand, however, that ending harmful effects, protecting the weak, and banishing evil influences is anything but a philosophical void.",
+                features: {
+                    2: [
+                        {
+                            name: "Abjuration Savant",
+                            description: "The gold and time you must spend to copy an abjuration spell into your spellbook is halved."
+                        },
+                        {
+                            name: "Arcane Ward",
+                            description: "You can weave magic around yourself for protection. When you cast an abjuration spell of 1st level or higher, you can simultaneously use a strand of the spell's magic to create a magical ward on yourself that lasts until you finish a long rest. The ward has hit points equal to twice your wizard level + your Intelligence modifier. Whenever you take damage, the ward takes the damage instead. If this damage reduces the ward to 0 hit points, you take any remaining damage. While the ward has 0 hit points, it can't absorb damage, but its magic remains. Whenever you cast an abjuration spell of 1st level or higher, the ward regains a number of hit points equal to twice the level of the spell. Once you create the ward, you can't create it again until you finish a long rest."
+                        }
+                    ],
+                    6: [{
+                        name: "Projected Ward",
+                        description: "When a creature that you can see within 30 feet of you takes damage, you can use your reaction to cause your Arcane Ward to absorb that damage. If this damage reduces the ward to 0 hit points, the warded creature takes any remaining damage."
+                    }],
+                    10: [{
+                        name: "Improved Abjuration",
+                        description: "When you cast an abjuration spell that requires you to make an ability check as a part of casting that spell (as in Counterspell and Dispel Magic), you add your proficiency bonus to that ability check."
+                    }],
+                    14: [{
+                        name: "Spell Resistance",
+                        description: "You have advantage on saving throws against spells. Furthermore, you have resistance against the damage of spells."
                     }]
                 }
             }

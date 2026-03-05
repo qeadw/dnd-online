@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Manager - D&D Online</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Inventory Page Layout */
+        .inventory-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: var(--space-lg);
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-lg);
+        }
+
+        /* Equipment Browser Panel */
+        .equipment-panel {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            border: 1px solid var(--accent-gold-border);
+            height: fit-content;
+            position: sticky;
+            top: var(--space-lg);
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .equipment-panel h3 {
+            color: var(--accent-gold);
+            border-bottom: 2px solid var(--accent-gold);
+            padding-bottom: var(--space-sm);
+            margin-bottom: var(--space-md);
+        }
+
+        /* Search and Filters */
+        .equipment-search {
+            margin-bottom: var(--space-md);
+        }
+
+        .equipment-search input {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--accent-gold-border);
+            border-radius: var(--radius-sm);
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+        }
+
+        .category-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+            margin-bottom: var(--space-md);
+        }
+
+        .category-tab {
+            padding: var(--space-xs) var(--space-sm);
+            background-color: var(--bg-dark);
+            border: 1px solid var(--accent-gold-border);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: var(--font-size-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .category-tab:hover,
+        .category-tab.active {
+            background-color: var(--accent-gold-light);
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        /* Equipment List */
+        .equipment-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .equipment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-sm);
+            background-color: var(--bg-dark);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            border: 1px solid transparent;
+        }
+
+        .equipment-item:hover {
+            background-color: var(--accent-gold-light);
+            border-color: var(--accent-gold-border);
+        }
+
+        .equipment-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .equipment-item-name {
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            font-size: var(--font-size-sm);
+        }
+
+        .equipment-item-details {
+            font-size: var(--font-size-xs);
+            color: var(--text-label);
+        }
+
+        .equipment-item-add {
+            padding: var(--space-xs) var(--space-sm);
+            background-color: var(--color-success);
+            color: var(--text-primary);
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: var(--font-size-xs);
+            transition: all var(--transition-fast);
+        }
+
+        .equipment-item-add:hover {
+            background-color: var(--color-success-hover);
+        }
+
+        /* Main Inventory Panel */
+        .inventory-panel {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        /* Carrying Capacity Section */
+        .capacity-section {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            border: 1px solid var(--accent-gold-border);
+        }
+
+        .capacity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+
+        .capacity-header h3 {
+            color: var(--accent-gold);
+            margin: 0;
+        }
+
+        .strength-input {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .strength-input label {
+            color: var(--text-secondary);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .strength-input input {
+            width: 60px;
+            padding: var(--space-xs) var(--space-sm);
+            text-align: center;
+            border: 1px solid var(--accent-gold-border);
+            border-radius: var(--radius-sm);
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-size: var(--font-size-lg);
+        }
+
+        .capacity-bar {
+            height: 24px;
+            background-color: var(--bg-dark);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            position: relative;
+            margin-bottom: var(--space-sm);
+        }
+
+        .capacity-fill {
+            height: 100%;
+            transition: width 0.3s ease, background-color 0.3s ease;
+            border-radius: var(--radius-md);
+        }
+
+        .capacity-fill.normal {
+            background: linear-gradient(90deg, var(--color-success), #2ecc71);
+        }
+
+        .capacity-fill.encumbered {
+            background: linear-gradient(90deg, #f39c12, #e67e22);
+        }
+
+        .capacity-fill.heavily-encumbered {
+            background: linear-gradient(90deg, var(--color-error), #c0392b);
+        }
+
+        .capacity-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-sm);
+            color: var(--text-primary);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .capacity-info {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            font-size: var(--font-size-sm);
+        }
+
+        .capacity-stat {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .capacity-stat-label {
+            color: var(--text-label);
+        }
+
+        .capacity-stat-value {
+            font-weight: var(--font-weight-bold);
+        }
+
+        .encumbrance-status {
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-sm);
+        }
+
+        .encumbrance-status.normal {
+            background-color: rgba(39, 174, 96, 0.2);
+            color: var(--color-success);
+        }
+
+        .encumbrance-status.encumbered {
+            background-color: rgba(243, 156, 18, 0.2);
+            color: #f39c12;
+        }
+
+        .encumbrance-status.heavily-encumbered {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--color-error);
+        }
+
+        /* Currency Section */
+        .currency-section {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            border: 1px solid var(--accent-gold-border);
+        }
+
+        .currency-section h3 {
+            color: var(--accent-gold);
+            border-bottom: 2px solid var(--accent-gold);
+            padding-bottom: var(--space-sm);
+            margin-bottom: var(--space-md);
+        }
+
+        .currency-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+
+        .currency-item {
+            text-align: center;
+            background-color: var(--bg-dark);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+        }
+
+        .currency-item label {
+            display: block;
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--space-xs);
+            font-size: var(--font-size-sm);
+        }
+
+        .currency-item.cp label { color: #b87333; }
+        .currency-item.sp label { color: #c0c0c0; }
+        .currency-item.ep label { color: #85bb65; }
+        .currency-item.gp label { color: #ffd700; }
+        .currency-item.pp label { color: #e5e4e2; }
+
+        .currency-item input {
+            width: 100%;
+            padding: var(--space-sm);
+            text-align: center;
+            border: 1px solid var(--accent-gold-border);
+            border-radius: var(--radius-sm);
+            background-color: var(--bg-darkest);
+            color: var(--text-primary);
+            font-size: var(--font-size-lg);
+        }
+
+        .currency-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-md);
+            background-color: var(--bg-dark);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-md);
+        }
+
+        .currency-total-label {
+            color: var(--text-secondary);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .currency-total-value {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            color: #ffd700;
+        }
+
+        .currency-conversion {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+        }
+
+        .currency-conversion button {
+            padding: var(--space-xs) var(--space-sm);
+            background-color: var(--accent-gold-light);
+            border: 1px solid var(--accent-gold);
+            border-radius: var(--radius-sm);
+            color: var(--accent-gold);
+            cursor: pointer;
+            font-size: var(--font-size-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .currency-conversion button:hover {
+            background-color: var(--accent-gold);
+            color: var(--bg-darkest);
+        }
+
+        /* Inventory Items Section */
+        .inventory-items-section {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            border: 1px solid var(--accent-gold-border);
+        }
+
+        .inventory-items-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+
+        .inventory-items-header h3 {
+            color: var(--accent-gold);
+            margin: 0;
+        }
+
+        .inventory-actions {
+            display: flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+
+        .inventory-actions button {
+            padding: var(--space-xs) var(--space-md);
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            transition: all var(--transition-fast);
+        }
+
+        .btn-add-custom {
+            background-color: var(--accent-gold);
+            color: var(--bg-darkest);
+        }
+
+        .btn-add-custom:hover {
+            background-color: var(--accent-gold-hover);
+        }
+
+        .btn-save {
+            background-color: var(--color-success);
+            color: var(--text-primary);
+        }
+
+        .btn-save:hover {
+            background-color: var(--color-success-hover);
+        }
+
+        .btn-export,
+        .btn-import {
+            background-color: var(--color-info);
+            color: var(--text-primary);
+        }
+
+        .btn-export:hover,
+        .btn-import:hover {
+            background-color: var(--color-info-hover);
+        }
+
+        .btn-clear {
+            background-color: var(--color-error);
+            color: var(--text-primary);
+        }
+
+        .btn-clear:hover {
+            background-color: var(--color-error-hover);
+        }
+
+        /* Inventory Table */
+        .inventory-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--font-size-sm);
+        }
+
+        .inventory-table th {
+            text-align: left;
+            padding: var(--space-sm) var(--space-md);
+            background-color: var(--bg-dark);
+            color: var(--accent-gold);
+            font-weight: var(--font-weight-bold);
+            border-bottom: 2px solid var(--accent-gold);
+            white-space: nowrap;
+        }
+
+        .inventory-table td {
+            padding: var(--space-sm) var(--space-md);
+            border-bottom: 1px solid var(--accent-gold-border);
+            vertical-align: middle;
+        }
+
+        .inventory-table tr:hover {
+            background-color: var(--bg-hover);
+        }
+
+        .inventory-table .item-name {
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+        }
+
+        .inventory-table .item-category {
+            color: var(--text-label);
+            font-size: var(--font-size-xs);
+        }
+
+        .quantity-input {
+            width: 60px;
+            padding: var(--space-xs);
+            text-align: center;
+            border: 1px solid var(--accent-gold-border);
+            border-radius: var(--radius-sm);
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+        }
+
+        .status-select {
+            padding: var(--space-xs) var(--space-sm);
+            border: 1px solid var(--accent-gold-border);
+            border-radius: var(--radius-sm);
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-size: var(--font-size-sm);
+        }
+
+        .status-select option {
+            background-color: var(--bg-dark);
+        }
+
+        .item-weight {
+            text-align: right;
+        }
+
+        .btn-remove-item {
+            padding: var(--space-xs) var(--space-sm);
+            background-color: var(--color-error);
+            color: var(--text-primary);
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: var(--font-size-xs);
+            transition: all var(--transition-fast);
+        }
+
+        .btn-remove-item:hover {
+            background-color: var(--color-error-hover);
+        }
+
+        .empty-inventory {
+            text-align: center;
+            padding: var(--space-2xl);
+            color: var(--text-muted);
+        }
+
+        .empty-inventory p {
+            max-width: none;
+        }
+
+        /* Custom Item Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            border: 2px solid var(--accent-gold);
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal h3 {
+            color: var(--accent-gold);
+            margin-bottom: var(--space-lg);
+            border-bottom: 2px solid var(--accent-gold);
+            padding-bottom: var(--space-sm);
+        }
+
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .modal-form label {
+            color: var(--text-secondary);
+            font-weight: var(--font-weight-medium);
+            margin-bottom: var(--space-xs);
+        }
+
+        .modal-form input,
+        .modal-form select,
+        .modal-form textarea {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--accent-gold-border);
+            border-radius: var(--radius-sm);
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+        }
+
+        .modal-form textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-sm);
+            margin-top: var(--space-md);
+        }
+
+        .modal-buttons button {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            font-weight: var(--font-weight-semibold);
+            transition: all var(--transition-fast);
+        }
+
+        .btn-modal-cancel {
+            background-color: var(--bg-hover);
+            color: var(--text-secondary);
+        }
+
+        .btn-modal-cancel:hover {
+            background-color: var(--bg-dark);
+        }
+
+        .btn-modal-add {
+            background-color: var(--color-success);
+            color: var(--text-primary);
+        }
+
+        .btn-modal-add:hover {
+            background-color: var(--color-success-hover);
+        }
+
+        /* Import file input */
+        .import-input {
+            display: none;
+        }
+
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: var(--space-lg);
+            right: var(--space-lg);
+            padding: var(--space-md) var(--space-lg);
+            background-color: var(--color-success);
+            color: var(--text-primary);
+            border-radius: var(--radius-md);
+            font-weight: var(--font-weight-semibold);
+            z-index: 1001;
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s;
+            opacity: 1;
+        }
+
+        .toast.error {
+            background-color: var(--color-error);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            .inventory-container {
+                grid-template-columns: 1fr;
+            }
+
+            .equipment-panel {
+                position: static;
+                max-height: none;
+            }
+
+            .currency-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .currency-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .capacity-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .inventory-table th,
+            .inventory-table td {
+                padding: var(--space-xs) var(--space-sm);
+                font-size: var(--font-size-xs);
+            }
+
+            .quantity-input {
+                width: 50px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .currency-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .currency-item.ep {
+                grid-column: span 2;
+            }
+
+            .category-tabs {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to content</a>
+    <header>
+        <h1>Inventory Manager</h1>
+        <nav class="main-nav">
+            <a href="index.html" class="nav-link">Game Tools</a>
+            <a href="character-creator.html" class="nav-link">Character Creator</a>
+            <a href="characters.html" class="nav-link">My Characters</a>
+            <a href="spells.html" class="nav-link">Spells</a>
+            <a href="monsters.html" class="nav-link">Monsters</a>
+            <a href="monster-builder.html" class="nav-link">Monster Builder</a>
+            <a href="combat.html" class="nav-link">Combat</a>
+            <a href="inventory.html" class="nav-link active">Inventory</a>
+        </nav>
+    </header>
+
+    <main class="inventory-container" id="main">
+        <!-- Equipment Browser Panel -->
+        <aside class="equipment-panel">
+            <h3>Equipment Database</h3>
+
+            <div class="equipment-search">
+                <label for="equipment-search" class="visually-hidden">Search equipment</label>
+                <input type="text" id="equipment-search" placeholder="Search equipment...">
+            </div>
+
+            <div class="category-tabs" role="tablist" aria-label="Equipment categories">
+                <button class="category-tab active" data-category="all" role="tab" aria-selected="true">All</button>
+                <button class="category-tab" data-category="weapons" role="tab" aria-selected="false">Weapons</button>
+                <button class="category-tab" data-category="armor" role="tab" aria-selected="false">Armor</button>
+                <button class="category-tab" data-category="gear" role="tab" aria-selected="false">Gear</button>
+                <button class="category-tab" data-category="tools" role="tab" aria-selected="false">Tools</button>
+                <button class="category-tab" data-category="ammunition" role="tab" aria-selected="false">Ammo</button>
+            </div>
+
+            <div class="equipment-list" id="equipment-list" role="list" aria-label="Available equipment">
+                <!-- Equipment items will be populated by JavaScript -->
+            </div>
+        </aside>
+
+        <!-- Main Inventory Panel -->
+        <div class="inventory-panel">
+            <!-- Carrying Capacity Section -->
+            <section class="capacity-section">
+                <div class="capacity-header">
+                    <h3>Carrying Capacity</h3>
+                    <div class="strength-input">
+                        <label for="strength-score">Strength Score:</label>
+                        <input type="number" id="strength-score" value="10" min="1" max="30" aria-label="Strength score">
+                    </div>
+                </div>
+
+                <div class="capacity-bar">
+                    <div class="capacity-fill normal" id="capacity-fill" style="width: 0%"></div>
+                    <span class="capacity-text" id="capacity-text">0 / 150 lbs</span>
+                </div>
+
+                <div class="capacity-info">
+                    <div class="capacity-stat">
+                        <span class="capacity-stat-label">Current Weight:</span>
+                        <span class="capacity-stat-value" id="current-weight">0 lbs</span>
+                    </div>
+                    <div class="capacity-stat">
+                        <span class="capacity-stat-label">Carry Capacity:</span>
+                        <span class="capacity-stat-value" id="carry-capacity">150 lbs</span>
+                    </div>
+                    <div class="capacity-stat">
+                        <span class="capacity-stat-label">Encumbered:</span>
+                        <span class="capacity-stat-value" id="encumbered-threshold">50 lbs</span>
+                    </div>
+                    <div class="capacity-stat">
+                        <span class="capacity-stat-label">Heavily Encumbered:</span>
+                        <span class="capacity-stat-value" id="heavily-threshold">100 lbs</span>
+                    </div>
+                    <span class="encumbrance-status normal" id="encumbrance-status">Normal</span>
+                </div>
+            </section>
+
+            <!-- Currency Section -->
+            <section class="currency-section">
+                <h3>Currency</h3>
+
+                <div class="currency-grid">
+                    <div class="currency-item cp">
+                        <label for="currency-cp">CP</label>
+                        <input type="number" id="currency-cp" value="0" min="0" aria-label="Copper pieces">
+                    </div>
+                    <div class="currency-item sp">
+                        <label for="currency-sp">SP</label>
+                        <input type="number" id="currency-sp" value="0" min="0" aria-label="Silver pieces">
+                    </div>
+                    <div class="currency-item ep">
+                        <label for="currency-ep">EP</label>
+                        <input type="number" id="currency-ep" value="0" min="0" aria-label="Electrum pieces">
+                    </div>
+                    <div class="currency-item gp">
+                        <label for="currency-gp">GP</label>
+                        <input type="number" id="currency-gp" value="0" min="0" aria-label="Gold pieces">
+                    </div>
+                    <div class="currency-item pp">
+                        <label for="currency-pp">PP</label>
+                        <input type="number" id="currency-pp" value="0" min="0" aria-label="Platinum pieces">
+                    </div>
+                </div>
+
+                <div class="currency-total">
+                    <span class="currency-total-label">Total Value (in GP):</span>
+                    <span class="currency-total-value" id="currency-total">0 GP</span>
+                </div>
+
+                <div class="currency-conversion">
+                    <button onclick="convertCurrency('cp', 'sp')" aria-label="Convert copper to silver">10 CP = 1 SP</button>
+                    <button onclick="convertCurrency('sp', 'gp')" aria-label="Convert silver to gold">10 SP = 1 GP</button>
+                    <button onclick="convertCurrency('ep', 'gp')" aria-label="Convert electrum to gold">2 EP = 1 GP</button>
+                    <button onclick="convertCurrency('gp', 'pp')" aria-label="Convert gold to platinum">10 GP = 1 PP</button>
+                    <button onclick="consolidateCurrency()" aria-label="Consolidate all currency to highest denominations">Consolidate All</button>
+                </div>
+            </section>
+
+            <!-- Inventory Items Section -->
+            <section class="inventory-items-section">
+                <div class="inventory-items-header">
+                    <h3>Inventory Items</h3>
+                    <div class="inventory-actions">
+                        <button class="btn-add-custom" onclick="openCustomItemModal()" aria-label="Add custom item">+ Custom Item</button>
+                        <button class="btn-save" onclick="saveInventory()" aria-label="Save inventory to browser">Save</button>
+                        <button class="btn-export" onclick="exportInventory()" aria-label="Export inventory as JSON">Export</button>
+                        <button class="btn-import" onclick="document.getElementById('import-input').click()" aria-label="Import inventory from JSON">Import</button>
+                        <input type="file" id="import-input" class="import-input" accept=".json" onchange="importInventory(event)">
+                        <button class="btn-clear" onclick="clearInventory()" aria-label="Clear all inventory items">Clear</button>
+                    </div>
+                </div>
+
+                <div class="inventory-table-wrapper">
+                    <table class="inventory-table" aria-label="Inventory items">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th>Weight (ea)</th>
+                                <th>Total Weight</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-body">
+                            <!-- Inventory items will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="empty-inventory" id="empty-inventory">
+                    <p>Your inventory is empty. Add items from the equipment database or create custom items.</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Custom Item Modal -->
+    <div class="modal-overlay" id="custom-item-modal">
+        <div class="modal" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+            <h3 id="modal-title">Add Custom Item</h3>
+            <form class="modal-form" onsubmit="addCustomItem(event)">
+                <div>
+                    <label for="custom-name">Item Name *</label>
+                    <input type="text" id="custom-name" required>
+                </div>
+                <div>
+                    <label for="custom-category">Category</label>
+                    <select id="custom-category">
+                        <option value="Custom">Custom</option>
+                        <option value="Weapon">Weapon</option>
+                        <option value="Armor">Armor</option>
+                        <option value="Gear">Gear</option>
+                        <option value="Tool">Tool</option>
+                        <option value="Consumable">Consumable</option>
+                        <option value="Magic Item">Magic Item</option>
+                        <option value="Treasure">Treasure</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="custom-weight">Weight (lbs)</label>
+                    <input type="number" id="custom-weight" value="0" min="0" step="0.1">
+                </div>
+                <div>
+                    <label for="custom-quantity">Quantity</label>
+                    <input type="number" id="custom-quantity" value="1" min="1">
+                </div>
+                <div>
+                    <label for="custom-description">Description</label>
+                    <textarea id="custom-description" placeholder="Item description..."></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-modal-cancel" onclick="closeCustomItemModal()">Cancel</button>
+                    <button type="submit" class="btn-modal-add">Add Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="data/equipment.js"></script>
+    <script>
+        // Inventory State
+        let inventory = [];
+        let currency = { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 };
+        let strengthScore = 10;
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadInventory();
+            populateEquipmentList();
+            setupEventListeners();
+            updateUI();
+        });
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Equipment search
+            document.getElementById('equipment-search').addEventListener('input', filterEquipment);
+
+            // Category tabs
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.category-tab').forEach(t => {
+                        t.classList.remove('active');
+                        t.setAttribute('aria-selected', 'false');
+                    });
+                    this.classList.add('active');
+                    this.setAttribute('aria-selected', 'true');
+                    filterEquipment();
+                });
+            });
+
+            // Strength score
+            document.getElementById('strength-score').addEventListener('change', function() {
+                strengthScore = parseInt(this.value) || 10;
+                updateCapacity();
+                saveInventory();
+            });
+
+            // Currency inputs
+            ['cp', 'sp', 'ep', 'gp', 'pp'].forEach(type => {
+                document.getElementById(`currency-${type}`).addEventListener('change', function() {
+                    currency[type] = parseInt(this.value) || 0;
+                    updateCurrencyTotal();
+                    saveInventory();
+                });
+            });
+
+            // Close modal on escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeCustomItemModal();
+                }
+            });
+
+            // Close modal on overlay click
+            document.getElementById('custom-item-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeCustomItemModal();
+                }
+            });
+        }
+
+        // Populate Equipment List
+        function populateEquipmentList() {
+            filterEquipment();
+        }
+
+        // Filter Equipment
+        function filterEquipment() {
+            const searchTerm = document.getElementById('equipment-search').value.toLowerCase();
+            const activeTab = document.querySelector('.category-tab.active');
+            const category = activeTab ? activeTab.dataset.category : 'all';
+
+            const equipmentList = document.getElementById('equipment-list');
+            equipmentList.innerHTML = '';
+
+            const allItems = getAllEquipmentItems();
+
+            const filteredItems = allItems.filter(item => {
+                const matchesSearch = item.name.toLowerCase().includes(searchTerm) ||
+                                     (item.category && item.category.toLowerCase().includes(searchTerm));
+
+                let matchesCategory = true;
+                if (category !== 'all') {
+                    matchesCategory = item.type === category;
+                }
+
+                return matchesSearch && matchesCategory;
+            });
+
+            if (filteredItems.length === 0) {
+                equipmentList.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: var(--space-md);">No equipment found</p>';
+                return;
+            }
+
+            filteredItems.forEach(item => {
+                const itemElement = createEquipmentItemElement(item);
+                equipmentList.appendChild(itemElement);
+            });
+        }
+
+        // Get All Equipment Items
+        function getAllEquipmentItems() {
+            const items = [];
+
+            // Weapons
+            if (EQUIPMENT.weapons) {
+                Object.entries(EQUIPMENT.weapons).forEach(([key, weapon]) => {
+                    items.push({
+                        id: `weapon_${key}`,
+                        name: weapon.name,
+                        category: weapon.category,
+                        weight: weapon.weight || 0,
+                        cost: weapon.cost,
+                        description: weapon.description,
+                        type: 'weapons',
+                        data: weapon
+                    });
+                });
+            }
+
+            // Armor
+            if (EQUIPMENT.armor) {
+                Object.entries(EQUIPMENT.armor).forEach(([key, armor]) => {
+                    items.push({
+                        id: `armor_${key}`,
+                        name: armor.name,
+                        category: armor.category,
+                        weight: armor.weight || 0,
+                        cost: armor.cost,
+                        description: armor.description,
+                        type: 'armor',
+                        data: armor
+                    });
+                });
+            }
+
+            // Adventuring Gear
+            if (EQUIPMENT.adventuringGear) {
+                Object.entries(EQUIPMENT.adventuringGear).forEach(([key, gear]) => {
+                    items.push({
+                        id: `gear_${key}`,
+                        name: gear.name,
+                        category: 'Adventuring Gear',
+                        weight: gear.weight || 0,
+                        cost: gear.cost,
+                        description: gear.description,
+                        type: 'gear',
+                        data: gear
+                    });
+                });
+            }
+
+            // Tools
+            if (EQUIPMENT.tools) {
+                Object.entries(EQUIPMENT.tools).forEach(([key, tool]) => {
+                    items.push({
+                        id: `tool_${key}`,
+                        name: tool.name,
+                        category: 'Tools',
+                        weight: tool.weight || 0,
+                        cost: tool.cost,
+                        description: tool.description,
+                        type: 'tools',
+                        data: tool
+                    });
+                });
+            }
+
+            // Ammunition
+            if (EQUIPMENT.ammunition) {
+                Object.entries(EQUIPMENT.ammunition).forEach(([key, ammo]) => {
+                    items.push({
+                        id: `ammo_${key}`,
+                        name: ammo.name,
+                        category: 'Ammunition',
+                        weight: ammo.weight || 0,
+                        cost: ammo.cost,
+                        description: ammo.description,
+                        quantity: ammo.quantity,
+                        type: 'ammunition',
+                        data: ammo
+                    });
+                });
+            }
+
+            return items;
+        }
+
+        // Create Equipment Item Element
+        function createEquipmentItemElement(item) {
+            const div = document.createElement('div');
+            div.className = 'equipment-item';
+            div.setAttribute('role', 'listitem');
+
+            const costText = item.cost ? `${item.cost.amount} ${item.cost.unit}` : 'N/A';
+            const weightText = item.weight ? `${item.weight} lb` : '0 lb';
+
+            div.innerHTML = `
+                <div class="equipment-item-info">
+                    <div class="equipment-item-name">${item.name}</div>
+                    <div class="equipment-item-details">${costText} | ${weightText}</div>
+                </div>
+                <button class="equipment-item-add" onclick="addItemToInventory('${item.id}')" aria-label="Add ${item.name} to inventory">Add</button>
+            `;
+
+            return div;
+        }
+
+        // Add Item to Inventory
+        function addItemToInventory(itemId) {
+            const allItems = getAllEquipmentItems();
+            const item = allItems.find(i => i.id === itemId);
+
+            if (!item) return;
+
+            // Check if item already exists in inventory
+            const existingIndex = inventory.findIndex(i => i.id === itemId);
+
+            if (existingIndex !== -1) {
+                inventory[existingIndex].quantity++;
+            } else {
+                inventory.push({
+                    id: itemId,
+                    name: item.name,
+                    category: item.category,
+                    weight: item.weight,
+                    quantity: 1,
+                    status: 'carried',
+                    description: item.description,
+                    isCustom: false
+                });
+            }
+
+            updateUI();
+            saveInventory();
+            showToast(`Added ${item.name} to inventory`);
+        }
+
+        // Remove Item from Inventory
+        function removeItem(index) {
+            const itemName = inventory[index].name;
+            inventory.splice(index, 1);
+            updateUI();
+            saveInventory();
+            showToast(`Removed ${itemName} from inventory`);
+        }
+
+        // Update Item Quantity
+        function updateItemQuantity(index, quantity) {
+            const qty = parseInt(quantity) || 1;
+            if (qty < 1) {
+                removeItem(index);
+            } else {
+                inventory[index].quantity = qty;
+                updateUI();
+                saveInventory();
+            }
+        }
+
+        // Update Item Status
+        function updateItemStatus(index, status) {
+            inventory[index].status = status;
+            updateUI();
+            saveInventory();
+        }
+
+        // Update UI
+        function updateUI() {
+            updateInventoryTable();
+            updateCapacity();
+            updateCurrencyTotal();
+        }
+
+        // Update Inventory Table
+        function updateInventoryTable() {
+            const tbody = document.getElementById('inventory-body');
+            const emptyMessage = document.getElementById('empty-inventory');
+
+            tbody.innerHTML = '';
+
+            if (inventory.length === 0) {
+                emptyMessage.style.display = 'block';
+                return;
+            }
+
+            emptyMessage.style.display = 'none';
+
+            inventory.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                const totalWeight = (item.weight * item.quantity).toFixed(2);
+
+                tr.innerHTML = `
+                    <td>
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-category">${item.category || 'Custom'}</div>
+                    </td>
+                    <td>
+                        <input type="number" class="quantity-input" value="${item.quantity}" min="1"
+                               onchange="updateItemQuantity(${index}, this.value)"
+                               aria-label="Quantity of ${item.name}">
+                    </td>
+                    <td class="item-weight">${item.weight} lb</td>
+                    <td class="item-weight">${totalWeight} lb</td>
+                    <td>
+                        <select class="status-select" onchange="updateItemStatus(${index}, this.value)"
+                                aria-label="Status of ${item.name}">
+                            <option value="equipped" ${item.status === 'equipped' ? 'selected' : ''}>Equipped</option>
+                            <option value="carried" ${item.status === 'carried' ? 'selected' : ''}>Carried</option>
+                            <option value="stored" ${item.status === 'stored' ? 'selected' : ''}>Stored</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button class="btn-remove-item" onclick="removeItem(${index})"
+                                aria-label="Remove ${item.name}">Remove</button>
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Update Capacity
+        function updateCapacity() {
+            const str = parseInt(document.getElementById('strength-score').value) || 10;
+            strengthScore = str;
+
+            // Calculate capacities (using variant encumbrance rules)
+            const carryCapacity = str * 15;
+            const encumberedThreshold = str * 5;
+            const heavilyThreshold = str * 10;
+
+            // Calculate current weight (only equipped and carried items)
+            let currentWeight = 0;
+            inventory.forEach(item => {
+                if (item.status !== 'stored') {
+                    currentWeight += item.weight * item.quantity;
+                }
+            });
+
+            // Add currency weight (50 coins = 1 lb)
+            const totalCoins = currency.cp + currency.sp + currency.ep + currency.gp + currency.pp;
+            currentWeight += totalCoins / 50;
+
+            currentWeight = parseFloat(currentWeight.toFixed(2));
+
+            // Update display
+            document.getElementById('current-weight').textContent = `${currentWeight} lbs`;
+            document.getElementById('carry-capacity').textContent = `${carryCapacity} lbs`;
+            document.getElementById('encumbered-threshold').textContent = `${encumberedThreshold} lbs`;
+            document.getElementById('heavily-threshold').textContent = `${heavilyThreshold} lbs`;
+
+            // Update capacity bar
+            const percentage = Math.min((currentWeight / carryCapacity) * 100, 100);
+            const capacityFill = document.getElementById('capacity-fill');
+            const capacityText = document.getElementById('capacity-text');
+            const statusElement = document.getElementById('encumbrance-status');
+
+            capacityFill.style.width = `${percentage}%`;
+            capacityText.textContent = `${currentWeight} / ${carryCapacity} lbs`;
+
+            // Determine encumbrance status
+            capacityFill.classList.remove('normal', 'encumbered', 'heavily-encumbered');
+            statusElement.classList.remove('normal', 'encumbered', 'heavily-encumbered');
+
+            if (currentWeight > heavilyThreshold) {
+                capacityFill.classList.add('heavily-encumbered');
+                statusElement.classList.add('heavily-encumbered');
+                statusElement.textContent = 'Heavily Encumbered (Speed -20, Disadvantage)';
+            } else if (currentWeight > encumberedThreshold) {
+                capacityFill.classList.add('encumbered');
+                statusElement.classList.add('encumbered');
+                statusElement.textContent = 'Encumbered (Speed -10)';
+            } else {
+                capacityFill.classList.add('normal');
+                statusElement.classList.add('normal');
+                statusElement.textContent = 'Normal';
+            }
+        }
+
+        // Update Currency Total
+        function updateCurrencyTotal() {
+            // Convert everything to GP
+            // 1 PP = 10 GP, 1 GP = 1 GP, 1 EP = 0.5 GP, 1 SP = 0.1 GP, 1 CP = 0.01 GP
+            const totalGP = (currency.cp * 0.01) +
+                           (currency.sp * 0.1) +
+                           (currency.ep * 0.5) +
+                           currency.gp +
+                           (currency.pp * 10);
+
+            document.getElementById('currency-total').textContent = `${totalGP.toFixed(2)} GP`;
+        }
+
+        // Currency Conversion
+        function convertCurrency(from, to) {
+            const rates = {
+                'cp_sp': { from: 10, to: 1 },
+                'sp_gp': { from: 10, to: 1 },
+                'ep_gp': { from: 2, to: 1 },
+                'gp_pp': { from: 10, to: 1 }
+            };
+
+            const key = `${from}_${to}`;
+            const rate = rates[key];
+
+            if (!rate) return;
+
+            if (currency[from] >= rate.from) {
+                const conversions = Math.floor(currency[from] / rate.from);
+                currency[from] -= conversions * rate.from;
+                currency[to] += conversions * rate.to;
+
+                // Update inputs
+                document.getElementById(`currency-${from}`).value = currency[from];
+                document.getElementById(`currency-${to}`).value = currency[to];
+
+                updateCurrencyTotal();
+                updateCapacity();
+                saveInventory();
+                showToast(`Converted ${conversions * rate.from} ${from.toUpperCase()} to ${conversions * rate.to} ${to.toUpperCase()}`);
+            } else {
+                showToast(`Not enough ${from.toUpperCase()} to convert`, true);
+            }
+        }
+
+        // Consolidate Currency
+        function consolidateCurrency() {
+            // Convert everything to copper first
+            let totalCopper = currency.cp +
+                             (currency.sp * 10) +
+                             (currency.ep * 50) +
+                             (currency.gp * 100) +
+                             (currency.pp * 1000);
+
+            // Convert back to highest denominations
+            currency.pp = Math.floor(totalCopper / 1000);
+            totalCopper %= 1000;
+
+            currency.gp = Math.floor(totalCopper / 100);
+            totalCopper %= 100;
+
+            currency.sp = Math.floor(totalCopper / 10);
+            totalCopper %= 10;
+
+            currency.cp = totalCopper;
+            currency.ep = 0; // Electrum is not used in consolidation
+
+            // Update inputs
+            ['cp', 'sp', 'ep', 'gp', 'pp'].forEach(type => {
+                document.getElementById(`currency-${type}`).value = currency[type];
+            });
+
+            updateCurrencyTotal();
+            updateCapacity();
+            saveInventory();
+            showToast('Currency consolidated');
+        }
+
+        // Custom Item Modal
+        function openCustomItemModal() {
+            document.getElementById('custom-item-modal').classList.add('active');
+            document.getElementById('custom-name').focus();
+        }
+
+        function closeCustomItemModal() {
+            document.getElementById('custom-item-modal').classList.remove('active');
+            // Reset form
+            document.getElementById('custom-name').value = '';
+            document.getElementById('custom-category').value = 'Custom';
+            document.getElementById('custom-weight').value = '0';
+            document.getElementById('custom-quantity').value = '1';
+            document.getElementById('custom-description').value = '';
+        }
+
+        function addCustomItem(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('custom-name').value.trim();
+            const category = document.getElementById('custom-category').value;
+            const weight = parseFloat(document.getElementById('custom-weight').value) || 0;
+            const quantity = parseInt(document.getElementById('custom-quantity').value) || 1;
+            const description = document.getElementById('custom-description').value.trim();
+
+            if (!name) {
+                showToast('Please enter an item name', true);
+                return;
+            }
+
+            inventory.push({
+                id: `custom_${Date.now()}`,
+                name: name,
+                category: category,
+                weight: weight,
+                quantity: quantity,
+                status: 'carried',
+                description: description,
+                isCustom: true
+            });
+
+            closeCustomItemModal();
+            updateUI();
+            saveInventory();
+            showToast(`Added ${name} to inventory`);
+        }
+
+        // Save/Load Inventory
+        function saveInventory() {
+            const data = {
+                inventory: inventory,
+                currency: currency,
+                strengthScore: strengthScore
+            };
+            localStorage.setItem('dnd-inventory', JSON.stringify(data));
+        }
+
+        function loadInventory() {
+            const saved = localStorage.getItem('dnd-inventory');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    inventory = data.inventory || [];
+                    currency = data.currency || { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 };
+                    strengthScore = data.strengthScore || 10;
+
+                    // Update UI elements
+                    document.getElementById('strength-score').value = strengthScore;
+                    ['cp', 'sp', 'ep', 'gp', 'pp'].forEach(type => {
+                        document.getElementById(`currency-${type}`).value = currency[type];
+                    });
+                } catch (e) {
+                    console.error('Error loading inventory:', e);
+                }
+            }
+        }
+
+        // Export Inventory
+        function exportInventory() {
+            const data = {
+                inventory: inventory,
+                currency: currency,
+                strengthScore: strengthScore,
+                exportDate: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `dnd-inventory-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Inventory exported');
+        }
+
+        // Import Inventory
+        function importInventory(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+
+                    if (data.inventory) {
+                        inventory = data.inventory;
+                    }
+                    if (data.currency) {
+                        currency = data.currency;
+                        ['cp', 'sp', 'ep', 'gp', 'pp'].forEach(type => {
+                            document.getElementById(`currency-${type}`).value = currency[type] || 0;
+                        });
+                    }
+                    if (data.strengthScore) {
+                        strengthScore = data.strengthScore;
+                        document.getElementById('strength-score').value = strengthScore;
+                    }
+
+                    updateUI();
+                    saveInventory();
+                    showToast('Inventory imported successfully');
+                } catch (e) {
+                    console.error('Error importing inventory:', e);
+                    showToast('Error importing inventory file', true);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // Reset file input
+        }
+
+        // Clear Inventory
+        function clearInventory() {
+            if (confirm('Are you sure you want to clear your entire inventory? This cannot be undone.')) {
+                inventory = [];
+                currency = { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 };
+
+                ['cp', 'sp', 'ep', 'gp', 'pp'].forEach(type => {
+                    document.getElementById(`currency-${type}`).value = 0;
+                });
+
+                updateUI();
+                saveInventory();
+                showToast('Inventory cleared');
+            }
+        }
+
+        // Toast Notification
+        function showToast(message, isError = false) {
+            const toast = document.createElement('div');
+            toast.className = 'toast' + (isError ? ' error' : '');
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

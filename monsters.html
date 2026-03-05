@@ -643,7 +643,9 @@
             <a href="characters.html" class="nav-link">My Characters</a>
             <a href="spells.html" class="nav-link">Spells</a>
             <a href="monsters.html" class="nav-link active">Monsters</a>
-            <a href="combat.html" class="nav-link">Combat Tracker</a>
+            <a href="monster-builder.html" class="nav-link">Monster Builder</a>
+            <a href="combat.html" class="nav-link">Combat</a>
+            <a href="inventory.html" class="nav-link">Inventory</a>
         </nav>
     </header>
 
@@ -715,6 +717,17 @@
         const monstersList = document.getElementById('monsters-list');
         const monsterCount = document.getElementById('monster-count');
         const clearFiltersBtn = document.getElementById('clear-filters-btn');
+
+        // Merge custom monsters from localStorage into MONSTERS
+        function loadCustomMonsters() {
+            const customMonstersDB = JSON.parse(localStorage.getItem('customMonstersDB') || '{}');
+            Object.entries(customMonstersDB).forEach(([key, monster]) => {
+                MONSTERS[key] = monster;
+            });
+        }
+
+        // Load custom monsters immediately
+        loadCustomMonsters();
 
         // CR Values mapping
         const crValues = [
