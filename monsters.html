@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monster Database - D&D Online</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Layout - consistent with spells.html */
+        .monsters-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Filter Panel - matches spells.html exactly */
+        .filters-panel {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .filters-panel h3 {
+            margin-top: 0;
+            color: #e4a11b;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+        }
+
+        fieldset.filter-group {
+            border: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+        }
+
+        fieldset.filter-group legend {
+            display: block;
+            margin-bottom: 5px;
+            color: #ccc;
+            font-weight: bold;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ccc;
+            font-weight: bold;
+        }
+
+        .filter-group input[type="text"],
+        .filter-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background: #1a1a1a;
+            color: #fff;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .filter-group input[type="text"]:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: #e4a11b;
+            box-shadow: 0 0 0 2px rgba(228, 161, 27, 0.2);
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: normal;
+            cursor: pointer;
+            padding: 4px 8px;
+            background: #333;
+            border-radius: 4px;
+            font-size: 0.9em;
+            transition: background 0.2s;
+        }
+
+        .checkbox-group label:hover {
+            background: #444;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            accent-color: #e4a11b;
+        }
+
+        /* CR Range Slider */
+        .cr-range-container {
+            margin-top: 10px;
+        }
+
+        .cr-slider {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .cr-slider input[type="range"] {
+            flex: 1;
+            accent-color: #e4a11b;
+            height: 6px;
+            cursor: pointer;
+        }
+
+        .cr-value {
+            min-width: 40px;
+            text-align: center;
+            color: #e4a11b;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .cr-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8em;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        /* Clear Filters Button - matches spells.html */
+        .clear-filters {
+            width: 100%;
+            padding: 10px;
+            background: #444;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 0.95rem;
+            transition: background 0.2s;
+        }
+
+        .clear-filters:hover {
+            background: #555;
+        }
+
+        /* Monster List */
+        .monsters-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .monster-count {
+            color: #888;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        /* Monster Card - consistent with spell-card */
+        .monster-card {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+            border-left: 4px solid #666;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .monster-card:hover {
+            background: #333;
+            transform: translateX(5px);
+        }
+
+        .monster-card.expanded {
+            border-left-color: #e4a11b;
+            overflow: visible;
+        }
+
+        /* Monster Type Color Coding */
+        .monster-card[data-type="Aberration"] { border-left-color: #9b59b6; }
+        .monster-card[data-type="Beast"] { border-left-color: #27ae60; }
+        .monster-card[data-type="Celestial"] { border-left-color: #f1c40f; }
+        .monster-card[data-type="Construct"] { border-left-color: #95a5a6; }
+        .monster-card[data-type="Dragon"] { border-left-color: #e74c3c; }
+        .monster-card[data-type="Elemental"] { border-left-color: #3498db; }
+        .monster-card[data-type="Fey"] { border-left-color: #1abc9c; }
+        .monster-card[data-type="Fiend"] { border-left-color: #c0392b; }
+        .monster-card[data-type="Giant"] { border-left-color: #d35400; }
+        .monster-card[data-type="Humanoid"] { border-left-color: #2980b9; }
+        .monster-card[data-type="Monstrosity"] { border-left-color: #8e44ad; }
+        .monster-card[data-type="Ooze"] { border-left-color: #16a085; }
+        .monster-card[data-type="Plant"] { border-left-color: #2ecc71; }
+        .monster-card[data-type="Undead"] { border-left-color: #34495e; }
+
+        .monster-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .monster-header > div:first-child {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .monster-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #fff;
+            margin: 0;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+
+        .monster-subtitle {
+            color: #888;
+            font-size: 0.9em;
+            font-style: italic;
+            margin-top: 2px;
+            word-break: break-word;
+        }
+
+        /* Tags - consistent with spell tags */
+        .monster-tags {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .monster-tag {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            background: #444;
+            color: #ccc;
+            white-space: nowrap;
+        }
+
+        .monster-tag.cr {
+            background: #8e44ad;
+            color: #fff;
+        }
+
+        .monster-tag.size {
+            background: #2980b9;
+            color: #fff;
+        }
+
+        /* ============================================
+           STAT BLOCK - Classic D&D Style, Modernized
+           ============================================ */
+        .stat-block {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.4s ease, opacity 0.3s ease, margin-top 0.3s ease, padding-top 0.3s ease;
+            margin-top: 0;
+            padding-top: 0;
+            min-width: 0;
+        }
+
+        .monster-card.expanded .stat-block {
+            max-height: none;
+            opacity: 1;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #e4a11b;
+            overflow: visible;
+        }
+
+        /* Stat Block Header */
+        .stat-block-header {
+            border-bottom: 2px solid #e4a11b;
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+            min-width: 0;
+        }
+
+        .stat-block-header .name {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #e4a11b;
+            margin: 0;
+            letter-spacing: 0.5px;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+
+        .stat-block-header .type-line {
+            font-style: italic;
+            color: #aaa;
+            font-size: 0.95rem;
+            margin-top: 4px;
+            word-break: break-word;
+        }
+
+        /* Divider Lines */
+        .stat-block-divider {
+            height: 2px;
+            background: linear-gradient(to right, #e4a11b, transparent);
+            margin: 12px 0;
+        }
+
+        /* Basic Properties (AC, HP, Speed) */
+        .stat-block-basics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 8px;
+            margin-bottom: 12px;
+            min-width: 0;
+        }
+
+        .stat-block-basics .property {
+            color: #ddd;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+
+        .stat-block-basics .property-name {
+            color: #e4a11b;
+            font-weight: bold;
+        }
+
+        /* Ability Scores Grid */
+        .ability-scores {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(50px, 1fr));
+            gap: 8px;
+            text-align: center;
+            background: #1a1a1a;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 12px 0;
+            border: 1px solid #333;
+            overflow-x: auto;
+            min-width: 0;
+        }
+
+        .ability-score {
+            padding: 8px 4px;
+            min-width: 0;
+        }
+
+        .ability-score .ability-name {
+            color: #e4a11b;
+            font-weight: bold;
+            font-size: 0.85em;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+        }
+
+        .ability-score .ability-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #fff;
+            white-space: nowrap;
+        }
+
+        .ability-score .ability-mod {
+            color: #888;
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+
+        /* Properties Section (Saves, Skills, Immunities, etc.) */
+        .stat-block-properties {
+            margin: 12px 0;
+            min-width: 0;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .stat-block-properties .property {
+            margin-bottom: 6px;
+            color: #ddd;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+
+        .stat-block-properties .property-name {
+            color: #e4a11b;
+            font-weight: bold;
+        }
+
+        /* Traits, Actions, Reactions, Legendary Actions */
+        .trait-block,
+        .action-block,
+        .legendary-block,
+        .reaction-block {
+            margin: 12px 0;
+            min-width: 0;
+        }
+
+        .trait-block h4,
+        .action-block h4,
+        .legendary-block h4,
+        .reaction-block h4 {
+            color: #e4a11b;
+            font-size: 1.1rem;
+            border-bottom: 1px solid #e4a11b;
+            padding-bottom: 6px;
+            margin: 16px 0 12px 0;
+            letter-spacing: 0.5px;
+        }
+
+        .trait,
+        .action,
+        .legendary-action,
+        .reaction {
+            margin-bottom: 12px;
+            line-height: 1.6;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+
+        .trait .trait-name,
+        .action .action-name,
+        .legendary-action .la-name,
+        .reaction .reaction-name {
+            font-weight: bold;
+            font-style: italic;
+            color: #fff;
+        }
+
+        .trait .trait-description,
+        .action .action-description,
+        .legendary-action .la-description,
+        .reaction .reaction-description {
+            color: #ccc;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+
+        /* Legendary Actions Description */
+        .legendary-intro {
+            color: #aaa;
+            font-size: 0.9em;
+            margin-bottom: 12px;
+            line-height: 1.5;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            border-left: 3px solid #e4a11b;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+
+        /* No Results */
+        .no-monsters {
+            text-align: center;
+            color: #888;
+            padding: 40px;
+            background: #2a2a2a;
+            border-radius: 8px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            .monsters-container {
+                grid-template-columns: 1fr;
+            }
+
+            .filters-panel {
+                position: static;
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .monsters-container {
+                grid-template-columns: 1fr;
+                padding: 15px;
+                gap: 15px;
+            }
+
+            .filters-panel {
+                position: static;
+                padding: 15px;
+            }
+
+            .ability-scores {
+                grid-template-columns: repeat(3, minmax(45px, 1fr));
+                gap: 6px;
+                padding: 10px;
+            }
+
+            .ability-score {
+                padding: 6px 2px;
+            }
+
+            .ability-score .ability-name {
+                font-size: 0.75em;
+                letter-spacing: 0;
+            }
+
+            .ability-score .ability-value {
+                font-size: 1em;
+            }
+
+            .ability-score .ability-mod {
+                font-size: 0.8em;
+            }
+
+            .stat-block-basics {
+                grid-template-columns: 1fr;
+            }
+
+            .monster-header {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .monster-tags {
+                align-self: flex-start;
+            }
+
+            .monster-card {
+                padding: 12px;
+            }
+
+            .stat-block-header .name {
+                font-size: 1.3em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .monsters-container {
+                padding: 10px;
+                gap: 10px;
+            }
+
+            .ability-scores {
+                grid-template-columns: repeat(2, minmax(60px, 1fr));
+                gap: 8px;
+            }
+
+            .checkbox-group {
+                gap: 6px;
+            }
+
+            .checkbox-group label {
+                padding: 3px 6px;
+                font-size: 0.85em;
+            }
+
+            .monster-name {
+                font-size: 1.1em;
+            }
+
+            .monster-tag {
+                padding: 2px 6px;
+                font-size: 0.7em;
+            }
+
+            .filters-panel {
+                padding: 12px;
+            }
+
+            .filter-group {
+                margin-bottom: 15px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .ability-scores {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .monster-header > div:first-child {
+                width: 100%;
+            }
+
+            .monster-tags {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+
+        /* Navigation link overflow prevention */
+        header .main-nav {
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        header .main-nav .nav-link {
+            white-space: nowrap;
+            min-width: 0;
+        }
+
+        @media (max-width: 600px) {
+            header .main-nav {
+                gap: 6px;
+            }
+
+            header .main-nav .nav-link {
+                padding: 6px 10px;
+                font-size: 0.85em;
+            }
+        }
+
+        @media (max-width: 400px) {
+            header .main-nav .nav-link {
+                padding: 5px 8px;
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to content</a>
+    <header>
+        <h1>Monster Database</h1>
+        <nav class="main-nav">
+            <a href="index.html" class="nav-link">Game Tools</a>
+            <a href="character-creator.html" class="nav-link">Character Creator</a>
+            <a href="characters.html" class="nav-link">My Characters</a>
+            <a href="spells.html" class="nav-link">Spells</a>
+            <a href="monsters.html" class="nav-link active">Monsters</a>
+            <a href="combat.html" class="nav-link">Combat Tracker</a>
+        </nav>
+    </header>
+
+    <main class="monsters-container" id="main">
+        <aside class="filters-panel" aria-label="Monster filters">
+            <h3 id="filters-heading">Filters</h3>
+
+            <div class="filter-group">
+                <label for="monster-search">Search</label>
+                <input type="text" id="monster-search" placeholder="Search monsters...">
+            </div>
+
+            <fieldset class="filter-group">
+                <legend>Challenge Rating</legend>
+                <div class="cr-range-container">
+                    <div class="cr-slider">
+                        <label for="cr-min" class="cr-value" id="cr-min-value">0</label>
+                        <input type="range" id="cr-min" min="0" max="30" value="0" step="1" aria-label="Minimum challenge rating">
+                    </div>
+                    <div class="cr-slider">
+                        <label for="cr-max" class="cr-value" id="cr-max-value">30</label>
+                        <input type="range" id="cr-max" min="0" max="30" value="30" step="1" aria-label="Maximum challenge rating">
+                    </div>
+                    <div class="cr-labels">
+                        <span>Min CR</span>
+                        <span>Max CR</span>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="filter-group">
+                <legend>Type</legend>
+                <div class="checkbox-group" id="type-filters" role="group" aria-label="Filter by creature type">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </fieldset>
+
+            <fieldset class="filter-group">
+                <legend>Size</legend>
+                <div class="checkbox-group" id="size-filters" role="group" aria-label="Filter by creature size">
+                    <label><input type="checkbox" value="Tiny" checked> Tiny</label>
+                    <label><input type="checkbox" value="Small" checked> Small</label>
+                    <label><input type="checkbox" value="Medium" checked> Medium</label>
+                    <label><input type="checkbox" value="Large" checked> Large</label>
+                    <label><input type="checkbox" value="Huge" checked> Huge</label>
+                    <label><input type="checkbox" value="Gargantuan" checked> Gargantuan</label>
+                </div>
+            </fieldset>
+
+            <button class="clear-filters" id="clear-filters-btn">Clear All Filters</button>
+        </aside>
+
+        <section class="monsters-list" id="monsters-list" aria-live="polite" aria-label="Monster list">
+            <div class="monster-count" id="monster-count" aria-live="polite">Loading monsters...</div>
+            <!-- Monsters will be populated here -->
+        </section>
+    </main>
+
+    <script src="data/monsters.js"></script>
+    <script>
+        // DOM Elements
+        const searchInput = document.getElementById('monster-search');
+        const crMinSlider = document.getElementById('cr-min');
+        const crMaxSlider = document.getElementById('cr-max');
+        const crMinValue = document.getElementById('cr-min-value');
+        const crMaxValue = document.getElementById('cr-max-value');
+        const typeFiltersContainer = document.getElementById('type-filters');
+        const sizeFiltersContainer = document.getElementById('size-filters');
+        const monstersList = document.getElementById('monsters-list');
+        const monsterCount = document.getElementById('monster-count');
+        const clearFiltersBtn = document.getElementById('clear-filters-btn');
+
+        // CR Values mapping
+        const crValues = [
+            "0", "1/8", "1/4", "1/2", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
+            "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
+            "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"
+        ];
+
+        // Utility Functions
+        function crToIndex(cr) {
+            const index = crValues.indexOf(cr);
+            return index >= 0 ? index : 0;
+        }
+
+        function indexToCR(index) {
+            return crValues[index] || "0";
+        }
+
+        function getCRNumericValue(cr) {
+            if (cr === "0") return 0;
+            if (cr === "1/8") return 0.125;
+            if (cr === "1/4") return 0.25;
+            if (cr === "1/2") return 0.5;
+            return parseFloat(cr);
+        }
+
+        function getModifier(score) {
+            const mod = Math.floor((score - 10) / 2);
+            return mod >= 0 ? `+${mod}` : `${mod}`;
+        }
+
+        // Initialize Type Filters
+        function initTypeFilters() {
+            const types = getMonsterTypes();
+            typeFiltersContainer.innerHTML = types.map(type =>
+                `<label><input type="checkbox" value="${type}" checked> ${type}</label>`
+            ).join('');
+
+            typeFiltersContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.addEventListener('change', renderMonsters);
+            });
+        }
+
+        // Get Selected Filters
+        function getSelectedTypes() {
+            const types = [];
+            typeFiltersContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                if (cb.checked) types.push(cb.value);
+            });
+            return types;
+        }
+
+        function getSelectedSizes() {
+            const sizes = [];
+            sizeFiltersContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                if (cb.checked) sizes.push(cb.value);
+            });
+            return sizes;
+        }
+
+        // Filter Monsters
+        function filterMonsters() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedTypes = getSelectedTypes();
+            const selectedSizes = getSelectedSizes();
+            const minCR = getCRNumericValue(indexToCR(parseInt(crMinSlider.value)));
+            const maxCR = getCRNumericValue(indexToCR(parseInt(crMaxSlider.value)));
+
+            return Object.entries(MONSTERS).filter(([key, monster]) => {
+                if (searchTerm && !monster.name.toLowerCase().includes(searchTerm)) {
+                    return false;
+                }
+                if (!selectedTypes.includes(monster.type)) {
+                    return false;
+                }
+                if (!selectedSizes.includes(monster.size)) {
+                    return false;
+                }
+                const monsterCR = getCRNumericValue(monster.cr);
+                if (monsterCR < minCR || monsterCR > maxCR) {
+                    return false;
+                }
+                return true;
+            }).sort((a, b) => {
+                const crA = getCRNumericValue(a[1].cr);
+                const crB = getCRNumericValue(b[1].cr);
+                if (crA !== crB) return crA - crB;
+                return a[1].name.localeCompare(b[1].name);
+            });
+        }
+
+        // Format Functions
+        function formatSpeed(speed) {
+            const parts = [];
+            if (speed.walk) parts.push(`${speed.walk} ft.`);
+            if (speed.fly) parts.push(`fly ${speed.fly} ft.${speed.hover ? ' (hover)' : ''}`);
+            if (speed.swim) parts.push(`swim ${speed.swim} ft.`);
+            if (speed.climb) parts.push(`climb ${speed.climb} ft.`);
+            if (speed.burrow) parts.push(`burrow ${speed.burrow} ft.`);
+            return parts.join(', ');
+        }
+
+        function formatSavingThrows(monster) {
+            if (!monster.savingThrows) return null;
+            const names = { str: 'Str', dex: 'Dex', con: 'Con', int: 'Int', wis: 'Wis', cha: 'Cha' };
+            return Object.entries(monster.savingThrows)
+                .map(([ability, value]) => `${names[ability]} ${value >= 0 ? '+' : ''}${value}`)
+                .join(', ');
+        }
+
+        function formatSkills(monster) {
+            if (!monster.skills) return null;
+            const names = {
+                perception: 'Perception', stealth: 'Stealth', athletics: 'Athletics',
+                acrobatics: 'Acrobatics', arcana: 'Arcana', deception: 'Deception',
+                history: 'History', insight: 'Insight', intimidation: 'Intimidation',
+                investigation: 'Investigation', medicine: 'Medicine', nature: 'Nature',
+                performance: 'Performance', persuasion: 'Persuasion', religion: 'Religion',
+                sleightOfHand: 'Sleight of Hand', survival: 'Survival'
+            };
+            return Object.entries(monster.skills)
+                .map(([skill, value]) => `${names[skill] || skill.charAt(0).toUpperCase() + skill.slice(1)} ${value >= 0 ? '+' : ''}${value}`)
+                .join(', ');
+        }
+
+        // Render Stat Block
+        function renderStatBlock(monster) {
+            const typeLine = monster.subtype
+                ? `${monster.size} ${monster.type.toLowerCase()} (${monster.subtype}), ${monster.alignment}`
+                : `${monster.size} ${monster.type.toLowerCase()}, ${monster.alignment}`;
+
+            const acText = monster.acType ? `${monster.ac} (${monster.acType})` : monster.ac;
+            const savingThrows = formatSavingThrows(monster);
+            const skills = formatSkills(monster);
+
+            let html = `
+                <div class="stat-block">
+                    <div class="stat-block-header">
+                        <h3 class="name">${monster.name}</h3>
+                        <div class="type-line">${typeLine}</div>
+                    </div>
+
+                    <div class="stat-block-divider"></div>
+
+                    <div class="stat-block-basics">
+                        <div class="property">
+                            <span class="property-name">Armor Class</span> ${acText}
+                        </div>
+                        <div class="property">
+                            <span class="property-name">Hit Points</span> ${monster.hp} (${monster.hitDice})
+                        </div>
+                        <div class="property">
+                            <span class="property-name">Speed</span> ${formatSpeed(monster.speed)}
+                        </div>
+                    </div>
+
+                    <div class="stat-block-divider"></div>
+
+                    <div class="ability-scores">
+                        <div class="ability-score">
+                            <div class="ability-name">STR</div>
+                            <div class="ability-value">${monster.abilities.str}</div>
+                            <div class="ability-mod">(${getModifier(monster.abilities.str)})</div>
+                        </div>
+                        <div class="ability-score">
+                            <div class="ability-name">DEX</div>
+                            <div class="ability-value">${monster.abilities.dex}</div>
+                            <div class="ability-mod">(${getModifier(monster.abilities.dex)})</div>
+                        </div>
+                        <div class="ability-score">
+                            <div class="ability-name">CON</div>
+                            <div class="ability-value">${monster.abilities.con}</div>
+                            <div class="ability-mod">(${getModifier(monster.abilities.con)})</div>
+                        </div>
+                        <div class="ability-score">
+                            <div class="ability-name">INT</div>
+                            <div class="ability-value">${monster.abilities.int}</div>
+                            <div class="ability-mod">(${getModifier(monster.abilities.int)})</div>
+                        </div>
+                        <div class="ability-score">
+                            <div class="ability-name">WIS</div>
+                            <div class="ability-value">${monster.abilities.wis}</div>
+                            <div class="ability-mod">(${getModifier(monster.abilities.wis)})</div>
+                        </div>
+                        <div class="ability-score">
+                            <div class="ability-name">CHA</div>
+                            <div class="ability-value">${monster.abilities.cha}</div>
+                            <div class="ability-mod">(${getModifier(monster.abilities.cha)})</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-block-divider"></div>
+
+                    <div class="stat-block-properties">
+                        ${savingThrows ? `<div class="property"><span class="property-name">Saving Throws</span> ${savingThrows}</div>` : ''}
+                        ${skills ? `<div class="property"><span class="property-name">Skills</span> ${skills}</div>` : ''}
+                        ${monster.damageVulnerabilities ? `<div class="property"><span class="property-name">Damage Vulnerabilities</span> ${monster.damageVulnerabilities.join(', ')}</div>` : ''}
+                        ${monster.damageResistances ? `<div class="property"><span class="property-name">Damage Resistances</span> ${monster.damageResistances.join(', ')}</div>` : ''}
+                        ${monster.damageImmunities ? `<div class="property"><span class="property-name">Damage Immunities</span> ${monster.damageImmunities.join(', ')}</div>` : ''}
+                        ${monster.conditionImmunities ? `<div class="property"><span class="property-name">Condition Immunities</span> ${monster.conditionImmunities.join(', ')}</div>` : ''}
+                        <div class="property"><span class="property-name">Senses</span> ${monster.senses.join(', ')}</div>
+                        <div class="property"><span class="property-name">Languages</span> ${monster.languages.length > 0 ? monster.languages.join(', ') : '\u2014'}</div>
+                        <div class="property"><span class="property-name">Challenge</span> ${monster.cr} (${monster.xp.toLocaleString()} XP)</div>
+                    </div>
+
+                    <div class="stat-block-divider"></div>
+            `;
+
+            // Traits
+            if (monster.traits && monster.traits.length > 0) {
+                html += `<div class="trait-block">`;
+                monster.traits.forEach(trait => {
+                    html += `
+                        <div class="trait">
+                            <span class="trait-name">${trait.name}.</span>
+                            <span class="trait-description">${trait.description}</span>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+
+            // Actions
+            if (monster.actions && monster.actions.length > 0) {
+                html += `<div class="action-block"><h4>Actions</h4>`;
+                monster.actions.forEach(action => {
+                    html += `
+                        <div class="action">
+                            <span class="action-name">${action.name}.</span>
+                            <span class="action-description">${action.description}</span>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+
+            // Reactions
+            if (monster.reactions && monster.reactions.length > 0) {
+                html += `<div class="reaction-block"><h4>Reactions</h4>`;
+                monster.reactions.forEach(reaction => {
+                    html += `
+                        <div class="reaction">
+                            <span class="reaction-name">${reaction.name}.</span>
+                            <span class="reaction-description">${reaction.description}</span>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+
+            // Legendary Actions
+            if (monster.legendaryActions && monster.legendaryActions.length > 0) {
+                html += `
+                    <div class="legendary-block">
+                        <h4>Legendary Actions</h4>
+                        <p class="legendary-intro">
+                            The ${monster.name.toLowerCase()} can take 3 legendary actions, choosing from the options below.
+                            Only one legendary action option can be used at a time and only at the end of another creature's turn.
+                            The ${monster.name.toLowerCase()} regains spent legendary actions at the start of its turn.
+                        </p>
+                `;
+                monster.legendaryActions.forEach(la => {
+                    html += `
+                        <div class="legendary-action">
+                            <span class="la-name">${la.name}.</span>
+                            <span class="la-description">${la.description}</span>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+
+            html += `</div>`;
+            return html;
+        }
+
+        // Render Monster Cards
+        function renderMonsters() {
+            const filteredMonsters = filterMonsters();
+            const countText = `Showing ${filteredMonsters.length} monster${filteredMonsters.length !== 1 ? 's' : ''}`;
+            monsterCount.textContent = countText;
+
+            if (filteredMonsters.length === 0) {
+                monstersList.innerHTML = `
+                    <div class="monster-count">${countText}</div>
+                    <div class="no-monsters">
+                        <p>No monsters match your filters.</p>
+                        <button class="clear-filters" onclick="clearFilters()">Clear Filters</button>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `<div class="monster-count">${countText}</div>`;
+
+            filteredMonsters.forEach(([key, monster]) => {
+                const subtitle = monster.subtype
+                    ? `${monster.size} ${monster.type.toLowerCase()} (${monster.subtype})`
+                    : `${monster.size} ${monster.type.toLowerCase()}`;
+
+                html += `
+                    <div class="monster-card" data-type="${monster.type}" data-key="${key}" role="button" tabindex="0" aria-expanded="false" aria-label="${monster.name}, CR ${monster.cr}, ${subtitle}">
+                        <div class="monster-header">
+                            <div>
+                                <h3 class="monster-name">${monster.name}</h3>
+                                <div class="monster-subtitle">${subtitle}</div>
+                            </div>
+                            <div class="monster-tags">
+                                <span class="monster-tag cr" aria-label="Challenge Rating ${monster.cr}">CR ${monster.cr}</span>
+                                <span class="monster-tag size" aria-label="Size: ${monster.size}">${monster.size}</span>
+                            </div>
+                        </div>
+                        ${renderStatBlock(monster)}
+                    </div>
+                `;
+            });
+
+            monstersList.innerHTML = html;
+
+            // Add click and keyboard handlers for expand/collapse
+            monstersList.querySelectorAll('.monster-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const isExpanded = card.classList.toggle('expanded');
+                    card.setAttribute('aria-expanded', isExpanded);
+                });
+                card.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        const isExpanded = card.classList.toggle('expanded');
+                        card.setAttribute('aria-expanded', isExpanded);
+                    }
+                });
+            });
+        }
+
+        // Clear All Filters
+        function clearFilters() {
+            searchInput.value = '';
+            crMinSlider.value = 0;
+            crMaxSlider.value = 30;
+            crMinValue.textContent = indexToCR(0);
+            crMaxValue.textContent = indexToCR(30);
+            typeFiltersContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+            sizeFiltersContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+            renderMonsters();
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            initTypeFilters();
+            renderMonsters();
+
+            searchInput.addEventListener('input', renderMonsters);
+
+            crMinSlider.addEventListener('input', () => {
+                crMinValue.textContent = indexToCR(parseInt(crMinSlider.value));
+                if (parseInt(crMinSlider.value) > parseInt(crMaxSlider.value)) {
+                    crMaxSlider.value = crMinSlider.value;
+                    crMaxValue.textContent = indexToCR(parseInt(crMaxSlider.value));
+                }
+                renderMonsters();
+            });
+
+            crMaxSlider.addEventListener('input', () => {
+                crMaxValue.textContent = indexToCR(parseInt(crMaxSlider.value));
+                if (parseInt(crMaxSlider.value) < parseInt(crMinSlider.value)) {
+                    crMinSlider.value = crMaxSlider.value;
+                    crMinValue.textContent = indexToCR(parseInt(crMinSlider.value));
+                }
+                renderMonsters();
+            });
+
+            sizeFiltersContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.addEventListener('change', renderMonsters);
+            });
+
+            clearFiltersBtn.addEventListener('click', clearFilters);
+        });
+    </script>
+</body>
+</html>

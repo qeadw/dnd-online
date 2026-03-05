@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Characters - D&D Online</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="characters.css">
+    <style>
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to content</a>
+    <header>
+        <h1>D&D Online</h1>
+        <nav class="main-nav">
+            <a href="index.html" class="nav-link">Game Tools</a>
+            <a href="character-creator.html" class="nav-link">Character Creator</a>
+            <a href="characters.html" class="nav-link active">My Characters</a>
+            <a href="spells.html" class="nav-link">Spells</a>
+            <a href="monsters.html" class="nav-link">Monsters</a>
+            <a href="combat.html" class="nav-link">Combat Tracker</a>
+        </nav>
+    </header>
+
+    <main class="characters-main" id="main">
+        <!-- Character List View -->
+        <section id="character-list-view" class="characters-section" aria-labelledby="char-list-heading">
+            <div class="section-header">
+                <h2 id="char-list-heading">My Characters</h2>
+                <div class="header-actions">
+                    <button class="btn-secondary" onclick="importCharacter()">
+                        <span class="btn-icon">&#43;</span> Import Character
+                    </button>
+                    <label for="import-file" class="visually-hidden">Import character file</label>
+                    <input type="file" id="import-file" accept=".json" style="display: none;" onchange="handleImport(event)" aria-label="Import character JSON file">
+                </div>
+            </div>
+
+            <div id="no-characters" class="no-characters" style="display: none;">
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" role="img">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <line x1="19" y1="8" x2="19" y2="14"/>
+                            <line x1="22" y1="11" x2="16" y2="11"/>
+                        </svg>
+                    </div>
+                    <h3>No Characters Yet</h3>
+                    <p>Create your first character to begin your adventure!</p>
+                    <a href="character-creator.html" class="btn-primary">Create Character</a>
+                </div>
+            </div>
+
+            <div id="character-grid" class="character-grid" aria-live="polite" role="list" aria-label="Character list">
+                <!-- Character cards will be populated by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Character Sheet View -->
+        <section id="character-sheet-view" class="character-sheet-section" style="display: none;" aria-labelledby="sheet-heading">
+            <div class="sheet-header">
+                <button class="back-btn" onclick="showCharacterList()" aria-label="Back to character list">
+                    <span class="back-arrow" aria-hidden="true">&#8592;</span> Back to Characters
+                </button>
+                <div class="sheet-actions" role="group" aria-label="Character actions">
+                    <button class="btn-secondary" onclick="exportCurrentCharacter()" aria-label="Export character as JSON">
+                        <span class="btn-icon" aria-hidden="true">&#8595;</span> Export
+                    </button>
+                    <button class="btn-secondary" onclick="printCharacterSheet()" aria-label="Print character sheet">
+                        <span class="btn-icon" aria-hidden="true">&#9113;</span> Print
+                    </button>
+                </div>
+            </div>
+
+            <div id="character-sheet-content" class="sheet-content" aria-live="polite">
+                <!-- Character sheet will be populated by JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+        <div class="modal-overlay" onclick="closeDeleteModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="delete-modal-title">Delete Character?</h3>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="delete-char-name"></strong>?</p>
+                <p class="modal-warning">This action cannot be undone.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn-danger" onclick="confirmDelete()">Delete Character</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Scripts -->
+    <script src="data/races.js"></script>
+    <script src="data/classes.js"></script>
+    <script src="data/backgrounds.js"></script>
+    <script src="data/feats.js"></script>
+    <script src="data/spells.js"></script>
+    <script src="characters.js"></script>
+</body>
+</html>

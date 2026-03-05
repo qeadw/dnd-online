@@ -1,0 +1,1280 @@
+/* ==========================================================================
+   Characters Page Styles
+   Consistent with site-wide design patterns from styles.css and character-creator.css
+   ========================================================================== */
+
+/* ==========================================================================
+   Layout
+   ========================================================================== */
+
+.characters-main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.characters-section,
+.character-sheet-section {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 30px;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(201, 162, 39, 0.3);
+}
+
+/* ==========================================================================
+   Section Header
+   ========================================================================== */
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.section-header h2 {
+    color: #c9a227;
+    margin: 0;
+    font-size: 1.5rem;
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   Buttons - Matching site-wide patterns
+   ========================================================================== */
+
+.btn-primary {
+    padding: 12px 30px;
+    background: #c9a227;
+    color: #1a1a2e;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(201, 162, 39, 0.4);
+}
+
+.btn-secondary {
+    padding: 10px 20px;
+    background: rgba(201, 162, 39, 0.15);
+    color: #c9a227;
+    border: 1px solid rgba(201, 162, 39, 0.5);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-secondary:hover {
+    background: rgba(201, 162, 39, 0.3);
+    border-color: #c9a227;
+    transform: translateY(-1px);
+}
+
+.btn-icon {
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.btn-danger {
+    padding: 12px 25px;
+    background: linear-gradient(145deg, #8b0000, #6a0000);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(145deg, #a50000, #8b0000);
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(139, 0, 0, 0.4);
+}
+
+/* ==========================================================================
+   Empty State
+   ========================================================================== */
+
+.no-characters {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.empty-state {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.empty-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 25px;
+    color: #c9a227;
+    opacity: 0.6;
+}
+
+.empty-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.empty-state h3 {
+    color: #c9a227;
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+}
+
+.empty-state p {
+    color: #aaa;
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   Character Grid
+   ========================================================================== */
+
+.character-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+}
+
+/* ==========================================================================
+   Character Card - Matching selection-card patterns
+   ========================================================================== */
+
+.character-card {
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 12px;
+    padding: 24px;
+    border: 2px solid rgba(201, 162, 39, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    /* Prevent card content overflow */
+    overflow: hidden;
+    min-width: 0;
+}
+
+.character-card:hover {
+    border-color: rgba(201, 162, 39, 0.6);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    gap: 12px;
+}
+
+.char-name {
+    color: #c9a227;
+    font-size: 1.35rem;
+    margin: 0;
+    word-break: break-word;
+    line-height: 1.3;
+    /* Prevent overflow with truncation for very long names */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    max-width: 100%;
+}
+
+.char-level {
+    background: linear-gradient(145deg, rgba(201, 162, 39, 0.3), rgba(201, 162, 39, 0.2));
+    color: #c9a227;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    white-space: nowrap;
+    border: 1px solid rgba(201, 162, 39, 0.3);
+}
+
+.char-info {
+    color: #ccc;
+    margin-bottom: 18px;
+    /* Prevent info section overflow */
+    overflow: hidden;
+    min-width: 0;
+}
+
+.char-race-class {
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+    color: #eee;
+    /* Handle long race/class name combinations */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.char-background {
+    color: #bbb;
+    font-size: 0.9rem;
+    /* Handle long background names */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Mini Stats Display on Card */
+.char-stats {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    margin-bottom: 16px;
+    padding: 14px 10px;
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 10px;
+    border: 1px solid rgba(201, 162, 39, 0.15);
+}
+
+.stat-mini {
+    text-align: center;
+    /* Prevent stat overflow */
+    min-width: 0;
+    overflow: hidden;
+}
+
+.stat-mini .stat-label {
+    font-size: 0.75rem;
+    color: #aaa;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin-bottom: 3px;
+    /* Prevent label overflow */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stat-mini .stat-value {
+    font-size: 1.05rem;
+    font-weight: bold;
+    color: #c9a227;
+    /* Prevent value overflow */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Combat Stats on Card */
+.char-combat {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 18px;
+    padding: 12px 15px;
+    background: linear-gradient(145deg, rgba(139, 0, 0, 0.2), rgba(100, 0, 0, 0.15));
+    border-radius: 10px;
+    justify-content: center;
+    border: 1px solid rgba(139, 0, 0, 0.2);
+}
+
+.combat-stat {
+    text-align: center;
+    padding: 0 10px;
+}
+
+.combat-stat:not(:last-child) {
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.combat-stat .combat-label {
+    font-size: 0.75rem;
+    color: #bbb;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin-bottom: 2px;
+    /* Prevent label overflow */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.combat-stat .combat-value {
+    font-size: 1.15rem;
+    font-weight: bold;
+    color: #fff;
+    /* Prevent value overflow */
+    white-space: nowrap;
+}
+
+/* Card Action Buttons */
+.card-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: auto;
+}
+
+.card-actions button {
+    flex: 1;
+    min-width: 70px;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    /* Prevent button text overflow */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* Ensure minimum touch target */
+    min-height: 44px;
+}
+
+.card-actions button:focus-visible {
+    outline: 2px solid #c9a227;
+    outline-offset: 2px;
+}
+
+.btn-load {
+    background: #c9a227;
+    color: #1a1a2e;
+}
+
+.btn-load:hover {
+    background: #dab43a;
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(201, 162, 39, 0.3);
+}
+
+.btn-export {
+    background: rgba(201, 162, 39, 0.2);
+    color: #c9a227;
+    border: 1px solid rgba(201, 162, 39, 0.3);
+}
+
+.btn-export:hover {
+    background: rgba(201, 162, 39, 0.35);
+    border-color: #c9a227;
+}
+
+.btn-delete {
+    background: rgba(139, 0, 0, 0.3);
+    color: #ff6b6b;
+    border: 1px solid rgba(139, 0, 0, 0.3);
+}
+
+.btn-delete:hover {
+    background: rgba(139, 0, 0, 0.5);
+    border-color: rgba(139, 0, 0, 0.6);
+}
+
+/* ==========================================================================
+   Character Sheet View
+   ========================================================================== */
+
+.sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(201, 162, 39, 0.2);
+}
+
+.back-btn {
+    padding: 10px 20px;
+    background: transparent;
+    color: #c9a227;
+    border: 1px solid rgba(201, 162, 39, 0.4);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.back-btn:hover {
+    background: rgba(201, 162, 39, 0.15);
+    border-color: #c9a227;
+}
+
+.back-arrow {
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+.sheet-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* ==========================================================================
+   Character Sheet Content
+   ========================================================================== */
+
+.sheet-content {
+    color: #eee;
+}
+
+/* Sheet Top Section - Identity and Combat Stats */
+.sheet-top {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 40px;
+    margin-bottom: 35px;
+    padding-bottom: 25px;
+    border-bottom: 2px solid rgba(201, 162, 39, 0.25);
+    align-items: start;
+}
+
+.sheet-identity h2 {
+    color: #c9a227;
+    font-size: 2.4rem;
+    margin: 0 0 10px 0;
+    line-height: 1.2;
+    /* Handle long character names on sheet */
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.sheet-identity .subtitle {
+    color: #bbb;
+    font-size: 1.25rem;
+    margin-bottom: 18px;
+    /* Handle long race/class combinations */
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.sheet-identity .details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    font-size: 0.95rem;
+    color: #ccc;
+}
+
+.sheet-identity .details span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 6px;
+}
+
+.sheet-identity .details strong {
+    color: #c9a227;
+}
+
+/* Combat Stat Boxes */
+.sheet-combat-box {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.combat-box {
+    background: rgba(0, 0, 0, 0.45);
+    border: 2px solid rgba(201, 162, 39, 0.4);
+    border-radius: 12px;
+    padding: 18px 28px;
+    text-align: center;
+    min-width: 85px;
+    transition: all 0.3s ease;
+}
+
+.combat-box:hover {
+    border-color: rgba(201, 162, 39, 0.7);
+    transform: translateY(-2px);
+}
+
+.combat-box .label {
+    font-size: 0.75rem;
+    color: #bbb;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+}
+
+.combat-box .value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #c9a227;
+    line-height: 1;
+}
+
+/* ==========================================================================
+   Ability Scores Grid
+   ========================================================================== */
+
+.sheet-abilities {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+    margin-bottom: 35px;
+}
+
+.ability-box {
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(201, 162, 39, 0.25);
+    border-radius: 12px;
+    padding: 18px 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.ability-box:hover {
+    border-color: rgba(201, 162, 39, 0.5);
+    transform: translateY(-2px);
+}
+
+.ability-box .ability-name {
+    font-size: 0.75rem;
+    color: #bbb;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+    /* Prevent label overflow on small screens */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ability-box .ability-score {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #fff;
+    line-height: 1;
+    /* Ensure score stays contained */
+    white-space: nowrap;
+}
+
+.ability-box .ability-mod {
+    font-size: 1.15rem;
+    color: #c9a227;
+    margin-top: 8px;
+    font-weight: 600;
+    /* Ensure modifier stays contained */
+    white-space: nowrap;
+}
+
+/* ==========================================================================
+   Sheet Sections Grid
+   ========================================================================== */
+
+.sheet-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+.sheet-section {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    padding: 22px;
+    border: 1px solid rgba(201, 162, 39, 0.15);
+    /* Prevent section content overflow */
+    overflow: hidden;
+    min-width: 0;
+}
+
+.sheet-section h3 {
+    color: #c9a227;
+    font-size: 1.15rem;
+    margin: 0 0 18px 0;
+    padding-bottom: 12px;
+    border-bottom: 2px solid rgba(201, 162, 39, 0.3);
+}
+
+.sheet-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sheet-section li {
+    padding: 10px 0;
+    color: #ccc;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    line-height: 1.5;
+    /* Handle long list item content */
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.sheet-section li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.sheet-section li strong {
+    color: #c9a227;
+}
+
+/* ==========================================================================
+   Feature/Trait Cards
+   ========================================================================== */
+
+.feature-item {
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    border-left: 4px solid #c9a227;
+    transition: all 0.3s ease;
+}
+
+.feature-item:last-child {
+    margin-bottom: 0;
+}
+
+.feature-item:hover {
+    background: rgba(0, 0, 0, 0.35);
+    transform: translateX(3px);
+}
+
+.feature-item h4 {
+    color: #c9a227;
+    margin: 0 0 10px 0;
+    font-size: 1rem;
+    /* Handle long feature names */
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.feature-item h4 small {
+    color: #777;
+    font-weight: normal;
+}
+
+.feature-item p {
+    color: #bbb;
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    /* Handle long descriptions */
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+/* ==========================================================================
+   Spell Slots
+   ========================================================================== */
+
+.spell-slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+    gap: 12px;
+}
+
+.spell-slot {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(201, 162, 39, 0.25);
+    border-radius: 10px;
+    padding: 14px 10px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.spell-slot:hover {
+    border-color: rgba(201, 162, 39, 0.5);
+    transform: translateY(-2px);
+}
+
+.spell-slot .slot-level {
+    font-size: 0.75rem;
+    color: #bbb;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin-bottom: 6px;
+    /* Prevent level label overflow */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.spell-slot .slot-count {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #c9a227;
+    /* Ensure count stays contained */
+    white-space: nowrap;
+}
+
+/* ==========================================================================
+   Equipment List
+   ========================================================================== */
+
+.equipment-list {
+    columns: 2;
+    column-gap: 25px;
+}
+
+.equipment-list li {
+    break-inside: avoid;
+    padding: 8px 0;
+    padding-left: 18px;
+    position: relative;
+    /* Handle long equipment names */
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.equipment-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    background: #c9a227;
+    border-radius: 50%;
+}
+
+/* ==========================================================================
+   Character Details Section
+   ========================================================================== */
+
+.character-details-section {
+    grid-column: 1 / -1;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.detail-item {
+    background: rgba(0, 0, 0, 0.25);
+    padding: 16px 18px;
+    border-radius: 10px;
+    border: 1px solid rgba(201, 162, 39, 0.1);
+}
+
+.detail-item label {
+    font-size: 0.75rem;
+    color: #bbb;
+    display: block;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.detail-item p {
+    margin: 0;
+    color: #ddd;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Full Width Sections */
+.full-width {
+    grid-column: 1 / -1;
+}
+
+/* Backstory */
+.backstory-text {
+    color: #bbb;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   Modal Dialog - Polished Design
+   ========================================================================== */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    position: relative;
+    background: linear-gradient(145deg, #1e1e35 0%, #141428 100%);
+    padding: 0;
+    border-radius: 16px;
+    border: 1px solid rgba(201, 162, 39, 0.4);
+    max-width: 420px;
+    width: 90%;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+    animation: modalFadeIn 0.3s ease;
+    /* Prevent modal overflow on small screens */
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-header {
+    padding: 24px 28px 0;
+}
+
+.modal-header h3 {
+    color: #c9a227;
+    margin: 0;
+    font-size: 1.35rem;
+}
+
+.modal-body {
+    padding: 20px 28px 28px;
+    /* Allow scrolling for long modal content */
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+.modal-body p {
+    color: #ccc;
+    margin: 0 0 12px 0;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.modal-body p:last-child {
+    margin-bottom: 0;
+}
+
+.modal-warning {
+    color: #ff6b6b !important;
+    font-size: 0.9rem !important;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 14px;
+    justify-content: flex-end;
+    padding: 20px 28px;
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(201, 162, 39, 0.15);
+    border-radius: 0 0 16px 16px;
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+
+@media print {
+    body {
+        background: white;
+        color: black;
+        padding: 0;
+    }
+
+    header,
+    .sheet-header,
+    .main-nav {
+        display: none !important;
+    }
+
+    .characters-main {
+        padding: 0;
+        max-width: none;
+    }
+
+    .character-sheet-section {
+        background: white;
+        border: none;
+        padding: 0;
+        box-shadow: none;
+    }
+
+    .sheet-content,
+    .sheet-content * {
+        color: black !important;
+    }
+
+    .ability-box,
+    .combat-box,
+    .sheet-section,
+    .feature-item,
+    .detail-item,
+    .spell-slot {
+        border: 1px solid #ccc !important;
+        background: white !important;
+        box-shadow: none !important;
+    }
+
+    .sheet-top {
+        border-bottom: 2px solid #333 !important;
+    }
+
+    .sheet-section h3 {
+        border-bottom: 2px solid #333 !important;
+    }
+
+    .feature-item {
+        border-left: 3px solid #333 !important;
+    }
+}
+
+/* ==========================================================================
+   Responsive Design
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+    .sheet-top {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+
+    .sheet-combat-box {
+        justify-content: flex-start;
+    }
+
+    .sheet-abilities {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .characters-section,
+    .character-sheet-section {
+        padding: 20px;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+
+    .header-actions {
+        justify-content: center;
+    }
+
+    .character-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sheet-abilities {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .ability-box {
+        padding: 14px 10px;
+    }
+
+    .ability-box .ability-score {
+        font-size: 1.6rem;
+    }
+
+    .sheet-combat-box {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .combat-box {
+        padding: 14px 22px;
+        min-width: 75px;
+    }
+
+    .equipment-list {
+        columns: 1;
+    }
+
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sheet-identity h2 {
+        font-size: 1.8rem;
+    }
+
+    .sheet-identity .subtitle {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .characters-main {
+        padding: 15px;
+    }
+
+    .characters-section,
+    .character-sheet-section {
+        padding: 15px;
+        border-radius: 12px;
+    }
+
+    .char-stats {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        padding: 12px 8px;
+    }
+
+    /* Reduce stat font sizes on mobile to prevent overlap */
+    .stat-mini .stat-label {
+        font-size: 0.55rem;
+        letter-spacing: 0.3px;
+    }
+
+    .stat-mini .stat-value {
+        font-size: 0.95rem;
+    }
+
+    .sheet-abilities {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    /* Reduce ability box sizes on mobile */
+    .ability-box {
+        padding: 12px 8px;
+    }
+
+    .ability-box .ability-name {
+        font-size: 0.65rem;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+
+    .ability-box .ability-score {
+        font-size: 1.5rem;
+    }
+
+    .ability-box .ability-mod {
+        font-size: 1rem;
+        margin-top: 6px;
+    }
+
+    .sheet-sections {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 10px;
+        max-height: 85vh;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+    }
+
+    .modal-actions button {
+        width: 100%;
+    }
+
+    .sheet-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .sheet-actions {
+        justify-content: center;
+    }
+
+    .back-btn {
+        justify-content: center;
+    }
+
+    .char-combat {
+        flex-wrap: wrap;
+    }
+
+    .combat-stat {
+        flex: 1;
+        min-width: 60px;
+    }
+
+    .combat-stat:not(:last-child) {
+        border-right: none;
+    }
+
+    /* Reduce character card name size on mobile */
+    .char-name {
+        font-size: 1.2rem;
+    }
+
+    /* Ensure race/class wraps on very small screens */
+    .char-race-class {
+        white-space: normal;
+        -webkit-line-clamp: 2;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+    }
+
+    /* Smaller card action buttons */
+    .card-actions button {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+        min-width: 60px;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 400px) {
+    /* Stack stats in 2 columns on very small screens */
+    .char-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+
+    .stat-mini .stat-label {
+        font-size: 0.5rem;
+    }
+
+    .stat-mini .stat-value {
+        font-size: 0.9rem;
+    }
+
+    /* Single column ability grid on extra small */
+    .sheet-abilities {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .ability-box .ability-score {
+        font-size: 1.3rem;
+    }
+
+    .ability-box .ability-mod {
+        font-size: 0.9rem;
+    }
+
+    /* Smaller sheet identity */
+    .sheet-identity h2 {
+        font-size: 1.4rem;
+    }
+
+    .sheet-identity .subtitle {
+        font-size: 0.95rem;
+    }
+
+    /* Combat boxes on very small screens */
+    .combat-box {
+        padding: 12px 16px;
+        min-width: 65px;
+    }
+
+    .combat-box .value {
+        font-size: 1.5rem;
+    }
+
+    .combat-box .label {
+        font-size: 0.6rem;
+    }
+
+    /* Modal adjustments */
+    .modal-header {
+        padding: 18px 20px 0;
+    }
+
+    .modal-body {
+        padding: 16px 20px 20px;
+    }
+
+    .modal-actions {
+        padding: 16px 20px;
+    }
+
+    .modal-header h3 {
+        font-size: 1.2rem;
+    }
+
+    /* Smaller buttons */
+    .btn-secondary {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+    }
+
+    .btn-primary {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+    }
+}
+
+/* ==========================================================================
+   Accessibility Improvements
+   ========================================================================== */
+
+.btn-primary:focus,
+.btn-secondary:focus,
+.btn-danger:focus,
+.btn-load:focus,
+.btn-export:focus,
+.btn-delete:focus,
+.back-btn:focus {
+    outline: 2px solid #c9a227;
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

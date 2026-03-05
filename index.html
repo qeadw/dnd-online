@@ -3,103 +3,1263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>D&D Online</title>
+    <title>D&D Online - Game Tools</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Game Tools Page Layout */
+        .game-tools-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Card styling for all sections */
+        .tool-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(201, 162, 39, 0.3);
+            min-width: 0; /* Allow flex/grid children to shrink below content size */
+            overflow: hidden; /* Prevent content overflow */
+        }
+
+        .tool-card h2 {
+            color: #c9a227;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #c9a227;
+            padding-bottom: 10px;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+        }
+
+        .tool-card h3 {
+            color: #c9a227;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+        }
+
+        /* Dice Roller - spans 2 columns */
+        .dice-roller-card {
+            grid-column: span 2;
+        }
+
+        /* Quick Macros - spans 1 column, full height */
+        .macros-card {
+            grid-row: span 2;
+        }
+
+        /* Dice buttons */
+        .dice-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .die-btn {
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            background: linear-gradient(145deg, #8b0000, #5c0000);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .die-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.6);
+        }
+
+        /* Advantage/Disadvantage */
+        .advantage-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .advantage-btn,
+        .disadvantage-btn {
+            flex: 1 1 auto;
+            min-width: 120px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .advantage-btn {
+            background: linear-gradient(145deg, #228b22, #165016);
+            color: #fff;
+        }
+
+        .advantage-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(34, 139, 34, 0.6);
+        }
+
+        .disadvantage-btn {
+            background: linear-gradient(145deg, #8b0000, #5c0000);
+            color: #fff;
+        }
+
+        .disadvantage-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.6);
+        }
+
+        /* Dice Expression */
+        .dice-expression {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .dice-expression input {
+            flex: 1 1 200px;
+            min-width: 0;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: 1px solid #c9a227;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .dice-expression input::placeholder {
+            color: #888;
+        }
+
+        .dice-expression button {
+            padding: 10px 20px;
+            background: linear-gradient(145deg, #4a4a8a, #2a2a5a);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .dice-expression button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(74, 74, 138, 0.6);
+        }
+
+        /* Custom Roll */
+        .custom-roll {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .custom-roll input {
+            width: 60px;
+            min-width: 50px;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #c9a227;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .custom-roll span {
+            color: #aaa;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .custom-roll button {
+            padding: 8px 20px;
+            background: #c9a227;
+            color: #1a1a2e;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .custom-roll button:hover {
+            background: #dab32e;
+        }
+
+        /* Dice Animation */
+        .dice-animation-container {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 10px;
+        }
+
+        .dice-animation-container.active {
+            display: flex;
+        }
+
+        .rolling-dice {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #c9a227;
+            text-shadow: 0 0 10px rgba(201, 162, 39, 0.5);
+        }
+
+        .rolling-dice.rolling {
+            animation: shake 0.1s infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            25% { transform: translateX(-5px) rotate(-5deg); }
+            50% { transform: translateX(5px) rotate(5deg); }
+            75% { transform: translateX(-5px) rotate(-5deg); }
+        }
+
+        /* Roll Result */
+        .roll-result {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .roll-result .big-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #c9a227;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .roll-result .roll-details {
+            color: #aaa;
+            margin-top: 5px;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .roll-result.roll-animate {
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Critical/Fumble styles */
+        .critical-hit {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 20px #ffd700, 0 0 30px #ff8c00;
+            animation: criticalPulse 0.5s ease-in-out infinite alternate;
+            margin-bottom: 5px;
+        }
+
+        @keyframes criticalPulse {
+            from { text-shadow: 0 0 20px #ffd700, 0 0 30px #ff8c00; }
+            to { text-shadow: 0 0 30px #ffd700, 0 0 50px #ff8c00, 0 0 70px #ff4500; }
+        }
+
+        .fumble {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff4444;
+            text-shadow: 0 0 20px #ff0000;
+            animation: fumbleShake 0.3s ease-in-out infinite;
+            margin-bottom: 5px;
+        }
+
+        @keyframes fumbleShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-3px); }
+            75% { transform: translateX(3px); }
+        }
+
+        .big-number.critical { color: #ffd700; text-shadow: 0 0 20px #ffd700; }
+        .big-number.fumble-num { color: #ff4444; text-shadow: 0 0 20px #ff0000; }
+        .big-number.damage { color: #ff6b6b; }
+
+        .chosen-roll { color: #00ff00; font-weight: bold; font-size: 1.2em; }
+        .discarded-roll { color: #666; text-decoration: line-through; }
+        .modifier-display { color: #c9a227; }
+        .chosen-info { color: #aaa; font-size: 0.9rem; margin-top: 5px; }
+
+        /* Roll History */
+        .roll-history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(201, 162, 39, 0.3);
+            flex-wrap: wrap;
+        }
+
+        .roll-history-header span {
+            font-weight: bold;
+            color: #c9a227;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .clear-history-btn {
+            padding: 4px 12px;
+            background: #8b0000;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.2s;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .clear-history-btn:hover {
+            background: #a00;
+        }
+
+        .roll-history {
+            max-height: 150px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .roll-history p {
+            padding: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .history-time { color: #666; font-size: 0.8rem; min-width: 60px; flex-shrink: 0; }
+        .history-text { flex: 1; min-width: 0; word-break: break-word; overflow-wrap: break-word; }
+
+        .roll-history p.history-critical {
+            background: rgba(255, 215, 0, 0.1);
+            border-left: 3px solid #ffd700;
+        }
+
+        .roll-history p.history-critical .history-text { color: #ffd700; }
+
+        .roll-history p.history-fumble {
+            background: rgba(255, 0, 0, 0.1);
+            border-left: 3px solid #ff4444;
+        }
+
+        .roll-history p.history-fumble .history-text { color: #ff4444; }
+        .roll-history p.history-damage { border-left: 3px solid #ff6b6b; }
+
+        /* Macro Groups */
+        .macro-group {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .macro-group:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .macro-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .macro-row label {
+            color: #aaa;
+            flex-shrink: 0;
+        }
+
+        .macro-modifier {
+            width: 70px;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #c9a227;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            text-align: center;
+        }
+
+        .macro-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .macro-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        .macro-btn.attack { background: linear-gradient(145deg, #8b0000, #5c0000); color: #fff; }
+        .macro-btn.ability { background: linear-gradient(145deg, #4a4a8a, #2a2a5a); color: #fff; }
+        .macro-btn.save { background: linear-gradient(145deg, #228b22, #165016); color: #fff; }
+        .macro-btn.damage { background: linear-gradient(145deg, #ff6b6b, #cc4444); color: #fff; }
+        .macro-btn.custom { background: linear-gradient(145deg, #c9a227, #a08020); color: #1a1a2e; }
+
+        .macro-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        .damage-macros {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 8px;
+        }
+
+        /* Custom Macro */
+        .custom-macro {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .macro-name-input,
+        .macro-expr-input {
+            flex: 1 1 80px;
+            min-width: 80px;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #c9a227;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+        }
+
+        .save-macro-btn {
+            padding: 8px 15px;
+            background: #228b22;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .save-macro-btn:hover {
+            background: #2a9f2a;
+        }
+
+        .custom-macros-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .custom-macro-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            flex-wrap: wrap;
+            min-width: 0;
+        }
+
+        .custom-macro-item .macro-btn { flex-shrink: 0; max-width: 120px; }
+        .macro-expr { flex: 1; min-width: 0; color: #888; font-size: 0.9rem; word-break: break-word; overflow-wrap: break-word; }
+
+        .delete-macro-btn {
+            padding: 5px 10px;
+            background: #8b0000;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        /* Initiative Tracker */
+        .add-character {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .add-character input {
+            flex: 1 1 80px;
+            min-width: 80px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #c9a227;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+        }
+
+        .add-character input::placeholder {
+            color: #888;
+        }
+
+        .add-character button {
+            padding: 10px 20px;
+            background: #c9a227;
+            color: #1a1a2e;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .add-character button:hover {
+            background: #dab32e;
+        }
+
+        #initiativeList {
+            list-style: none;
+            margin-bottom: 15px;
+        }
+
+        #initiativeList li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            margin-bottom: 5px;
+            border-radius: 5px;
+            border-left: 4px solid #c9a227;
+            flex-wrap: wrap;
+            min-width: 0;
+        }
+
+        #initiativeList li span {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #initiativeList li.active {
+            background: rgba(201, 162, 39, 0.3);
+            border-left-color: #00ff00;
+        }
+
+        #initiativeList li button {
+            background: #8b0000;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .initiative-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .clear-btn,
+        .next-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .clear-btn {
+            background: #8b0000;
+            color: #fff;
+        }
+
+        .clear-btn:hover {
+            background: #a00;
+        }
+
+        .next-btn {
+            background: #228b22;
+            color: #fff;
+        }
+
+        .next-btn:hover {
+            background: #2a9f2a;
+        }
+
+        /* Character Reference */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .stat label {
+            display: block;
+            font-weight: bold;
+            color: #c9a227;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stat input {
+            width: 100%;
+            max-width: 50px;
+            padding: 6px;
+            text-align: center;
+            border-radius: 5px;
+            border: 1px solid #c9a227;
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .stat .modifier {
+            display: block;
+            margin-top: 5px;
+            font-size: 1rem;
+            color: #aaa;
+        }
+
+        .hp-tracker {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            flex-wrap: wrap;
+        }
+
+        .hp-tracker label {
+            color: #c9a227;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .hp-tracker span {
+            flex-shrink: 0;
+        }
+
+        .hp-tracker input {
+            width: 60px;
+            min-width: 50px;
+            padding: 8px;
+            text-align: center;
+            border-radius: 5px;
+            border: 1px solid #c9a227;
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        /* Session Notes */
+        .notes-card textarea {
+            width: 100%;
+            height: 180px;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #c9a227;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 1rem;
+            resize: vertical;
+            font-family: inherit;
+            box-sizing: border-box;
+            max-width: 100%;
+        }
+
+        .notes-card textarea::placeholder {
+            color: #888;
+        }
+
+        /* Conditions Reference */
+        .conditions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .condition-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(201, 162, 39, 0.2);
+            transition: all 0.3s ease;
+            min-width: 0;
+        }
+
+        .condition-item:hover {
+            border-color: rgba(201, 162, 39, 0.5);
+        }
+
+        .condition-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s ease;
+            min-width: 0;
+        }
+
+        .condition-header:hover {
+            background: rgba(201, 162, 39, 0.1);
+        }
+
+        .condition-name {
+            font-weight: bold;
+            color: #c9a227;
+            font-size: 1rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
+        }
+
+        .condition-toggle {
+            color: #aaa;
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .condition-item.expanded .condition-toggle {
+            transform: rotate(180deg);
+        }
+
+        .condition-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .condition-item.expanded .condition-content {
+            max-height: 500px;
+            padding: 15px;
+        }
+
+        .condition-description {
+            color: #ccc;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            line-height: 1.4;
+            font-style: italic;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .condition-effects {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .condition-effects li {
+            padding: 6px 0 6px 20px;
+            position: relative;
+            color: #ddd;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .condition-effects li:last-child {
+            border-bottom: none;
+        }
+
+        .condition-effects li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background: #c9a227;
+            border-radius: 50%;
+        }
+
+        .condition-additional {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(201, 162, 39, 0.3);
+            color: #aaa;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .condition-item[data-condition="exhaustion"] .condition-effects li {
+            padding-left: 0;
+        }
+
+        .condition-item[data-condition="exhaustion"] .condition-effects li::before {
+            display: none;
+        }
+
+        .exhaustion-level {
+            display: inline-block;
+            background: rgba(139, 0, 0, 0.4);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-right: 8px;
+            font-weight: bold;
+            color: #c9a227;
+            min-width: 65px;
+            text-align: center;
+        }
+
+        .exhaustion-level-6 {
+            background: rgba(139, 0, 0, 0.8);
+            color: #ff6b6b;
+        }
+
+        /* Navigation overflow protection */
+        header {
+            overflow: hidden;
+        }
+
+        header h1 {
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .main-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .main-nav .nav-link {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .game-tools-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .dice-roller-card {
+                grid-column: span 2;
+            }
+
+            .macros-card {
+                grid-row: span 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .game-tools-container {
+                grid-template-columns: 1fr;
+                padding: 10px;
+            }
+
+            .dice-roller-card {
+                grid-column: span 1;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .damage-macros {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .advantage-buttons {
+                flex-direction: column;
+            }
+
+            .advantage-btn,
+            .disadvantage-btn {
+                min-width: 100%;
+            }
+
+            .dice-expression {
+                flex-direction: column;
+            }
+
+            .dice-expression input {
+                flex: 1 1 100%;
+            }
+
+            .dice-expression button {
+                width: 100%;
+            }
+
+            .custom-roll {
+                justify-content: center;
+            }
+
+            .main-nav .nav-link {
+                padding: 6px 10px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dice-buttons {
+                justify-content: center;
+            }
+
+            .die-btn {
+                padding: 12px 16px;
+                font-size: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .stat {
+                padding: 8px;
+            }
+
+            .stat input {
+                width: 100%;
+                max-width: 40px;
+                padding: 4px;
+            }
+
+            .damage-macros {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .hp-tracker {
+                justify-content: center;
+            }
+
+            .roll-result .big-number {
+                font-size: 2rem;
+            }
+
+            .custom-roll input {
+                width: 50px;
+                min-width: 45px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .damage-macros {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .initiative-controls {
+                flex-direction: column;
+            }
+
+            .clear-btn,
+            .next-btn {
+                width: 100%;
+            }
+
+            .hp-tracker input {
+                width: 50px;
+                min-width: 45px;
+            }
+
+            .main-nav .nav-link {
+                padding: 5px 8px;
+                font-size: 0.8rem;
+                max-width: 150px;
+            }
+
+            .tool-card {
+                padding: 15px;
+            }
+
+            .tool-card h2 {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
 </head>
 <body>
+    <a href="#main" class="skip-link">Skip to content</a>
     <header>
         <h1>D&D Online</h1>
         <nav class="main-nav">
             <a href="index.html" class="nav-link active">Game Tools</a>
             <a href="character-creator.html" class="nav-link">Character Creator</a>
+            <a href="characters.html" class="nav-link">My Characters</a>
+            <a href="spells.html" class="nav-link">Spells</a>
+            <a href="monsters.html" class="nav-link">Monsters</a>
+            <a href="combat.html" class="nav-link">Combat Tracker</a>
         </nav>
     </header>
 
-    <main>
-        <section class="dice-roller">
+    <main class="game-tools-container" id="main">
+        <!-- Dice Roller Section -->
+        <section class="tool-card dice-roller-card">
             <h2>Dice Roller</h2>
-            <div class="dice-buttons">
-                <button onclick="rollDice(4)">d4</button>
-                <button onclick="rollDice(6)">d6</button>
-                <button onclick="rollDice(8)">d8</button>
-                <button onclick="rollDice(10)">d10</button>
-                <button onclick="rollDice(12)">d12</button>
-                <button onclick="rollDice(20)">d20</button>
-                <button onclick="rollDice(100)">d100</button>
+
+            <div class="dice-buttons" role="group" aria-label="Dice buttons">
+                <button onclick="rollDice(4)" class="die-btn" data-die="4" aria-label="Roll 4-sided die">d4</button>
+                <button onclick="rollDice(6)" class="die-btn" data-die="6" aria-label="Roll 6-sided die">d6</button>
+                <button onclick="rollDice(8)" class="die-btn" data-die="8" aria-label="Roll 8-sided die">d8</button>
+                <button onclick="rollDice(10)" class="die-btn" data-die="10" aria-label="Roll 10-sided die">d10</button>
+                <button onclick="rollDice(12)" class="die-btn" data-die="12" aria-label="Roll 12-sided die">d12</button>
+                <button onclick="rollDice(20)" class="die-btn" data-die="20" aria-label="Roll 20-sided die">d20</button>
+                <button onclick="rollDice(100)" class="die-btn" data-die="100" aria-label="Roll 100-sided die">d100</button>
             </div>
-            <div class="custom-roll">
-                <input type="number" id="numDice" value="1" min="1" max="20">
-                <span>d</span>
-                <input type="number" id="diceType" value="20" min="1" max="100">
-                <span>+</span>
-                <input type="number" id="modifier" value="0">
+
+            <div class="advantage-buttons" role="group" aria-label="Advantage and disadvantage rolls">
+                <button onclick="rollWithAdvantage()" class="advantage-btn" aria-label="Roll with advantage - roll 2d20, take highest">Advantage</button>
+                <button onclick="rollWithDisadvantage()" class="disadvantage-btn" aria-label="Roll with disadvantage - roll 2d20, take lowest">Disadvantage</button>
+            </div>
+
+            <div class="dice-expression">
+                <label for="diceExpression" class="visually-hidden">Dice expression</label>
+                <input type="text" id="diceExpression" placeholder="e.g., 2d6+3+1d4" aria-label="Dice expression, for example 2d6+3+1d4">
+                <button onclick="parseDiceExpression()">Roll Expression</button>
+            </div>
+
+            <div class="custom-roll" role="group" aria-label="Custom dice roll">
+                <label for="numDice" class="visually-hidden">Number of dice</label>
+                <input type="number" id="numDice" value="1" min="1" max="20" aria-label="Number of dice">
+                <span aria-hidden="true">d</span>
+                <label for="diceType" class="visually-hidden">Dice type</label>
+                <input type="number" id="diceType" value="20" min="1" max="100" aria-label="Dice type (number of sides)">
+                <span aria-hidden="true">+</span>
+                <label for="modifier" class="visually-hidden">Modifier</label>
+                <input type="number" id="modifier" value="0" aria-label="Roll modifier">
                 <button onclick="customRoll()">Roll</button>
             </div>
-            <div class="roll-result" id="rollResult">
+
+            <div class="dice-animation-container" id="diceAnimationContainer">
+                <div class="rolling-dice" id="rollingDice"></div>
+            </div>
+
+            <div class="roll-result" id="rollResult" aria-live="polite" aria-atomic="true">
                 <p>Click a die to roll!</p>
             </div>
-            <div class="roll-history" id="rollHistory"></div>
+
+            <div class="roll-history-header">
+                <span id="rollHistoryLabel">Roll History</span>
+                <button onclick="clearRollHistory()" class="clear-history-btn" aria-label="Clear roll history">Clear</button>
+            </div>
+            <div class="roll-history" id="rollHistory" aria-labelledby="rollHistoryLabel" aria-live="polite"></div>
         </section>
 
-        <section class="initiative-tracker">
+        <!-- Quick Roll Macros Section -->
+        <section class="tool-card macros-card">
+            <h2>Quick Roll Macros</h2>
+
+            <div class="macro-group">
+                <h3>D20 Rolls</h3>
+                <div class="macro-row">
+                    <label for="d20Modifier">Modifier:</label>
+                    <input type="number" id="d20Modifier" value="0" class="macro-modifier" aria-label="D20 roll modifier">
+                </div>
+                <div class="macro-buttons">
+                    <button onclick="rollMacro('attack')" class="macro-btn attack">Attack Roll</button>
+                    <button onclick="rollMacro('ability')" class="macro-btn ability">Ability Check</button>
+                    <button onclick="rollMacro('save')" class="macro-btn save">Saving Throw</button>
+                </div>
+            </div>
+
+            <div class="macro-group">
+                <h3>Damage Rolls</h3>
+                <div class="macro-row">
+                    <label for="damageModifier">Modifier:</label>
+                    <input type="number" id="damageModifier" value="0" class="macro-modifier" aria-label="Damage roll modifier">
+                </div>
+                <div class="macro-buttons damage-macros" role="group" aria-label="Damage dice">
+                    <button onclick="rollDamage(1, 4)" class="macro-btn damage" aria-label="Roll 1d4 damage">1d4</button>
+                    <button onclick="rollDamage(1, 6)" class="macro-btn damage" aria-label="Roll 1d6 damage">1d6</button>
+                    <button onclick="rollDamage(1, 8)" class="macro-btn damage" aria-label="Roll 1d8 damage">1d8</button>
+                    <button onclick="rollDamage(1, 10)" class="macro-btn damage" aria-label="Roll 1d10 damage">1d10</button>
+                    <button onclick="rollDamage(1, 12)" class="macro-btn damage" aria-label="Roll 1d12 damage">1d12</button>
+                    <button onclick="rollDamage(2, 6)" class="macro-btn damage" aria-label="Roll 2d6 damage">2d6</button>
+                </div>
+            </div>
+
+            <div class="macro-group">
+                <h3>Custom Macro</h3>
+                <div class="custom-macro">
+                    <label for="macroName" class="visually-hidden">Macro name</label>
+                    <input type="text" id="macroName" placeholder="Macro name" class="macro-name-input" aria-label="Custom macro name">
+                    <label for="macroExpression" class="visually-hidden">Macro expression</label>
+                    <input type="text" id="macroExpression" placeholder="e.g., 1d20+5" class="macro-expr-input" aria-label="Macro dice expression, for example 1d20+5">
+                    <button onclick="saveCustomMacro()" class="save-macro-btn">Save</button>
+                </div>
+                <div class="custom-macros-list" id="customMacrosList" aria-live="polite"></div>
+            </div>
+        </section>
+
+        <!-- Initiative Tracker Section -->
+        <section class="tool-card">
             <h2>Initiative Tracker</h2>
             <div class="add-character">
-                <input type="text" id="charName" placeholder="Character name">
-                <input type="number" id="charInit" placeholder="Initiative">
+                <label for="charName" class="visually-hidden">Character name</label>
+                <input type="text" id="charName" placeholder="Character name" aria-label="Character name for initiative">
+                <label for="charInit" class="visually-hidden">Initiative value</label>
+                <input type="number" id="charInit" placeholder="Initiative" aria-label="Initiative roll value">
                 <button onclick="addToInitiative()">Add</button>
             </div>
-            <ul id="initiativeList"></ul>
-            <button onclick="clearInitiative()" class="clear-btn">Clear All</button>
-            <button onclick="nextTurn()" class="next-btn">Next Turn</button>
+            <ul id="initiativeList" aria-live="polite" aria-label="Initiative order"></ul>
+            <div class="initiative-controls" role="group" aria-label="Initiative controls">
+                <button onclick="clearInitiative()" class="clear-btn">Clear All</button>
+                <button onclick="nextTurn()" class="next-btn">Next Turn</button>
+            </div>
         </section>
 
-        <section class="character-sheet">
+        <!-- Quick Character Reference Section -->
+        <section class="tool-card">
             <h2>Quick Character Reference</h2>
-            <div class="stats-grid">
+            <div class="stats-grid" role="group" aria-label="Ability scores">
                 <div class="stat">
-                    <label>STR</label>
-                    <input type="number" id="str" value="10">
-                    <span class="modifier" id="strMod">+0</span>
+                    <label for="str">STR</label>
+                    <input type="number" id="str" value="10" aria-describedby="strMod">
+                    <span class="modifier" id="strMod" aria-label="Strength modifier">+0</span>
                 </div>
                 <div class="stat">
-                    <label>DEX</label>
-                    <input type="number" id="dex" value="10">
-                    <span class="modifier" id="dexMod">+0</span>
+                    <label for="dex">DEX</label>
+                    <input type="number" id="dex" value="10" aria-describedby="dexMod">
+                    <span class="modifier" id="dexMod" aria-label="Dexterity modifier">+0</span>
                 </div>
                 <div class="stat">
-                    <label>CON</label>
-                    <input type="number" id="con" value="10">
-                    <span class="modifier" id="conMod">+0</span>
+                    <label for="con">CON</label>
+                    <input type="number" id="con" value="10" aria-describedby="conMod">
+                    <span class="modifier" id="conMod" aria-label="Constitution modifier">+0</span>
                 </div>
                 <div class="stat">
-                    <label>INT</label>
-                    <input type="number" id="int" value="10">
-                    <span class="modifier" id="intMod">+0</span>
+                    <label for="int">INT</label>
+                    <input type="number" id="int" value="10" aria-describedby="intMod">
+                    <span class="modifier" id="intMod" aria-label="Intelligence modifier">+0</span>
                 </div>
                 <div class="stat">
-                    <label>WIS</label>
-                    <input type="number" id="wis" value="10">
-                    <span class="modifier" id="wisMod">+0</span>
+                    <label for="wis">WIS</label>
+                    <input type="number" id="wis" value="10" aria-describedby="wisMod">
+                    <span class="modifier" id="wisMod" aria-label="Wisdom modifier">+0</span>
                 </div>
                 <div class="stat">
-                    <label>CHA</label>
-                    <input type="number" id="cha" value="10">
-                    <span class="modifier" id="chaMod">+0</span>
+                    <label for="cha">CHA</label>
+                    <input type="number" id="cha" value="10" aria-describedby="chaMod">
+                    <span class="modifier" id="chaMod" aria-label="Charisma modifier">+0</span>
                 </div>
             </div>
-            <div class="hp-tracker">
-                <label>HP:</label>
-                <input type="number" id="currentHp" value="10"> /
-                <input type="number" id="maxHp" value="10">
+            <div class="hp-tracker" role="group" aria-label="Hit points">
+                <label for="currentHp">HP:</label>
+                <input type="number" id="currentHp" value="10" aria-label="Current hit points">
+                <span aria-hidden="true">/</span>
+                <label for="maxHp" class="visually-hidden">Maximum HP</label>
+                <input type="number" id="maxHp" value="10" aria-label="Maximum hit points">
             </div>
         </section>
 
-        <section class="notes">
-            <h2>Session Notes</h2>
-            <textarea id="sessionNotes" placeholder="Take notes here..."></textarea>
+        <!-- Session Notes Section -->
+        <section class="tool-card notes-card">
+            <h2 id="sessionNotesLabel">Session Notes</h2>
+            <label for="sessionNotes" class="visually-hidden">Session notes</label>
+            <textarea id="sessionNotes" placeholder="Take notes here..." aria-labelledby="sessionNotesLabel"></textarea>
+        </section>
+
+        <!-- Conditions Reference Section -->
+        <section class="tool-card">
+            <h2>Conditions Reference</h2>
+            <div class="conditions-list" id="conditionsList" role="list" aria-label="D&D conditions reference">
+                <!-- Conditions will be populated by JavaScript - each condition header should have role="button" aria-expanded -->
+            </div>
         </section>
     </main>
 
+    <script src="data/conditions.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

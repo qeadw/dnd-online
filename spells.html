@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spell Database - D&D Online</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Reset fieldset styling */
+        fieldset.filter-group {
+            border: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+        }
+
+        fieldset.filter-group legend {
+            display: block;
+            margin-bottom: 5px;
+            color: #ccc;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to content</a>
+    <header>
+        <h1>Spell Database</h1>
+        <nav class="main-nav">
+            <a href="index.html" class="nav-link">Game Tools</a>
+            <a href="character-creator.html" class="nav-link">Character Creator</a>
+            <a href="characters.html" class="nav-link">My Characters</a>
+            <a href="spells.html" class="nav-link active">Spells</a>
+            <a href="monsters.html" class="nav-link">Monsters</a>
+            <a href="combat.html" class="nav-link">Combat Tracker</a>
+        </nav>
+    </header>
+
+    <main class="database-container" id="main">
+        <aside class="filters-panel" aria-label="Spell filters">
+            <h3 id="filters-heading">Filters</h3>
+
+            <div class="filter-group">
+                <label for="spell-search">Search</label>
+                <input type="text" id="spell-search" placeholder="Search spells...">
+            </div>
+
+            <fieldset class="filter-group">
+                <legend>Spell Level</legend>
+                <div class="checkbox-group level-filters" role="group" aria-label="Filter by spell level">
+                    <label><input type="checkbox" value="0" checked> Cantrip</label>
+                    <label><input type="checkbox" value="1" checked> 1st</label>
+                    <label><input type="checkbox" value="2" checked> 2nd</label>
+                    <label><input type="checkbox" value="3" checked> 3rd</label>
+                    <label><input type="checkbox" value="4" checked> 4th</label>
+                    <label><input type="checkbox" value="5" checked> 5th</label>
+                    <label><input type="checkbox" value="6" checked> 6th</label>
+                    <label><input type="checkbox" value="7" checked> 7th</label>
+                    <label><input type="checkbox" value="8" checked> 8th</label>
+                    <label><input type="checkbox" value="9" checked> 9th</label>
+                </div>
+            </fieldset>
+
+            <fieldset class="filter-group">
+                <legend>School</legend>
+                <div class="checkbox-group" id="school-filters" role="group" aria-label="Filter by magic school">
+                    <label><input type="checkbox" value="Abjuration" checked> Abjuration</label>
+                    <label><input type="checkbox" value="Conjuration" checked> Conjuration</label>
+                    <label><input type="checkbox" value="Divination" checked> Divination</label>
+                    <label><input type="checkbox" value="Enchantment" checked> Enchantment</label>
+                    <label><input type="checkbox" value="Evocation" checked> Evocation</label>
+                    <label><input type="checkbox" value="Illusion" checked> Illusion</label>
+                    <label><input type="checkbox" value="Necromancy" checked> Necromancy</label>
+                    <label><input type="checkbox" value="Transmutation" checked> Transmutation</label>
+                </div>
+            </fieldset>
+
+            <div class="filter-group">
+                <label for="class-filter">Class</label>
+                <select id="class-filter">
+                    <option value="">All Classes</option>
+                    <option value="Bard">Bard</option>
+                    <option value="Cleric">Cleric</option>
+                    <option value="Druid">Druid</option>
+                    <option value="Paladin">Paladin</option>
+                    <option value="Ranger">Ranger</option>
+                    <option value="Sorcerer">Sorcerer</option>
+                    <option value="Warlock">Warlock</option>
+                    <option value="Wizard">Wizard</option>
+                </select>
+            </div>
+
+            <fieldset class="filter-group">
+                <legend>Special</legend>
+                <div class="checkbox-group" role="group" aria-label="Filter by special properties">
+                    <label><input type="checkbox" id="filter-concentration"> Concentration</label>
+                    <label><input type="checkbox" id="filter-ritual"> Ritual</label>
+                </div>
+            </fieldset>
+
+            <button class="clear-filters" onclick="clearFilters()">Clear All Filters</button>
+        </aside>
+
+        <section class="database-list" id="spells-list" aria-live="polite" aria-label="Spell list">
+            <div class="item-count" id="spell-count" aria-live="polite">Loading spells...</div>
+            <!-- Spells will be populated here -->
+        </section>
+    </main>
+
+    <script src="data/spells.js"></script>
+    <script>
+        // Get filter elements
+        const searchInput = document.getElementById('spell-search');
+        const classFilter = document.getElementById('class-filter');
+        const levelCheckboxes = document.querySelectorAll('.level-filters input[type="checkbox"]');
+        const schoolCheckboxes = document.querySelectorAll('#school-filters input[type="checkbox"]');
+        const concentrationFilter = document.getElementById('filter-concentration');
+        const ritualFilter = document.getElementById('filter-ritual');
+        const spellsList = document.getElementById('spells-list');
+        const spellCount = document.getElementById('spell-count');
+
+        // Render all spells on load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSpells();
+
+            // Add event listeners
+            searchInput.addEventListener('input', renderSpells);
+            classFilter.addEventListener('change', renderSpells);
+            levelCheckboxes.forEach(cb => cb.addEventListener('change', renderSpells));
+            schoolCheckboxes.forEach(cb => cb.addEventListener('change', renderSpells));
+            concentrationFilter.addEventListener('change', renderSpells);
+            ritualFilter.addEventListener('change', renderSpells);
+        });
+
+        function getSelectedLevels() {
+            const levels = [];
+            levelCheckboxes.forEach(cb => {
+                if (cb.checked) levels.push(parseInt(cb.value));
+            });
+            return levels;
+        }
+
+        function getSelectedSchools() {
+            const schools = [];
+            schoolCheckboxes.forEach(cb => {
+                if (cb.checked) schools.push(cb.value);
+            });
+            return schools;
+        }
+
+        function filterSpells() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedClass = classFilter.value;
+            const selectedLevels = getSelectedLevels();
+            const selectedSchools = getSelectedSchools();
+            const requireConcentration = concentrationFilter.checked;
+            const requireRitual = ritualFilter.checked;
+
+            return Object.entries(SPELLS).filter(([key, spell]) => {
+                // Search filter
+                if (searchTerm && !spell.name.toLowerCase().includes(searchTerm) &&
+                    !spell.description.toLowerCase().includes(searchTerm)) {
+                    return false;
+                }
+
+                // Level filter
+                if (!selectedLevels.includes(spell.level)) {
+                    return false;
+                }
+
+                // School filter
+                if (!selectedSchools.includes(spell.school)) {
+                    return false;
+                }
+
+                // Class filter
+                if (selectedClass && !spell.classes.includes(selectedClass)) {
+                    return false;
+                }
+
+                // Concentration filter
+                if (requireConcentration && !spell.concentration) {
+                    return false;
+                }
+
+                // Ritual filter
+                if (requireRitual && !spell.ritual) {
+                    return false;
+                }
+
+                return true;
+            }).sort((a, b) => {
+                // Sort by level, then name
+                if (a[1].level !== b[1].level) {
+                    return a[1].level - b[1].level;
+                }
+                return a[1].name.localeCompare(b[1].name);
+            });
+        }
+
+        function getLevelText(level) {
+            if (level === 0) return 'Cantrip';
+            if (level === 1) return '1st-level';
+            if (level === 2) return '2nd-level';
+            if (level === 3) return '3rd-level';
+            return `${level}th-level`;
+        }
+
+        function renderSpells() {
+            const filteredSpells = filterSpells();
+
+            spellCount.textContent = `Showing ${filteredSpells.length} spell${filteredSpells.length !== 1 ? 's' : ''}`;
+
+            if (filteredSpells.length === 0) {
+                spellsList.innerHTML = `
+                    <div class="item-count">${spellCount.textContent}</div>
+                    <div class="no-results">
+                        <p>No spells match your filters.</p>
+                        <button class="clear-filters" onclick="clearFilters()">Clear Filters</button>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `<div class="item-count">${spellCount.textContent}</div>`;
+
+            filteredSpells.forEach(([key, spell]) => {
+                const levelSchool = spell.level === 0
+                    ? `${spell.school} cantrip`
+                    : `${getLevelText(spell.level)} ${spell.school.toLowerCase()}`;
+
+                html += `
+                    <div class="spell-card" data-school="${spell.school}" onclick="toggleSpell(this)" onkeypress="handleSpellKeypress(event, this)" role="button" tabindex="0" aria-expanded="false" aria-label="${spell.name}, ${levelSchool}">
+                        <div class="spell-header">
+                            <div>
+                                <h3 class="spell-name">${spell.name}</h3>
+                                <div class="spell-level-school">${levelSchool}</div>
+                            </div>
+                            <div class="spell-tags">
+                                ${spell.concentration ? '<span class="spell-tag concentration" title="Concentration" aria-label="Requires concentration">C <span class="visually-hidden">Concentration</span></span>' : ''}
+                                ${spell.ritual ? '<span class="spell-tag ritual" title="Ritual" aria-label="Can be cast as ritual">R <span class="visually-hidden">Ritual</span></span>' : ''}
+                            </div>
+                        </div>
+                        <div class="spell-details" id="spell-details-${key}">
+                            <div class="spell-meta">
+                                <div class="spell-meta-item">
+                                    <strong>Casting Time</strong>
+                                    ${spell.castingTime}
+                                </div>
+                                <div class="spell-meta-item">
+                                    <strong>Range</strong>
+                                    ${spell.range}
+                                </div>
+                                <div class="spell-meta-item">
+                                    <strong>Components</strong>
+                                    ${spell.components}
+                                </div>
+                                <div class="spell-meta-item">
+                                    <strong>Duration</strong>
+                                    ${spell.duration}
+                                </div>
+                            </div>
+                            <div class="spell-description">${spell.description}</div>
+                            ${spell.higherLevels ? `
+                                <div class="spell-higher-levels">
+                                    <strong>At Higher Levels:</strong> ${spell.higherLevels}
+                                </div>
+                            ` : ''}
+                            <div class="spell-classes">
+                                ${spell.classes.map(c => `<span class="class-tag">${c}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            spellsList.innerHTML = html;
+        }
+
+        function toggleSpell(element) {
+            const isExpanded = element.classList.toggle('expanded');
+            element.setAttribute('aria-expanded', isExpanded);
+        }
+
+        function handleSpellKeypress(event, element) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleSpell(element);
+            }
+        }
+
+        function clearFilters() {
+            searchInput.value = '';
+            classFilter.value = '';
+            levelCheckboxes.forEach(cb => cb.checked = true);
+            schoolCheckboxes.forEach(cb => cb.checked = true);
+            concentrationFilter.checked = false;
+            ritualFilter.checked = false;
+            renderSpells();
+        }
+    </script>
+</body>
+</html>

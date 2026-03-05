@@ -8,384 +8,522 @@
     <link rel="stylesheet" href="character-creator.css">
 </head>
 <body>
+    <a href="#main" class="skip-link">Skip to content</a>
     <header>
-        <h1>D&D Character Creator</h1>
-        <a href="index.html" class="back-link">Back to Main</a>
+        <h1>D&D Online</h1>
+        <nav class="main-nav">
+            <a href="index.html" class="nav-link">Game Tools</a>
+            <a href="character-creator.html" class="nav-link active">Character Creator</a>
+            <a href="characters.html" class="nav-link">My Characters</a>
+            <a href="spells.html" class="nav-link">Spells</a>
+            <a href="monsters.html" class="nav-link">Monsters</a>
+            <a href="combat.html" class="nav-link">Combat Tracker</a>
+        </nav>
     </header>
 
-    <main class="creator-main">
-        <!-- Progress Bar -->
-        <div class="progress-bar">
-            <div class="progress-step active" data-step="1">
-                <span class="step-number">1</span>
-                <span class="step-label">Race</span>
-            </div>
-            <div class="progress-step" data-step="2">
-                <span class="step-number">2</span>
-                <span class="step-label">Class</span>
-            </div>
-            <div class="progress-step" data-step="3">
-                <span class="step-number">3</span>
-                <span class="step-label">Abilities</span>
-            </div>
-            <div class="progress-step" data-step="4">
-                <span class="step-number">4</span>
-                <span class="step-label">Background</span>
-            </div>
-            <div class="progress-step" data-step="5">
-                <span class="step-number">5</span>
-                <span class="step-label">Details</span>
-            </div>
-            <div class="progress-step" data-step="6">
-                <span class="step-number">6</span>
-                <span class="step-label">Equipment</span>
-            </div>
-            <div class="progress-step" data-step="7">
-                <span class="step-number">7</span>
-                <span class="step-label">Review</span>
-            </div>
-        </div>
-
-        <!-- Step 1: Race Selection -->
-        <section class="creator-step" id="step-1">
-            <h2>Choose Your Race</h2>
-            <p class="step-description">Your race determines your character's physical traits and some innate abilities.</p>
-
-            <div class="selection-grid" id="race-grid">
-                <!-- Races will be populated by JavaScript -->
-            </div>
-
-            <div class="selection-details" id="race-details">
-                <h3 id="race-name">Select a Race</h3>
-                <p id="race-description"></p>
-
-                <div id="race-traits" class="traits-container"></div>
-
-                <div id="subrace-selection" class="subrace-container" style="display: none;">
-                    <h4>Choose a Subrace</h4>
-                    <div id="subrace-options"></div>
-                </div>
-
-                <div id="dragonborn-ancestry" class="ancestry-container" style="display: none;">
-                    <h4>Choose Draconic Ancestry</h4>
-                    <select id="ancestry-select">
-                        <option value="">-- Select Ancestry --</option>
-                    </select>
-                    <p id="ancestry-details"></p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Step 2: Class Selection -->
-        <section class="creator-step" id="step-2" style="display: none;">
-            <h2>Choose Your Class</h2>
-            <p class="step-description">Your class defines your character's abilities, skills, and role in the party.</p>
-
-            <div class="selection-grid" id="class-grid">
-                <!-- Classes will be populated by JavaScript -->
-            </div>
-
-            <div class="selection-details" id="class-details">
-                <h3 id="class-name">Select a Class</h3>
-                <p id="class-description"></p>
-
-                <div id="class-info" class="class-info-container"></div>
-
-                <div id="subclass-selection" class="subclass-container" style="display: none;">
-                    <h4>Choose a Subclass (at level 3)</h4>
-                    <div id="subclass-options"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Step 3: Ability Scores -->
-        <section class="creator-step" id="step-3" style="display: none;">
-            <h2>Determine Ability Scores</h2>
-            <p class="step-description">Your ability scores define your character's raw capabilities.</p>
-
-            <div class="ability-method-selector">
-                <label>
-                    <input type="radio" name="ability-method" value="standard" checked>
-                    Standard Array (15, 14, 13, 12, 10, 8)
-                </label>
-                <label>
-                    <input type="radio" name="ability-method" value="pointbuy">
-                    Point Buy (27 points)
-                </label>
-                <label>
-                    <input type="radio" name="ability-method" value="roll">
-                    Roll (4d6 drop lowest)
-                </label>
-                <label>
-                    <input type="radio" name="ability-method" value="manual">
-                    Manual Entry
-                </label>
-            </div>
-
-            <div id="point-buy-remaining" class="point-buy-info" style="display: none;">
-                Points Remaining: <span id="points-left">27</span>
-            </div>
-
-            <div class="ability-scores-container">
-                <div class="ability-score-row">
-                    <div class="ability-score-card" data-ability="str">
-                        <label>Strength</label>
-                        <div class="score-controls">
-                            <button class="score-btn minus" onclick="adjustScore('str', -1)">-</button>
-                            <input type="number" id="score-str" value="10" min="3" max="18" readonly>
-                            <button class="score-btn plus" onclick="adjustScore('str', 1)">+</button>
-                        </div>
-                        <div class="racial-bonus" id="racial-str">+0</div>
-                        <div class="total-score">Total: <span id="total-str">10</span></div>
-                        <div class="modifier">Modifier: <span id="mod-str">+0</span></div>
-                    </div>
-                    <div class="ability-score-card" data-ability="dex">
-                        <label>Dexterity</label>
-                        <div class="score-controls">
-                            <button class="score-btn minus" onclick="adjustScore('dex', -1)">-</button>
-                            <input type="number" id="score-dex" value="10" min="3" max="18" readonly>
-                            <button class="score-btn plus" onclick="adjustScore('dex', 1)">+</button>
-                        </div>
-                        <div class="racial-bonus" id="racial-dex">+0</div>
-                        <div class="total-score">Total: <span id="total-dex">10</span></div>
-                        <div class="modifier">Modifier: <span id="mod-dex">+0</span></div>
-                    </div>
-                    <div class="ability-score-card" data-ability="con">
-                        <label>Constitution</label>
-                        <div class="score-controls">
-                            <button class="score-btn minus" onclick="adjustScore('con', -1)">-</button>
-                            <input type="number" id="score-con" value="10" min="3" max="18" readonly>
-                            <button class="score-btn plus" onclick="adjustScore('con', 1)">+</button>
-                        </div>
-                        <div class="racial-bonus" id="racial-con">+0</div>
-                        <div class="total-score">Total: <span id="total-con">10</span></div>
-                        <div class="modifier">Modifier: <span id="mod-con">+0</span></div>
-                    </div>
-                </div>
-                <div class="ability-score-row">
-                    <div class="ability-score-card" data-ability="int">
-                        <label>Intelligence</label>
-                        <div class="score-controls">
-                            <button class="score-btn minus" onclick="adjustScore('int', -1)">-</button>
-                            <input type="number" id="score-int" value="10" min="3" max="18" readonly>
-                            <button class="score-btn plus" onclick="adjustScore('int', 1)">+</button>
-                        </div>
-                        <div class="racial-bonus" id="racial-int">+0</div>
-                        <div class="total-score">Total: <span id="total-int">10</span></div>
-                        <div class="modifier">Modifier: <span id="mod-int">+0</span></div>
-                    </div>
-                    <div class="ability-score-card" data-ability="wis">
-                        <label>Wisdom</label>
-                        <div class="score-controls">
-                            <button class="score-btn minus" onclick="adjustScore('wis', -1)">-</button>
-                            <input type="number" id="score-wis" value="10" min="3" max="18" readonly>
-                            <button class="score-btn plus" onclick="adjustScore('wis', 1)">+</button>
-                        </div>
-                        <div class="racial-bonus" id="racial-wis">+0</div>
-                        <div class="total-score">Total: <span id="total-wis">10</span></div>
-                        <div class="modifier">Modifier: <span id="mod-wis">+0</span></div>
-                    </div>
-                    <div class="ability-score-card" data-ability="cha">
-                        <label>Charisma</label>
-                        <div class="score-controls">
-                            <button class="score-btn minus" onclick="adjustScore('cha', -1)">-</button>
-                            <input type="number" id="score-cha" value="10" min="3" max="18" readonly>
-                            <button class="score-btn plus" onclick="adjustScore('cha', 1)">+</button>
-                        </div>
-                        <div class="racial-bonus" id="racial-cha">+0</div>
-                        <div class="total-score">Total: <span id="total-cha">10</span></div>
-                        <div class="modifier">Modifier: <span id="mod-cha">+0</span></div>
-                    </div>
+    <div class="creator-layout">
+        <main class="creator-main" id="main">
+            <!-- Progress Bar -->
+            <div class="progress-container" role="navigation" aria-label="Character creation progress">
+                <div class="progress-bar">
+                    <div class="progress-track"></div>
+                    <div class="progress-fill" id="progress-fill" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="7" aria-label="Step 1 of 7"></div>
+                    <ol class="progress-steps" aria-label="Creation steps">
+                        <li class="progress-step active" data-step="1" aria-current="step">
+                            <span class="step-number" aria-hidden="true">1</span>
+                            <span class="step-label">Race</span>
+                        </li>
+                        <li class="progress-step" data-step="2">
+                            <span class="step-number" aria-hidden="true">2</span>
+                            <span class="step-label">Class</span>
+                        </li>
+                        <li class="progress-step" data-step="3">
+                            <span class="step-number" aria-hidden="true">3</span>
+                            <span class="step-label">Abilities</span>
+                        </li>
+                        <li class="progress-step" data-step="4">
+                            <span class="step-number" aria-hidden="true">4</span>
+                            <span class="step-label">Background</span>
+                        </li>
+                        <li class="progress-step" data-step="5">
+                            <span class="step-number" aria-hidden="true">5</span>
+                            <span class="step-label">Details</span>
+                        </li>
+                        <li class="progress-step" data-step="6">
+                            <span class="step-number" aria-hidden="true">6</span>
+                            <span class="step-label">Equipment</span>
+                        </li>
+                        <li class="progress-step" data-step="7">
+                            <span class="step-number" aria-hidden="true">7</span>
+                            <span class="step-label">Review</span>
+                        </li>
+                    </ol>
                 </div>
             </div>
 
-            <div id="standard-array-pool" class="array-pool">
-                <p>Drag scores to assign them:</p>
-                <div class="available-scores" id="available-scores"></div>
-            </div>
-
-            <button id="roll-abilities-btn" class="roll-btn" style="display: none;" onclick="rollAbilities()">
-                Roll All Abilities (4d6 drop lowest)
-            </button>
-        </section>
-
-        <!-- Step 4: Background Selection -->
-        <section class="creator-step" id="step-4" style="display: none;">
-            <h2>Choose Your Background</h2>
-            <p class="step-description">Your background reveals where you came from, how you became an adventurer, and your place in the world.</p>
-
-            <div class="selection-grid" id="background-grid">
-                <!-- Backgrounds will be populated by JavaScript -->
-            </div>
-
-            <div class="selection-details" id="background-details">
-                <h3 id="background-name">Select a Background</h3>
-                <p id="background-description"></p>
-
-                <div id="background-info" class="background-info-container"></div>
-            </div>
-        </section>
-
-        <!-- Step 5: Character Details -->
-        <section class="creator-step" id="step-5" style="display: none;">
-            <h2>Character Details</h2>
-            <p class="step-description">Define your character's personality and appearance.</p>
-
-            <div class="details-form">
-                <div class="form-group">
-                    <label for="char-name">Character Name</label>
-                    <input type="text" id="char-name" placeholder="Enter character name">
+            <!-- Step 1: Race Selection -->
+            <section class="creator-step" id="step-1" aria-labelledby="step1-heading">
+                <div class="step-header">
+                    <h2 id="step1-heading">Choose Your Race</h2>
+                    <p class="step-description">Your race determines your character's physical traits and some innate abilities.</p>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="char-alignment">Alignment</label>
-                        <select id="char-alignment">
-                            <option value="lawful-good">Lawful Good</option>
-                            <option value="neutral-good">Neutral Good</option>
-                            <option value="chaotic-good">Chaotic Good</option>
-                            <option value="lawful-neutral">Lawful Neutral</option>
-                            <option value="true-neutral" selected>True Neutral</option>
-                            <option value="chaotic-neutral">Chaotic Neutral</option>
-                            <option value="lawful-evil">Lawful Evil</option>
-                            <option value="neutral-evil">Neutral Evil</option>
-                            <option value="chaotic-evil">Chaotic Evil</option>
+                <div class="step-content">
+                    <div class="selection-grid" id="race-grid" role="listbox" aria-label="Available races">
+                        <!-- Races will be populated by JavaScript -->
+                    </div>
+
+                    <div class="selection-details" id="race-details" aria-live="polite">
+                        <h3 id="race-name">Select a Race</h3>
+                        <p id="race-description" class="details-description"></p>
+
+                        <div id="race-traits" class="traits-container"></div>
+
+                        <div id="subrace-selection" class="subrace-container" style="display: none;">
+                            <h4>Choose a Subrace</h4>
+                            <div id="subrace-options" class="subrace-options" role="radiogroup" aria-label="Subrace options"></div>
+                        </div>
+
+                        <div id="dragonborn-ancestry" class="ancestry-container" style="display: none;">
+                            <h4 id="ancestry-label">Choose Draconic Ancestry</h4>
+                            <label for="ancestry-select" class="visually-hidden">Draconic ancestry</label>
+                            <select id="ancestry-select" class="form-select" aria-labelledby="ancestry-label">
+                                <option value="">-- Select Ancestry --</option>
+                            </select>
+                            <p id="ancestry-details" class="ancestry-info" aria-live="polite"></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 2: Class Selection -->
+            <section class="creator-step" id="step-2" style="display: none;" aria-labelledby="step2-heading">
+                <div class="step-header">
+                    <h2 id="step2-heading">Choose Your Class</h2>
+                    <p class="step-description">Your class defines your character's abilities, skills, and role in the party.</p>
+                </div>
+
+                <div class="step-content">
+                    <div class="selection-grid" id="class-grid" role="listbox" aria-label="Available classes">
+                        <!-- Classes will be populated by JavaScript -->
+                    </div>
+
+                    <div class="selection-details" id="class-details" aria-live="polite">
+                        <h3 id="class-name">Select a Class</h3>
+                        <p id="class-description" class="details-description"></p>
+
+                        <div id="class-info" class="class-info-container"></div>
+
+                        <div id="subclass-selection" class="subclass-container" style="display: none;">
+                            <h4>Choose a Subclass (at level 3)</h4>
+                            <div id="subclass-options" class="subclass-options" role="radiogroup" aria-label="Subclass options"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Ability Scores -->
+            <section class="creator-step" id="step-3" style="display: none;" aria-labelledby="step3-heading">
+                <div class="step-header">
+                    <h2 id="step3-heading">Determine Ability Scores</h2>
+                    <p class="step-description">Your ability scores define your character's raw capabilities.</p>
+                </div>
+
+                <div class="step-content">
+                    <fieldset class="ability-method-selector" role="radiogroup" aria-label="Ability score generation method">
+                        <legend class="visually-hidden">Choose ability score generation method</legend>
+                        <label class="method-option">
+                            <input type="radio" name="ability-method" value="standard" checked>
+                            <span class="method-label">Standard Array</span>
+                            <span class="method-desc">(15, 14, 13, 12, 10, 8)</span>
+                        </label>
+                        <label class="method-option">
+                            <input type="radio" name="ability-method" value="pointbuy">
+                            <span class="method-label">Point Buy</span>
+                            <span class="method-desc">(27 points)</span>
+                        </label>
+                        <label class="method-option">
+                            <input type="radio" name="ability-method" value="roll">
+                            <span class="method-label">Roll</span>
+                            <span class="method-desc">(4d6 drop lowest)</span>
+                        </label>
+                        <label class="method-option">
+                            <input type="radio" name="ability-method" value="manual">
+                            <span class="method-label">Manual Entry</span>
+                            <span class="method-desc">(Custom values)</span>
+                        </label>
+                    </fieldset>
+
+                    <div id="point-buy-remaining" class="point-buy-info" style="display: none;" aria-live="polite">
+                        <span class="points-label">Points Remaining:</span>
+                        <span class="points-value" id="points-left">27</span>
+                    </div>
+
+                    <div class="ability-scores-grid" role="group" aria-label="Ability scores">
+                        <div class="ability-score-card" data-ability="str">
+                            <div class="ability-name" id="str-label">Strength</div>
+                            <div class="ability-abbr" aria-hidden="true">STR</div>
+                            <div class="score-controls" role="group" aria-labelledby="str-label">
+                                <button class="score-btn minus" onclick="adjustScore('str', -1)" aria-label="Decrease Strength">-</button>
+                                <input type="number" id="score-str" value="10" min="3" max="18" readonly aria-label="Strength base score">
+                                <button class="score-btn plus" onclick="adjustScore('str', 1)" aria-label="Increase Strength">+</button>
+                            </div>
+                            <div class="racial-bonus" id="racial-str" aria-label="Racial bonus">+0</div>
+                            <div class="score-total">
+                                <span class="total-label">Total</span>
+                                <span class="total-value" id="total-str" aria-live="polite">10</span>
+                            </div>
+                            <div class="score-modifier" id="mod-str" aria-label="Strength modifier">+0</div>
+                        </div>
+
+                        <div class="ability-score-card" data-ability="dex">
+                            <div class="ability-name" id="dex-label">Dexterity</div>
+                            <div class="ability-abbr" aria-hidden="true">DEX</div>
+                            <div class="score-controls" role="group" aria-labelledby="dex-label">
+                                <button class="score-btn minus" onclick="adjustScore('dex', -1)" aria-label="Decrease Dexterity">-</button>
+                                <input type="number" id="score-dex" value="10" min="3" max="18" readonly aria-label="Dexterity base score">
+                                <button class="score-btn plus" onclick="adjustScore('dex', 1)" aria-label="Increase Dexterity">+</button>
+                            </div>
+                            <div class="racial-bonus" id="racial-dex" aria-label="Racial bonus">+0</div>
+                            <div class="score-total">
+                                <span class="total-label">Total</span>
+                                <span class="total-value" id="total-dex" aria-live="polite">10</span>
+                            </div>
+                            <div class="score-modifier" id="mod-dex" aria-label="Dexterity modifier">+0</div>
+                        </div>
+
+                        <div class="ability-score-card" data-ability="con">
+                            <div class="ability-name" id="con-label">Constitution</div>
+                            <div class="ability-abbr" aria-hidden="true">CON</div>
+                            <div class="score-controls" role="group" aria-labelledby="con-label">
+                                <button class="score-btn minus" onclick="adjustScore('con', -1)" aria-label="Decrease Constitution">-</button>
+                                <input type="number" id="score-con" value="10" min="3" max="18" readonly aria-label="Constitution base score">
+                                <button class="score-btn plus" onclick="adjustScore('con', 1)" aria-label="Increase Constitution">+</button>
+                            </div>
+                            <div class="racial-bonus" id="racial-con" aria-label="Racial bonus">+0</div>
+                            <div class="score-total">
+                                <span class="total-label">Total</span>
+                                <span class="total-value" id="total-con" aria-live="polite">10</span>
+                            </div>
+                            <div class="score-modifier" id="mod-con" aria-label="Constitution modifier">+0</div>
+                        </div>
+
+                        <div class="ability-score-card" data-ability="int">
+                            <div class="ability-name" id="int-label">Intelligence</div>
+                            <div class="ability-abbr" aria-hidden="true">INT</div>
+                            <div class="score-controls" role="group" aria-labelledby="int-label">
+                                <button class="score-btn minus" onclick="adjustScore('int', -1)" aria-label="Decrease Intelligence">-</button>
+                                <input type="number" id="score-int" value="10" min="3" max="18" readonly aria-label="Intelligence base score">
+                                <button class="score-btn plus" onclick="adjustScore('int', 1)" aria-label="Increase Intelligence">+</button>
+                            </div>
+                            <div class="racial-bonus" id="racial-int" aria-label="Racial bonus">+0</div>
+                            <div class="score-total">
+                                <span class="total-label">Total</span>
+                                <span class="total-value" id="total-int" aria-live="polite">10</span>
+                            </div>
+                            <div class="score-modifier" id="mod-int" aria-label="Intelligence modifier">+0</div>
+                        </div>
+
+                        <div class="ability-score-card" data-ability="wis">
+                            <div class="ability-name" id="wis-label">Wisdom</div>
+                            <div class="ability-abbr" aria-hidden="true">WIS</div>
+                            <div class="score-controls" role="group" aria-labelledby="wis-label">
+                                <button class="score-btn minus" onclick="adjustScore('wis', -1)" aria-label="Decrease Wisdom">-</button>
+                                <input type="number" id="score-wis" value="10" min="3" max="18" readonly aria-label="Wisdom base score">
+                                <button class="score-btn plus" onclick="adjustScore('wis', 1)" aria-label="Increase Wisdom">+</button>
+                            </div>
+                            <div class="racial-bonus" id="racial-wis" aria-label="Racial bonus">+0</div>
+                            <div class="score-total">
+                                <span class="total-label">Total</span>
+                                <span class="total-value" id="total-wis" aria-live="polite">10</span>
+                            </div>
+                            <div class="score-modifier" id="mod-wis" aria-label="Wisdom modifier">+0</div>
+                        </div>
+
+                        <div class="ability-score-card" data-ability="cha">
+                            <div class="ability-name" id="cha-label">Charisma</div>
+                            <div class="ability-abbr" aria-hidden="true">CHA</div>
+                            <div class="score-controls" role="group" aria-labelledby="cha-label">
+                                <button class="score-btn minus" onclick="adjustScore('cha', -1)" aria-label="Decrease Charisma">-</button>
+                                <input type="number" id="score-cha" value="10" min="3" max="18" readonly aria-label="Charisma base score">
+                                <button class="score-btn plus" onclick="adjustScore('cha', 1)" aria-label="Increase Charisma">+</button>
+                            </div>
+                            <div class="racial-bonus" id="racial-cha" aria-label="Racial bonus">+0</div>
+                            <div class="score-total">
+                                <span class="total-label">Total</span>
+                                <span class="total-value" id="total-cha" aria-live="polite">10</span>
+                            </div>
+                            <div class="score-modifier" id="mod-cha" aria-label="Charisma modifier">+0</div>
+                        </div>
+                    </div>
+
+                    <div id="standard-array-pool" class="array-pool">
+                        <p class="pool-label">Drag scores to assign them:</p>
+                        <div class="available-scores" id="available-scores"></div>
+                    </div>
+
+                    <button id="roll-abilities-btn" class="roll-btn" style="display: none;" onclick="rollAbilities()">
+                        Roll All Abilities (4d6 drop lowest)
+                    </button>
+                </div>
+            </section>
+
+            <!-- Step 4: Background Selection -->
+            <section class="creator-step" id="step-4" style="display: none;" aria-labelledby="step4-heading">
+                <div class="step-header">
+                    <h2 id="step4-heading">Choose Your Background</h2>
+                    <p class="step-description">Your background reveals where you came from, how you became an adventurer, and your place in the world.</p>
+                </div>
+
+                <div class="step-content">
+                    <div class="selection-grid" id="background-grid" role="listbox" aria-label="Available backgrounds">
+                        <!-- Backgrounds will be populated by JavaScript -->
+                    </div>
+
+                    <div class="selection-details" id="background-details" aria-live="polite">
+                        <h3 id="background-name">Select a Background</h3>
+                        <p id="background-description" class="details-description"></p>
+
+                        <div id="background-info" class="background-info-container"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 5: Character Details -->
+            <section class="creator-step" id="step-5" style="display: none;" aria-labelledby="step5-heading">
+                <div class="step-header">
+                    <h2 id="step5-heading">Character Details</h2>
+                    <p class="step-description">Define your character's personality and appearance.</p>
+                </div>
+
+                <div class="step-content">
+                    <div class="details-form">
+                        <div class="form-group full-width">
+                            <label for="char-name">Character Name</label>
+                            <input type="text" id="char-name" class="form-input" placeholder="Enter character name" aria-required="true">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="char-alignment">Alignment</label>
+                                <select id="char-alignment" class="form-select">
+                                    <option value="lawful-good">Lawful Good</option>
+                                    <option value="neutral-good">Neutral Good</option>
+                                    <option value="chaotic-good">Chaotic Good</option>
+                                    <option value="lawful-neutral">Lawful Neutral</option>
+                                    <option value="true-neutral" selected>True Neutral</option>
+                                    <option value="chaotic-neutral">Chaotic Neutral</option>
+                                    <option value="lawful-evil">Lawful Evil</option>
+                                    <option value="neutral-evil">Neutral Evil</option>
+                                    <option value="chaotic-evil">Chaotic Evil</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="char-level">Starting Level</label>
+                                <input type="number" id="char-level" class="form-input" value="1" min="1" max="20">
+                            </div>
+                        </div>
+
+                        <div class="form-row triple">
+                            <div class="form-group">
+                                <label for="char-age">Age</label>
+                                <input type="text" id="char-age" class="form-input" placeholder="e.g., 25">
+                            </div>
+                            <div class="form-group">
+                                <label for="char-height">Height</label>
+                                <input type="text" id="char-height" class="form-input" placeholder="e.g., 5'10&quot;">
+                            </div>
+                            <div class="form-group">
+                                <label for="char-weight">Weight</label>
+                                <input type="text" id="char-weight" class="form-input" placeholder="e.g., 170 lbs">
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="char-appearance">Physical Appearance</label>
+                            <textarea id="char-appearance" class="form-textarea" rows="3" placeholder="Describe your character's appearance..."></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="char-personality">Personality Traits</label>
+                            <textarea id="char-personality" class="form-textarea" rows="2" placeholder="Two personality traits..."></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="char-ideals">Ideals</label>
+                            <textarea id="char-ideals" class="form-textarea" rows="2" placeholder="What drives your character..."></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="char-bonds">Bonds</label>
+                            <textarea id="char-bonds" class="form-textarea" rows="2" placeholder="Connections to people, places, or events..."></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="char-flaws">Flaws</label>
+                            <textarea id="char-flaws" class="form-textarea" rows="2" placeholder="A vice, fear, or weakness..."></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="char-backstory">Backstory</label>
+                            <textarea id="char-backstory" class="form-textarea" rows="5" placeholder="Your character's history..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Variant Human Feat Selection -->
+                    <div id="variant-human-feat" class="feat-selection" style="display: none;">
+                        <h3 id="feat-heading">Choose a Feat (Variant Human)</h3>
+                        <label for="feat-select" class="visually-hidden">Select a feat</label>
+                        <select id="feat-select" class="form-select" aria-labelledby="feat-heading">
+                            <option value="">-- Select a Feat --</option>
                         </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="char-level">Starting Level</label>
-                        <input type="number" id="char-level" value="1" min="1" max="20">
+                        <div id="feat-details" class="feat-details" aria-live="polite"></div>
                     </div>
                 </div>
+            </section>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="char-age">Age</label>
-                        <input type="text" id="char-age" placeholder="e.g., 25">
+            <!-- Step 6: Equipment -->
+            <section class="creator-step" id="step-6" style="display: none;" aria-labelledby="step6-heading">
+                <div class="step-header">
+                    <h2 id="step6-heading">Choose Equipment</h2>
+                    <p class="step-description">Select your starting equipment based on your class and background.</p>
+                </div>
+
+                <div class="step-content">
+                    <div id="equipment-choices" class="equipment-container" aria-live="polite">
+                        <!-- Equipment choices will be populated by JavaScript -->
                     </div>
-                    <div class="form-group">
-                        <label for="char-height">Height</label>
-                        <input type="text" id="char-height" placeholder="e.g., 5'10&quot;">
+
+                    <div class="gold-option">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="use-gold" aria-describedby="gold-desc">
+                            <span id="gold-desc">Use starting gold instead of equipment packs</span>
+                        </label>
+                        <div id="starting-gold" class="starting-gold-display" style="display: none;" aria-live="polite">
+                            <span class="gold-label">Starting Gold:</span>
+                            <span class="gold-amount" id="gold-amount">0</span>
+                            <span class="gold-currency">gp</span>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="char-weight">Weight</label>
-                        <input type="text" id="char-weight" placeholder="e.g., 170 lbs">
+
+                    <div id="equipment-list" class="equipment-list">
+                        <h3 id="equip-heading">Your Equipment</h3>
+                        <ul id="final-equipment" aria-labelledby="equip-heading" aria-live="polite"></ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 7: Review & Complete -->
+            <section class="creator-step" id="step-7" style="display: none;" aria-labelledby="step7-heading">
+                <div class="step-header">
+                    <h2 id="step7-heading">Review Your Character</h2>
+                    <p class="step-description">Review your character and make any final adjustments.</p>
+                </div>
+
+                <div class="step-content">
+                    <div class="character-sheet-preview" id="character-preview" aria-live="polite">
+                        <!-- Character preview will be populated by JavaScript -->
+                    </div>
+
+                    <div class="action-buttons" role="group" aria-label="Character actions">
+                        <button class="btn-primary" onclick="saveCharacter()">Save Character</button>
+                        <button class="btn-secondary" onclick="exportCharacter()">Export as PDF</button>
+                        <button class="btn-secondary" onclick="printCharacter()">Print Character Sheet</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Navigation Buttons -->
+            <nav class="nav-buttons" aria-label="Step navigation">
+                <button id="prev-btn" class="nav-btn nav-btn-prev" onclick="prevStep()" disabled aria-label="Go to previous step">
+                    <span class="nav-arrow" aria-hidden="true">&#8592;</span> Previous
+                </button>
+                <button id="next-btn" class="nav-btn nav-btn-next" onclick="nextStep()" aria-label="Go to next step">
+                    Next <span class="nav-arrow" aria-hidden="true">&#8594;</span>
+                </button>
+            </nav>
+        </main>
+
+        <!-- Character Summary Sidebar -->
+        <aside class="character-summary" id="character-summary" aria-label="Character summary">
+            <div class="summary-header">
+                <h3 id="summary-heading">Character Summary</h3>
+            </div>
+            <div class="summary-content">
+                <div class="summary-section">
+                    <div class="summary-item">
+                        <span class="summary-label">Name</span>
+                        <span class="summary-value" id="sum-name">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Race</span>
+                        <span class="summary-value" id="sum-race">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Class</span>
+                        <span class="summary-value" id="sum-class">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Background</span>
+                        <span class="summary-value" id="sum-background">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Level</span>
+                        <span class="summary-value" id="sum-level">1</span>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="char-appearance">Physical Appearance</label>
-                    <textarea id="char-appearance" rows="3" placeholder="Describe your character's appearance..."></textarea>
+                <div class="summary-divider"></div>
+
+                <div class="summary-abilities">
+                    <div class="summary-ability">
+                        <span class="ability-label">STR</span>
+                        <span class="ability-value" id="sum-str">10</span>
+                    </div>
+                    <div class="summary-ability">
+                        <span class="ability-label">DEX</span>
+                        <span class="ability-value" id="sum-dex">10</span>
+                    </div>
+                    <div class="summary-ability">
+                        <span class="ability-label">CON</span>
+                        <span class="ability-value" id="sum-con">10</span>
+                    </div>
+                    <div class="summary-ability">
+                        <span class="ability-label">INT</span>
+                        <span class="ability-value" id="sum-int">10</span>
+                    </div>
+                    <div class="summary-ability">
+                        <span class="ability-label">WIS</span>
+                        <span class="ability-value" id="sum-wis">10</span>
+                    </div>
+                    <div class="summary-ability">
+                        <span class="ability-label">CHA</span>
+                        <span class="ability-value" id="sum-cha">10</span>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="char-personality">Personality Traits</label>
-                    <textarea id="char-personality" rows="2" placeholder="Two personality traits..."></textarea>
-                </div>
+                <div class="summary-divider"></div>
 
-                <div class="form-group">
-                    <label for="char-ideals">Ideals</label>
-                    <textarea id="char-ideals" rows="2" placeholder="What drives your character..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="char-bonds">Bonds</label>
-                    <textarea id="char-bonds" rows="2" placeholder="Connections to people, places, or events..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="char-flaws">Flaws</label>
-                    <textarea id="char-flaws" rows="2" placeholder="A vice, fear, or weakness..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="char-backstory">Backstory</label>
-                    <textarea id="char-backstory" rows="5" placeholder="Your character's history..."></textarea>
+                <div class="summary-stats">
+                    <div class="summary-stat">
+                        <span class="stat-icon">&#9829;</span>
+                        <span class="stat-label">HP</span>
+                        <span class="stat-value" id="sum-hp">0</span>
+                    </div>
+                    <div class="summary-stat">
+                        <span class="stat-icon">&#9932;</span>
+                        <span class="stat-label">AC</span>
+                        <span class="stat-value" id="sum-ac">10</span>
+                    </div>
+                    <div class="summary-stat">
+                        <span class="stat-icon">&#10132;</span>
+                        <span class="stat-label">Speed</span>
+                        <span class="stat-value" id="sum-speed">30 ft</span>
+                    </div>
                 </div>
             </div>
-
-            <!-- Variant Human Feat Selection -->
-            <div id="variant-human-feat" class="feat-selection" style="display: none;">
-                <h3>Choose a Feat (Variant Human)</h3>
-                <select id="feat-select">
-                    <option value="">-- Select a Feat --</option>
-                </select>
-                <div id="feat-details"></div>
-            </div>
-        </section>
-
-        <!-- Step 6: Equipment -->
-        <section class="creator-step" id="step-6" style="display: none;">
-            <h2>Choose Equipment</h2>
-            <p class="step-description">Select your starting equipment based on your class and background.</p>
-
-            <div id="equipment-choices" class="equipment-container">
-                <!-- Equipment choices will be populated by JavaScript -->
-            </div>
-
-            <div class="gold-option">
-                <label>
-                    <input type="checkbox" id="use-gold">
-                    Use starting gold instead of equipment packs
-                </label>
-                <div id="starting-gold" style="display: none;">
-                    <p>Starting Gold: <span id="gold-amount">0</span> gp</p>
-                </div>
-            </div>
-
-            <div id="equipment-list" class="equipment-list">
-                <h3>Your Equipment</h3>
-                <ul id="final-equipment"></ul>
-            </div>
-        </section>
-
-        <!-- Step 7: Review & Complete -->
-        <section class="creator-step" id="step-7" style="display: none;">
-            <h2>Review Your Character</h2>
-            <p class="step-description">Review your character and make any final adjustments.</p>
-
-            <div class="character-sheet-preview" id="character-preview">
-                <!-- Character preview will be populated by JavaScript -->
-            </div>
-
-            <div class="action-buttons">
-                <button class="btn-primary" onclick="saveCharacter()">Save Character</button>
-                <button class="btn-secondary" onclick="exportCharacter()">Export as PDF</button>
-                <button class="btn-secondary" onclick="printCharacter()">Print Character Sheet</button>
-            </div>
-        </section>
-
-        <!-- Navigation Buttons -->
-        <div class="nav-buttons">
-            <button id="prev-btn" class="nav-btn" onclick="prevStep()" disabled>Previous</button>
-            <button id="next-btn" class="nav-btn" onclick="nextStep()">Next</button>
-        </div>
-    </main>
-
-    <!-- Character Summary Sidebar -->
-    <aside class="character-summary" id="character-summary">
-        <h3>Character Summary</h3>
-        <div class="summary-content">
-            <p><strong>Name:</strong> <span id="sum-name">-</span></p>
-            <p><strong>Race:</strong> <span id="sum-race">-</span></p>
-            <p><strong>Class:</strong> <span id="sum-class">-</span></p>
-            <p><strong>Background:</strong> <span id="sum-background">-</span></p>
-            <p><strong>Level:</strong> <span id="sum-level">1</span></p>
-            <hr>
-            <div class="sum-abilities">
-                <span>STR: <span id="sum-str">10</span></span>
-                <span>DEX: <span id="sum-dex">10</span></span>
-                <span>CON: <span id="sum-con">10</span></span>
-                <span>INT: <span id="sum-int">10</span></span>
-                <span>WIS: <span id="sum-wis">10</span></span>
-                <span>CHA: <span id="sum-cha">10</span></span>
-            </div>
-            <hr>
-            <p><strong>HP:</strong> <span id="sum-hp">0</span></p>
-            <p><strong>AC:</strong> <span id="sum-ac">10</span></p>
-            <p><strong>Speed:</strong> <span id="sum-speed">30</span> ft</p>
-        </div>
-    </aside>
+        </aside>
+    </div>
 
     <!-- Data Scripts -->
     <script src="data/races.js"></script>

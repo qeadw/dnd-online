@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combat Tracker - D&D Online</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Combat Container */
+        .combat-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Combat Controls */
+        .combat-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .combat-controls button {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-next-turn {
+            background: linear-gradient(145deg, #228b22, #165016);
+            color: #fff;
+        }
+
+        .btn-next-turn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(34, 139, 34, 0.6);
+        }
+
+        .btn-new-encounter {
+            background: linear-gradient(145deg, #8b0000, #5c0000);
+            color: #fff;
+        }
+
+        .btn-new-encounter:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.6);
+        }
+
+        .round-counter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: 1px solid rgba(201, 162, 39, 0.3);
+            color: #c9a227;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .round-counter #round-number {
+            font-size: 1.4rem;
+        }
+
+        /* Add Combatant Form */
+        .add-combatant-form {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(201, 162, 39, 0.3);
+        }
+
+        .add-combatant-form h3 {
+            color: #c9a227;
+            margin: 0 0 20px 0;
+            font-size: 1.2rem;
+            border-bottom: 2px solid #c9a227;
+            padding-bottom: 10px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .form-group label {
+            color: #aaa;
+            font-size: 0.85rem;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .form-group input {
+            padding: 10px 14px;
+            border: 1px solid rgba(201, 162, 39, 0.5);
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.4);
+            color: #fff;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #c9a227;
+            box-shadow: 0 0 8px rgba(201, 162, 39, 0.3);
+        }
+
+        .form-group input::placeholder {
+            color: #666;
+        }
+
+        .form-group input[type="number"] {
+            width: 80px;
+            min-width: 70px;
+        }
+
+        .form-group input[type="text"] {
+            width: 160px;
+            min-width: 120px;
+        }
+
+        .form-group.notes input {
+            width: 220px;
+            min-width: 150px;
+        }
+
+        .btn-add-combatant {
+            padding: 10px 30px;
+            background: #c9a227;
+            color: #1a1a2e;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 42px;
+        }
+
+        .btn-add-combatant:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(201, 162, 39, 0.4);
+        }
+
+        /* Combatant List */
+        .combatant-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Combatant Card */
+        .combatant-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 5px solid rgba(201, 162, 39, 0.3);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .combatant-card.active-turn {
+            border-left-color: #228b22;
+            background: linear-gradient(90deg, rgba(34, 139, 34, 0.15), rgba(255, 255, 255, 0.1));
+            box-shadow: 0 0 25px rgba(34, 139, 34, 0.25), inset 0 0 30px rgba(34, 139, 34, 0.05);
+        }
+
+        .combatant-card.dead {
+            opacity: 0.5;
+            border-left-color: #8b0000;
+        }
+
+        .combatant-card.unconscious {
+            border-left-color: #ff6b6b;
+            background: linear-gradient(90deg, rgba(255, 107, 107, 0.1), rgba(255, 255, 255, 0.1));
+        }
+
+        /* Combatant Header */
+        .combatant-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .combatant-name-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .combatant-initiative {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            background: linear-gradient(145deg, #c9a227, #a08020);
+            color: #1a1a2e;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(201, 162, 39, 0.4);
+        }
+
+        .combatant-name {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #fff;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            min-width: 0;
+            flex-shrink: 1;
+        }
+
+        .turn-indicator {
+            display: none;
+            background: linear-gradient(145deg, #228b22, #165016);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            animation: pulse-glow 2s infinite;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(34, 139, 34, 0.5); }
+            50% { box-shadow: 0 0 15px rgba(34, 139, 34, 0.8); }
+        }
+
+        .combatant-card.active-turn .turn-indicator {
+            display: inline-block;
+        }
+
+        .combatant-ac {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 6px 14px;
+            border-radius: 6px;
+            color: #aaa;
+            font-size: 0.9rem;
+            border: 1px solid rgba(201, 162, 39, 0.2);
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .combatant-ac span {
+            color: #c9a227;
+            font-weight: bold;
+        }
+
+        .concentration-badge {
+            background: #8e44ad;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .btn-remove {
+            background: rgba(139, 0, 0, 0.4);
+            color: #ff6b6b;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .btn-remove:hover {
+            background: rgba(139, 0, 0, 0.7);
+        }
+
+        /* Combatant Body - Three Column Grid */
+        .combatant-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Section Panels */
+        .hp-section,
+        .conditions-section,
+        .death-saves-section {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 18px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .hp-section h4,
+        .conditions-section h4,
+        .death-saves-section h4 {
+            color: #c9a227;
+            margin: 0 0 15px 0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* HP Section */
+        .hp-display {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .hp-current {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #4caf50;
+            line-height: 1;
+        }
+
+        .hp-current.low {
+            color: #ff9800;
+        }
+
+        .hp-current.critical {
+            color: #f44336;
+        }
+
+        .hp-max {
+            font-size: 1.3rem;
+            color: #666;
+        }
+
+        /* HP Bar */
+        .hp-bar {
+            height: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hp-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            transition: width 0.3s ease;
+            border-radius: 5px;
+        }
+
+        .hp-bar-fill.low {
+            background: linear-gradient(90deg, #ff9800, #ffc107);
+        }
+
+        .hp-bar-fill.critical {
+            background: linear-gradient(90deg, #f44336, #ff5722);
+        }
+
+        /* HP Controls */
+        .hp-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .hp-controls input {
+            width: 60px;
+            min-width: 50px;
+            padding: 8px;
+            text-align: center;
+            border: 1px solid rgba(201, 162, 39, 0.3);
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.4);
+            color: #fff;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .hp-controls input:focus {
+            outline: none;
+            border-color: #c9a227;
+        }
+
+        .hp-controls button {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .btn-damage {
+            background: linear-gradient(145deg, #f44336, #c62828);
+            color: #fff;
+        }
+
+        .btn-damage:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
+        }
+
+        .btn-heal {
+            background: linear-gradient(145deg, #4caf50, #2e7d32);
+            color: #fff;
+        }
+
+        .btn-heal:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+
+        /* Temp HP */
+        .temp-hp-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+        }
+
+        .temp-hp-section label {
+            color: #87ceeb;
+            font-size: 0.85rem;
+            font-weight: bold;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .temp-hp-section input {
+            width: 60px;
+            min-width: 50px;
+            padding: 6px;
+            text-align: center;
+            border: 1px solid rgba(135, 206, 235, 0.4);
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.4);
+            color: #87ceeb;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .temp-hp-section input:focus {
+            outline: none;
+            border-color: #87ceeb;
+        }
+
+        /* Conditions Section */
+        .active-conditions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+            min-height: 32px;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        /* Condition Tags - matching spells.html style */
+        .condition-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: #8e44ad;
+            color: #fff;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            flex-shrink: 0;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .condition-tag button {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1;
+            padding: 0;
+            margin-left: 2px;
+            transition: color 0.2s;
+            flex-shrink: 0;
+        }
+
+        .condition-tag button:hover {
+            color: #fff;
+        }
+
+        /* Condition Dropdown */
+        .condition-dropdown select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid rgba(201, 162, 39, 0.3);
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.4);
+            color: #fff;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .condition-dropdown select:focus {
+            outline: none;
+            border-color: #c9a227;
+        }
+
+        /* Concentration Toggle */
+        .concentration-toggle {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+        }
+
+        .concentration-toggle input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            min-width: 18px;
+            accent-color: #8e44ad;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .concentration-toggle label {
+            color: #aaa;
+            font-size: 0.9rem;
+            cursor: pointer;
+            flex: 1;
+            min-width: 0;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        /* Death Saves */
+        .death-saves-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .death-saves-label {
+            color: #aaa;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            min-width: 70px;
+        }
+
+        .death-saves-label.successes {
+            color: #4caf50;
+        }
+
+        .death-saves-label.failures {
+            color: #f44336;
+        }
+
+        .death-saves-boxes {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .death-save-box {
+            width: 28px;
+            height: 28px;
+            min-width: 28px;
+            border: 2px solid #555;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: transparent;
+            flex-shrink: 0;
+        }
+
+        .death-save-box:hover {
+            transform: scale(1.1);
+            border-color: #888;
+        }
+
+        .death-save-box.success {
+            background: linear-gradient(145deg, #4caf50, #388e3c);
+            border-color: #4caf50;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
+        }
+
+        .death-save-box.failure {
+            background: linear-gradient(145deg, #f44336, #c62828);
+            border-color: #f44336;
+            box-shadow: 0 0 8px rgba(244, 67, 54, 0.4);
+        }
+
+        .btn-reset-saves {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            margin-top: 5px;
+        }
+
+        .btn-reset-saves:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #ccc;
+        }
+
+        /* Notes */
+        .combatant-notes {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .combatant-notes input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid rgba(201, 162, 39, 0.2);
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #aaa;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        .combatant-notes input:focus {
+            outline: none;
+            border-color: rgba(201, 162, 39, 0.4);
+            color: #ccc;
+        }
+
+        .combatant-notes input::placeholder {
+            color: #555;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(201, 162, 39, 0.3);
+        }
+
+        .empty-state h3 {
+            color: #c9a227;
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            color: #888;
+            font-size: 1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .combatant-body {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .death-saves-section {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .combat-container {
+                padding: 15px;
+            }
+
+            .combat-controls {
+                justify-content: center;
+            }
+
+            .form-row {
+                justify-content: center;
+            }
+
+            .form-group input[type="text"],
+            .form-group.notes input {
+                width: 100%;
+                min-width: 150px;
+            }
+
+            .combatant-body {
+                grid-template-columns: 1fr;
+            }
+
+            .death-saves-section {
+                grid-column: span 1;
+            }
+
+            .combatant-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .combatant-name-section {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .btn-remove {
+                align-self: flex-end;
+                margin-top: -40px;
+            }
+
+            .combatant-name {
+                font-size: 1.2rem;
+            }
+
+            /* Mobile navigation fixes */
+            header {
+                padding: 15px 10px;
+            }
+
+            header h1 {
+                font-size: 1.5rem;
+                margin-bottom: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .add-combatant-form {
+                padding: 15px;
+            }
+
+            .form-group {
+                width: 100%;
+            }
+
+            .form-group input[type="number"] {
+                width: 100%;
+            }
+
+            .btn-add-combatant {
+                width: 100%;
+            }
+
+            .round-counter {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .combat-controls button {
+                flex: 1;
+                min-width: 120px;
+            }
+
+            .combatant-card {
+                padding: 15px;
+            }
+
+            .combatant-name-section {
+                gap: 8px;
+            }
+
+            .combatant-initiative {
+                width: 38px;
+                height: 38px;
+                min-width: 38px;
+                font-size: 1rem;
+            }
+
+            .combatant-name {
+                font-size: 1.1rem;
+            }
+
+            .turn-indicator {
+                padding: 3px 8px;
+                font-size: 0.65rem;
+            }
+
+            .combatant-ac {
+                padding: 4px 10px;
+                font-size: 0.8rem;
+            }
+
+            .concentration-badge {
+                padding: 3px 8px;
+                font-size: 0.65rem;
+            }
+
+            .btn-remove {
+                margin-top: 0;
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+
+            /* HP section mobile fixes */
+            .hp-section,
+            .conditions-section,
+            .death-saves-section {
+                padding: 12px;
+            }
+
+            .hp-display {
+                gap: 5px;
+            }
+
+            .hp-current {
+                font-size: 1.8rem;
+            }
+
+            .hp-max {
+                font-size: 1.1rem;
+            }
+
+            .hp-controls {
+                gap: 6px;
+            }
+
+            .hp-controls input {
+                width: 50px;
+                min-width: 45px;
+                padding: 6px;
+                font-size: 0.9rem;
+            }
+
+            .hp-controls button {
+                width: 34px;
+                height: 34px;
+                min-width: 34px;
+                font-size: 1rem;
+            }
+
+            /* Temp HP mobile fixes */
+            .temp-hp-section {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .temp-hp-section input {
+                width: 50px;
+            }
+
+            /* Death saves mobile fixes */
+            .death-saves-row {
+                gap: 8px;
+            }
+
+            .death-saves-label {
+                font-size: 0.8rem;
+                min-width: 60px;
+            }
+
+            .death-saves-boxes {
+                gap: 6px;
+            }
+
+            .death-save-box {
+                width: 24px;
+                height: 24px;
+                min-width: 24px;
+            }
+
+            /* Condition tags mobile fixes */
+            .condition-tag {
+                padding: 3px 8px;
+                font-size: 0.7rem;
+            }
+
+            .condition-dropdown select {
+                padding: 8px 10px;
+                font-size: 0.85rem;
+            }
+
+            /* Concentration toggle mobile */
+            .concentration-toggle label {
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .combat-container {
+                padding: 10px;
+            }
+
+            .combatant-card {
+                padding: 12px;
+            }
+
+            .hp-section h4,
+            .conditions-section h4,
+            .death-saves-section h4 {
+                font-size: 0.8rem;
+            }
+
+            .combatant-name {
+                font-size: 1rem;
+            }
+
+            .combat-controls button {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+
+            .round-counter {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+
+            .round-counter #round-number {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to content</a>
+    <header>
+        <h1>Combat Tracker</h1>
+        <nav class="main-nav">
+            <a href="index.html" class="nav-link">Game Tools</a>
+            <a href="character-creator.html" class="nav-link">Character Creator</a>
+            <a href="characters.html" class="nav-link">My Characters</a>
+            <a href="spells.html" class="nav-link">Spells</a>
+            <a href="monsters.html" class="nav-link">Monsters</a>
+            <a href="combat.html" class="nav-link active">Combat Tracker</a>
+        </nav>
+    </header>
+
+    <main class="combat-container" id="main">
+        <!-- Combat Controls -->
+        <div class="combat-controls" role="group" aria-label="Combat controls">
+            <button class="btn-next-turn" onclick="nextTurn()" aria-label="Advance to next turn">Next Turn</button>
+            <button class="btn-new-encounter" onclick="newEncounter()" aria-label="Start new encounter and clear all combatants">New Encounter</button>
+            <div class="round-counter" aria-live="polite">
+                <span>Round:</span>
+                <span id="round-number" aria-label="Current round number">1</span>
+            </div>
+        </div>
+
+        <!-- Add Combatant Form -->
+        <form class="add-combatant-form" onsubmit="event.preventDefault(); addCombatant();" role="form" aria-label="Add combatant form">
+            <h3>Add Combatant</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="combatant-name">Name</label>
+                    <input type="text" id="combatant-name" placeholder="Character name">
+                </div>
+                <div class="form-group">
+                    <label for="combatant-initiative">Initiative</label>
+                    <input type="number" id="combatant-initiative" placeholder="20">
+                </div>
+                <div class="form-group">
+                    <label for="combatant-ac">AC</label>
+                    <input type="number" id="combatant-ac" placeholder="15">
+                </div>
+                <div class="form-group">
+                    <label for="combatant-hp-max">Max HP</label>
+                    <input type="number" id="combatant-hp-max" placeholder="30">
+                </div>
+                <div class="form-group">
+                    <label for="combatant-hp-current">Current HP</label>
+                    <input type="number" id="combatant-hp-current" placeholder="30">
+                </div>
+                <div class="form-group notes">
+                    <label for="combatant-notes">Notes</label>
+                    <input type="text" id="combatant-notes" placeholder="e.g., Goblin 1, Wizard">
+                </div>
+                <button type="submit" class="btn-add-combatant">Add</button>
+            </div>
+        </form>
+
+        <!-- Combatant List -->
+        <div class="combatant-list" id="combatant-list" role="region" aria-live="polite" aria-label="Combat order">
+            <div class="empty-state">
+                <h3>No Combatants</h3>
+                <p>Add combatants using the form above to start tracking combat.</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // D&D 5e Conditions
+        const CONDITIONS = [
+            'Blinded', 'Charmed', 'Deafened', 'Exhaustion', 'Frightened',
+            'Grappled', 'Incapacitated', 'Invisible', 'Paralyzed', 'Petrified',
+            'Poisoned', 'Prone', 'Restrained', 'Stunned', 'Unconscious'
+        ];
+
+        // State
+        let combatants = [];
+        let currentTurnIndex = 0;
+        let roundNumber = 1;
+
+        // Load from localStorage
+        function loadState() {
+            const saved = localStorage.getItem('dnd-combat-tracker');
+            if (saved) {
+                const state = JSON.parse(saved);
+                combatants = state.combatants || [];
+                currentTurnIndex = state.currentTurnIndex || 0;
+                roundNumber = state.roundNumber || 1;
+            }
+            render();
+        }
+
+        // Save to localStorage
+        function saveState() {
+            const state = {
+                combatants,
+                currentTurnIndex,
+                roundNumber
+            };
+            localStorage.setItem('dnd-combat-tracker', JSON.stringify(state));
+        }
+
+        // Generate unique ID
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // Add new combatant
+        function addCombatant() {
+            const name = document.getElementById('combatant-name').value.trim();
+            const initiative = parseInt(document.getElementById('combatant-initiative').value) || 0;
+            const ac = parseInt(document.getElementById('combatant-ac').value) || 10;
+            const hpMax = parseInt(document.getElementById('combatant-hp-max').value) || 1;
+            const hpCurrent = parseInt(document.getElementById('combatant-hp-current').value) || hpMax;
+            const notes = document.getElementById('combatant-notes').value.trim();
+
+            if (!name) {
+                alert('Please enter a name for the combatant.');
+                return;
+            }
+
+            const combatant = {
+                id: generateId(),
+                name,
+                initiative,
+                ac,
+                hpMax,
+                hpCurrent,
+                hpTemp: 0,
+                notes,
+                conditions: [],
+                concentration: false,
+                deathSaves: { successes: 0, failures: 0 }
+            };
+
+            combatants.push(combatant);
+            sortByInitiative();
+            saveState();
+            render();
+
+            // Clear form
+            document.getElementById('combatant-name').value = '';
+            document.getElementById('combatant-initiative').value = '';
+            document.getElementById('combatant-ac').value = '';
+            document.getElementById('combatant-hp-max').value = '';
+            document.getElementById('combatant-hp-current').value = '';
+            document.getElementById('combatant-notes').value = '';
+            document.getElementById('combatant-name').focus();
+        }
+
+        // Sort combatants by initiative (descending)
+        function sortByInitiative() {
+            combatants.sort((a, b) => b.initiative - a.initiative);
+        }
+
+        // Remove combatant
+        function removeCombatant(id) {
+            const index = combatants.findIndex(c => c.id === id);
+            if (index === -1) return;
+
+            if (index < currentTurnIndex) {
+                currentTurnIndex--;
+            } else if (index === currentTurnIndex && currentTurnIndex >= combatants.length - 1) {
+                currentTurnIndex = 0;
+            }
+
+            combatants = combatants.filter(c => c.id !== id);
+            saveState();
+            render();
+        }
+
+        // Next turn
+        function nextTurn() {
+            if (combatants.length === 0) return;
+
+            currentTurnIndex++;
+            if (currentTurnIndex >= combatants.length) {
+                currentTurnIndex = 0;
+                roundNumber++;
+            }
+            saveState();
+            render();
+        }
+
+        // New encounter
+        function newEncounter() {
+            if (combatants.length > 0 && !confirm('Clear all combatants and start a new encounter?')) {
+                return;
+            }
+            combatants = [];
+            currentTurnIndex = 0;
+            roundNumber = 1;
+            saveState();
+            render();
+        }
+
+        // Adjust HP
+        function adjustHp(id, amount) {
+            const combatant = combatants.find(c => c.id === id);
+            if (!combatant) return;
+
+            if (amount < 0) {
+                // Damage - apply to temp HP first
+                let damage = Math.abs(amount);
+                if (combatant.hpTemp > 0) {
+                    if (combatant.hpTemp >= damage) {
+                        combatant.hpTemp -= damage;
+                        damage = 0;
+                    } else {
+                        damage -= combatant.hpTemp;
+                        combatant.hpTemp = 0;
+                    }
+                }
+                combatant.hpCurrent = Math.max(0, combatant.hpCurrent - damage);
+            } else {
+                // Healing
+                combatant.hpCurrent = Math.min(combatant.hpMax, combatant.hpCurrent + amount);
+            }
+
+            saveState();
+            render();
+        }
+
+        // Set temp HP
+        function setTempHp(id, value) {
+            const combatant = combatants.find(c => c.id === id);
+            if (!combatant) return;
+            combatant.hpTemp = Math.max(0, parseInt(value) || 0);
+            saveState();
+        }
+
+        // Add condition
+        function addCondition(id, condition) {
+            const combatant = combatants.find(c => c.id === id);
+            if (!combatant || !condition || combatant.conditions.includes(condition)) return;
+            combatant.conditions.push(condition);
+            saveState();
+            render();
+        }
+
+        // Remove condition
+        function removeCondition(id, condition) {
+            const combatant = combatants.find(c => c.id === id);
+            if (!combatant) return;
+            combatant.conditions = combatant.conditions.filter(c => c !== condition);
+            saveState();
+            render();
+        }
+
+        // Toggle concentration
+        function toggleConcentration(id) {
+            const combatant = combatants.find(c => c.id === id);
+            if (!combatant) return;
+            combatant.concentration = !combatant.concentration;
+            saveState();
+            render();
+        }
+
+        // Toggle death save
+        function toggleDeathSave(id, type, index) {
+            const combatant = combatants.find(c => c.id === id);
+            if (!combatant) return;
+
+            const current = combatant.deathSaves[type];
+            if (current > index) {
+                // Remove save
+                combatant.deathSaves[type] = index;
+            } else {
+                // Add save
+                combatant.deathSaves[type] = index + 1;
+            }
+
+            saveState();
+            render();
+        }
+
+        // Reset death saves
+        function resetDeathSaves(id) {
+            const combatant = combatants.find(c => c.id === id);
+            if (!combatant) return;
+            combatant.deathSaves = { successes: 0, failures: 0 };
+            saveState();
+            render();
+        }
+
+        // Update notes
+        function updateNotes(id, notes) {
+            const combatant = combatants.find(c => c.id === id);
+            if (!combatant) return;
+            combatant.notes = notes;
+            saveState();
+        }
+
+        // Get HP status class
+        function getHpStatusClass(current, max) {
+            const ratio = current / max;
+            if (ratio <= 0.25) return 'critical';
+            if (ratio <= 0.5) return 'low';
+            return '';
+        }
+
+        // Render
+        function render() {
+            document.getElementById('round-number').textContent = roundNumber;
+
+            const listEl = document.getElementById('combatant-list');
+
+            if (combatants.length === 0) {
+                listEl.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No Combatants</h3>
+                        <p>Add combatants using the form above to start tracking combat.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            combatants.forEach((c, index) => {
+                const isActive = index === currentTurnIndex;
+                const isDead = c.hpCurrent <= 0 && c.deathSaves.failures >= 3;
+                const isUnconscious = c.hpCurrent <= 0 && !isDead;
+                const hpPercent = Math.max(0, Math.min(100, (c.hpCurrent / c.hpMax) * 100));
+                const hpClass = getHpStatusClass(c.hpCurrent, c.hpMax);
+
+                const availableConditions = CONDITIONS.filter(cond => !c.conditions.includes(cond));
+
+                html += `
+                    <article class="combatant-card ${isActive ? 'active-turn' : ''} ${isDead ? 'dead' : ''} ${isUnconscious ? 'unconscious' : ''}" aria-label="${escapeHtml(c.name)}, Initiative ${c.initiative}${isActive ? ', current turn' : ''}">
+                        <div class="combatant-header">
+                            <div class="combatant-name-section">
+                                <div class="combatant-initiative" aria-label="Initiative ${c.initiative}">${c.initiative}</div>
+                                <span class="combatant-name">${escapeHtml(c.name)}</span>
+                                <span class="turn-indicator" aria-live="polite">Current Turn</span>
+                                <div class="combatant-ac" aria-label="Armor Class ${c.ac}">AC: <span>${c.ac}</span></div>
+                                ${c.concentration ? '<span class="concentration-badge" aria-label="Concentrating on a spell">Concentrating</span>' : ''}
+                            </div>
+                            <button class="btn-remove" onclick="removeCombatant('${c.id}')" aria-label="Remove ${escapeHtml(c.name)} from combat">Remove</button>
+                        </div>
+
+                        <div class="combatant-body">
+                            <!-- HP Section -->
+                            <div class="hp-section" role="group" aria-label="Hit points for ${escapeHtml(c.name)}">
+                                <h4>Hit Points</h4>
+                                <div class="hp-display" aria-live="polite">
+                                    <span class="hp-current ${hpClass}" aria-label="Current HP">${c.hpCurrent}</span>
+                                    <span class="hp-max" aria-label="Maximum HP">/ ${c.hpMax}</span>
+                                </div>
+                                <div class="hp-bar" role="progressbar" aria-valuenow="${c.hpCurrent}" aria-valuemin="0" aria-valuemax="${c.hpMax}" aria-label="HP bar">
+                                    <div class="hp-bar-fill ${hpClass}" style="width: ${hpPercent}%"></div>
+                                </div>
+                                <div class="hp-controls" role="group" aria-label="HP adjustment controls">
+                                    <button class="btn-damage" onclick="applyHpChange('${c.id}', 'damage')" aria-label="Apply damage">-</button>
+                                    <label for="hp-change-${c.id}" class="visually-hidden">HP change amount</label>
+                                    <input type="number" id="hp-change-${c.id}" value="1" min="1" aria-label="Amount of HP to change">
+                                    <button class="btn-heal" onclick="applyHpChange('${c.id}', 'heal')" aria-label="Apply healing">+</button>
+                                </div>
+                                <div class="temp-hp-section">
+                                    <label for="temp-hp-${c.id}">Temp HP:</label>
+                                    <input type="number" id="temp-hp-${c.id}" value="${c.hpTemp}" min="0" onchange="setTempHp('${c.id}', this.value)" aria-label="Temporary hit points">
+                                </div>
+                            </div>
+
+                            <!-- Conditions Section -->
+                            <div class="conditions-section" role="group" aria-label="Conditions for ${escapeHtml(c.name)}">
+                                <h4>Conditions</h4>
+                                <div class="active-conditions" aria-live="polite" aria-label="Active conditions">
+                                    ${c.conditions.map(cond => `
+                                        <span class="condition-tag">
+                                            ${cond}
+                                            <button onclick="removeCondition('${c.id}', '${cond}')" aria-label="Remove ${cond} condition">&times;</button>
+                                        </span>
+                                    `).join('')}
+                                </div>
+                                <div class="condition-dropdown">
+                                    <label for="add-condition-${c.id}" class="visually-hidden">Add condition</label>
+                                    <select id="add-condition-${c.id}" onchange="addCondition('${c.id}', this.value); this.value='';" aria-label="Add condition to ${escapeHtml(c.name)}">
+                                        <option value="">Add condition...</option>
+                                        ${availableConditions.map(cond => `<option value="${cond}">${cond}</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div class="concentration-toggle">
+                                    <input type="checkbox" id="concentration-${c.id}" ${c.concentration ? 'checked' : ''} onchange="toggleConcentration('${c.id}')">
+                                    <label for="concentration-${c.id}">Concentrating on a spell</label>
+                                </div>
+                            </div>
+
+                            <!-- Death Saves Section -->
+                            <div class="death-saves-section" role="group" aria-label="Death saving throws for ${escapeHtml(c.name)}">
+                                <h4>Death Saving Throws</h4>
+                                <div class="death-saves-row">
+                                    <span class="death-saves-label successes" id="successes-label-${c.id}">Successes</span>
+                                    <div class="death-saves-boxes" role="group" aria-labelledby="successes-label-${c.id}">
+                                        ${[0, 1, 2].map(i => `
+                                            <button class="death-save-box ${c.deathSaves.successes > i ? 'success' : ''}"
+                                                 onclick="toggleDeathSave('${c.id}', 'successes', ${i})"
+                                                 aria-label="Death save success ${i + 1}${c.deathSaves.successes > i ? ', marked' : ''}"
+                                                 aria-pressed="${c.deathSaves.successes > i}"></button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                <div class="death-saves-row">
+                                    <span class="death-saves-label failures" id="failures-label-${c.id}">Failures</span>
+                                    <div class="death-saves-boxes" role="group" aria-labelledby="failures-label-${c.id}">
+                                        ${[0, 1, 2].map(i => `
+                                            <button class="death-save-box ${c.deathSaves.failures > i ? 'failure' : ''}"
+                                                 onclick="toggleDeathSave('${c.id}', 'failures', ${i})"
+                                                 aria-label="Death save failure ${i + 1}${c.deathSaves.failures > i ? ', marked' : ''}"
+                                                 aria-pressed="${c.deathSaves.failures > i}"></button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                <button class="btn-reset-saves" onclick="resetDeathSaves('${c.id}')" aria-label="Reset death saves for ${escapeHtml(c.name)}">Reset Saves</button>
+                            </div>
+                        </div>
+
+                        <div class="combatant-notes">
+                            <label for="notes-${c.id}" class="visually-hidden">Notes for ${escapeHtml(c.name)}</label>
+                            <input type="text" id="notes-${c.id}" value="${escapeHtml(c.notes)}" placeholder="Notes..." onchange="updateNotes('${c.id}', this.value)" aria-label="Notes for ${escapeHtml(c.name)}">
+                        </div>
+                    </article>
+                `;
+            });
+
+            listEl.innerHTML = html;
+        }
+
+        // Apply HP change from input
+        function applyHpChange(id, type) {
+            const input = document.getElementById(`hp-change-${id}`);
+            const amount = parseInt(input.value) || 0;
+            if (type === 'damage') {
+                adjustHp(id, -amount);
+            } else {
+                adjustHp(id, amount);
+            }
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Keyboard shortcut for next turn
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'n' && e.ctrlKey) {
+                e.preventDefault();
+                nextTurn();
+            }
+        });
+
+        // Allow Enter to add combatant
+        document.getElementById('combatant-notes').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                addCombatant();
+            }
+        });
+
+        // Initialize
+        loadState();
+    </script>
+</body>
+</html>
