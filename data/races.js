@@ -700,6 +700,800 @@ const RACES = {
             ]
         },
         languages: ["Common", "Infernal"]
+    },
+
+    // ==========================================
+    // VOLO'S GUIDE TO MONSTERS RACES
+    // ==========================================
+
+    aasimar: {
+        name: "Aasimar",
+        description: "Aasimar are placed in the world to serve as guardians of law and good. Their patrons expect them to strike at evil, lead by example, and further the cause of justice. From an early age, an aasimar receives visions and guidance from celestial entities via dreams.",
+        abilityScoreIncrease: { cha: 2 },
+        age: "Aasimar mature at the same rate as humans, but they can live up to 160 years.",
+        alignment: "Imbued with celestial power, most aasimar are good. Outcast aasimar are most often neutral or even evil.",
+        size: "Medium",
+        sizeDescription: "Aasimar have the same range of height and weight as humans.",
+        speed: 30,
+        traits: [
+            {
+                name: "Darkvision",
+                description: "Blessed with a radiant soul, your vision can easily cut through darkness. You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray."
+            },
+            {
+                name: "Celestial Resistance",
+                description: "You have resistance to necrotic damage and radiant damage."
+            },
+            {
+                name: "Healing Hands",
+                description: "As an action, you can touch a creature and cause it to regain a number of hit points equal to your level. Once you use this trait, you can't use it again until you finish a long rest."
+            },
+            {
+                name: "Light Bearer",
+                description: "You know the light cantrip. Charisma is your spellcasting ability for it."
+            }
+        ],
+        resistances: ["necrotic", "radiant"],
+        spellcasting: {
+            ability: "cha",
+            innate: true,
+            cantrips: ["light"]
+        },
+        languages: ["Common", "Celestial"],
+        subraces: {
+            protector: {
+                name: "Protector Aasimar",
+                description: "Protector aasimar are charged by the powers of good to guard the weak, to strike at evil wherever it arises, and to stand vigilant against the darkness. From a young age, a protector aasimar receives advice and directives that urge to stand against evil.",
+                abilityScoreIncrease: { wis: 1 },
+                traits: [
+                    {
+                        name: "Radiant Soul",
+                        description: "Starting at 3rd level, you can use your action to unleash the divine energy within yourself, causing your eyes to glimmer and two luminous, incorporeal wings to sprout from your back. Your transformation lasts for 1 minute or until you end it as a bonus action. During it, you have a flying speed of 30 feet, and once on each of your turns, you can deal extra radiant damage to one target when you deal damage to it with an attack or a spell. The extra radiant damage equals your level. Once you use this trait, you can't use it again until you finish a long rest."
+                    }
+                ],
+                specialAbilities: {
+                    radiantSoul: {
+                        name: "Radiant Soul",
+                        levelRequired: 3,
+                        usesPerRest: 1,
+                        restType: "long",
+                        duration: "1 minute",
+                        effect: "Flying speed 30 ft., extra radiant damage equal to level"
+                    }
+                }
+            },
+            scourge: {
+                name: "Scourge Aasimar",
+                description: "Scourge aasimar are imbued with a divine energy that blazes intensely within them. It feeds a powerful desire to destroy evil - a desire that is, at its best, parsing and, at its worst, all-consuming.",
+                abilityScoreIncrease: { con: 1 },
+                traits: [
+                    {
+                        name: "Radiant Consumption",
+                        description: "Starting at 3rd level, you can use your action to unleash the divine energy within yourself, causing a searing light to radiate from you, pour out of your eyes and mouth, and threaten to char you. Your transformation lasts for 1 minute or until you end it as a bonus action. During it, you shed bright light in a 10-foot radius and dim light for an additional 10 feet, and at the end of each of your turns, you and each creature within 10 feet of you take radiant damage equal to half your level (rounded up). In addition, once on each of your turns, you can deal extra radiant damage to one target when you deal damage to it with an attack or a spell. The extra radiant damage equals your level. Once you use this trait, you can't use it again until you finish a long rest."
+                    }
+                ],
+                specialAbilities: {
+                    radiantConsumption: {
+                        name: "Radiant Consumption",
+                        levelRequired: 3,
+                        usesPerRest: 1,
+                        restType: "long",
+                        duration: "1 minute",
+                        effect: "Shed light, deal radiant damage to nearby creatures and self, extra radiant damage equal to level on attacks"
+                    }
+                }
+            },
+            fallen: {
+                name: "Fallen Aasimar",
+                description: "An aasimar who was touched by dark powers as a youth or who turns to evil in early adulthood can become one of the fallen - a group of aasimar whose inner light has been replaced by shadow.",
+                abilityScoreIncrease: { str: 1 },
+                traits: [
+                    {
+                        name: "Necrotic Shroud",
+                        description: "Starting at 3rd level, you can use your action to unleash the divine energy within yourself, causing your eyes to turn into pools of darkness and two skeletal, ghostly, flightless wings to sprout from your back. The instant you transform, other creatures within 10 feet of you that can see you must each succeed on a Charisma saving throw (DC 8 + your proficiency bonus + your Charisma modifier) or become frightened of you until the end of your next turn. Your transformation lasts for 1 minute or until you end it as a bonus action. During it, once on each of your turns, you can deal extra necrotic damage to one target when you deal damage to it with an attack or a spell. The extra necrotic damage equals your level. Once you use this trait, you can't use it again until you finish a long rest."
+                    }
+                ],
+                specialAbilities: {
+                    necroticShroud: {
+                        name: "Necrotic Shroud",
+                        levelRequired: 3,
+                        usesPerRest: 1,
+                        restType: "long",
+                        duration: "1 minute",
+                        effect: "Frighten nearby creatures, extra necrotic damage equal to level on attacks"
+                    }
+                }
+            }
+        }
+    },
+    goliath: {
+        name: "Goliath",
+        description: "At the highest mountain peaks - far above the slopes where trees grow and where the air is thin and the frigid winds howl - dwell the reclusive goliaths. Few folk can claim to have seen a goliath, and fewer still can claim friendship with them. Goliaths wander a bleak realm of rock, wind, and cold.",
+        abilityScoreIncrease: { str: 2, con: 1 },
+        age: "Goliaths have lifespans comparable to humans. They enter adulthood in their late teens and usually live less than a century.",
+        alignment: "Goliath society, with its clear roles and tasks, has a strong lawful bent. The goliath sense of fairness, balanced with an emphasis on self-sufficiency and personal accountability, pushes them toward neutrality.",
+        size: "Medium",
+        sizeDescription: "Goliaths are between 7 and 8 feet tall and weigh between 280 and 340 pounds.",
+        speed: 30,
+        traits: [
+            {
+                name: "Natural Athlete",
+                description: "You have proficiency in the Athletics skill."
+            },
+            {
+                name: "Stone's Endurance",
+                description: "You can focus yourself to occasionally shrug off injury. When you take damage, you can use your reaction to roll a d12. Add your Constitution modifier to the number rolled, and reduce the damage by that total. After you use this trait, you can't use it again until you finish a short or long rest."
+            },
+            {
+                name: "Powerful Build",
+                description: "You count as one size larger when determining your carrying capacity and the weight you can push, drag, or lift."
+            },
+            {
+                name: "Mountain Born",
+                description: "You have resistance to cold damage. You're also acclimated to high altitude, including elevations above 20,000 feet."
+            }
+        ],
+        skillProficiencies: ["Athletics"],
+        resistances: ["cold"],
+        specialAbilities: {
+            stonesEndurance: {
+                name: "Stone's Endurance",
+                usesPerRest: 1,
+                restType: "short",
+                trigger: "When you take damage",
+                effect: "Roll d12 + CON mod, reduce damage by that amount"
+            }
+        },
+        languages: ["Common", "Giant"]
+    },
+    firbolg: {
+        name: "Firbolg",
+        description: "Firbolg tribes cloister in remote forest strongholds, preferring to spend their days in quiet harmony with the woods. When provoked, firbolgs demonstrate formidable skills with weapons and druidic magic.",
+        abilityScoreIncrease: { wis: 2, str: 1 },
+        age: "As humanoids related to the fey, firbolg have long lifespans. A firbolg reaches adulthood around 30, and the oldest of them can live for 500 years.",
+        alignment: "As people who follow the rhythm of nature and see themselves as its caretakers, firbolg are typically neutral good.",
+        size: "Medium",
+        sizeDescription: "Firbolg are between 7 and 8 feet tall and weigh between 240 and 300 pounds.",
+        speed: 30,
+        traits: [
+            {
+                name: "Firbolg Magic",
+                description: "You can cast detect magic and disguise self with this trait, using Wisdom as your spellcasting ability for them. Once you cast either spell, you can't cast it again with this trait until you finish a short or long rest. When you use this version of disguise self, you can seem up to 3 feet shorter than normal, allowing you to more easily blend in with humans and elves."
+            },
+            {
+                name: "Hidden Step",
+                description: "As a bonus action, you can magically turn invisible until the start of your next turn or until you attack, make a damage roll, or force someone to make a saving throw. Once you use this trait, you can't use it again until you finish a short or long rest."
+            },
+            {
+                name: "Powerful Build",
+                description: "You count as one size larger when determining your carrying capacity and the weight you can push, drag, or lift."
+            },
+            {
+                name: "Speech of Beast and Leaf",
+                description: "You have the ability to communicate in a limited manner with beasts and plants. They can understand the meaning of your words, though you have no special ability to understand them in return. You have advantage on all Charisma checks you make to influence them."
+            }
+        ],
+        spellcasting: {
+            ability: "wis",
+            innate: true,
+            spells: [
+                { name: "detect magic", uses: 1, recharge: "short rest" },
+                { name: "disguise self", uses: 1, recharge: "short rest" }
+            ]
+        },
+        specialAbilities: {
+            hiddenStep: {
+                name: "Hidden Step",
+                usesPerRest: 1,
+                restType: "short",
+                duration: "Until start of next turn",
+                effect: "Turn invisible"
+            }
+        },
+        languages: ["Common", "Elvish", "Giant"]
+    },
+    tabaxi: {
+        name: "Tabaxi",
+        description: "Hailing from a strange and distant land, wandering tabaxi are catlike humanoids driven by curiosity to collect interesting artifacts, gather tales and stories, and lay eyes on all the world's wonders. Ultimate travelers, the inquisitive tabaxi rarely stay in one place for long.",
+        abilityScoreIncrease: { dex: 2, cha: 1 },
+        age: "Tabaxi have lifespans equivalent to humans.",
+        alignment: "Tabaxi tend toward chaotic alignments, as they let impulse and fancy guide their decisions. They are rarely evil, with most of them driven by curiosity rather than greed or other dark impulses.",
+        size: "Medium",
+        sizeDescription: "Tabaxi are taller on average than humans and relatively slender.",
+        speed: 30,
+        climbSpeed: 20,
+        traits: [
+            {
+                name: "Darkvision",
+                description: "You have a cat's keen senses, especially in the dark. You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray."
+            },
+            {
+                name: "Feline Agility",
+                description: "Your reflexes and agility allow you to move with a burst of speed. When you move on your turn in combat, you can double your speed until the end of the turn. Once you use this trait, you can't use it again until you move 0 feet on one of your turns."
+            },
+            {
+                name: "Cat's Claws",
+                description: "Because of your claws, you have a climbing speed of 20 feet. In addition, your claws are natural weapons, which you can use to make unarmed strikes. If you hit with them, you deal slashing damage equal to 1d4 + your Strength modifier, instead of the bludgeoning damage normal for an unarmed strike."
+            },
+            {
+                name: "Cat's Talent",
+                description: "You have proficiency in the Perception and Stealth skills."
+            }
+        ],
+        skillProficiencies: ["Perception", "Stealth"],
+        naturalWeapons: {
+            claws: {
+                damage: "1d4",
+                damageType: "slashing",
+                modifier: "str"
+            }
+        },
+        languages: ["Common"],
+        extraLanguages: 1
+    },
+    kenku: {
+        name: "Kenku",
+        description: "Haunted by an ancient crime that robbed them of their wings, the kenku wander the world as vagabonds and burglars who live at the edge of human society. Kenku suffer from a sinister reputation that is not entirely unearned, but they can prove to be valuable allies.",
+        abilityScoreIncrease: { dex: 2, wis: 1 },
+        age: "Kenku have shorter lifespans than humans. They reach maturity at about 12 years old and can live to 60.",
+        alignment: "Kenku are chaotic creatures, rarely making enduring commitments, and they care mostly for preserving their own hides. They are generally chaotic neutral in outlook.",
+        size: "Medium",
+        sizeDescription: "Kenku are around 5 feet tall and weigh between 90 and 120 pounds.",
+        speed: 30,
+        traits: [
+            {
+                name: "Expert Forgery",
+                description: "You can duplicate other creatures' handwriting and craftwork. You have advantage on all checks made to produce forgeries or duplicates of existing objects."
+            },
+            {
+                name: "Kenku Training",
+                description: "You are proficient in your choice of two of the following skills: Acrobatics, Deception, Stealth, and Sleight of Hand."
+            },
+            {
+                name: "Mimicry",
+                description: "You can mimic sounds you have heard, including voices. A creature that hears the sounds you make can tell they are imitations with a successful Wisdom (Insight) check opposed by your Charisma (Deception) check."
+            }
+        ],
+        skillProficiencyChoices: {
+            count: 2,
+            from: ["Acrobatics", "Deception", "Stealth", "Sleight of Hand"]
+        },
+        languages: ["Common", "Auran"],
+        languageNotes: "You can read and write Common and Auran, but you can speak only by using your Mimicry trait."
+    },
+    lizardfolk: {
+        name: "Lizardfolk",
+        description: "Lizardfolk possess an alien and inscrutable mindset, their desires and thoughts driven by a different set of basic principles than those of warm-blooded creatures. Their dismal swamp homes might lie hundreds of miles from the nearest human settlement, but the gap between their way of thinking and that of the smooth-skins is far greater.",
+        abilityScoreIncrease: { con: 2, wis: 1 },
+        age: "Lizardfolk reach maturity around age 14 and rarely live longer than 60 years.",
+        alignment: "Most lizardfolk are neutral. They see the world as a place of predators and prey, where life and death are natural processes. They wish only to survive, and prefer to leave other creatures to their own devices.",
+        size: "Medium",
+        sizeDescription: "Lizardfolk are a little bulkier and taller than humans, and their colorful frills make them appear even larger.",
+        speed: 30,
+        swimSpeed: 30,
+        traits: [
+            {
+                name: "Bite",
+                description: "Your fanged maw is a natural weapon, which you can use to make unarmed strikes. If you hit with it, you deal piercing damage equal to 1d6 + your Strength modifier, instead of the bludgeoning damage normal for an unarmed strike."
+            },
+            {
+                name: "Cunning Artisan",
+                description: "As part of a short rest, you can harvest bone and hide from a slain beast, construct, dragon, monstrosity, or plant creature of size Small or larger to create one of the following items: a shield, a club, a javelin, or 1d4 darts or blowgun needles. To use this trait, you need a blade, such as a dagger, or appropriate artisan's tools, such as leatherworker's tools."
+            },
+            {
+                name: "Hold Breath",
+                description: "You can hold your breath for up to 15 minutes at a time."
+            },
+            {
+                name: "Hunter's Lore",
+                description: "You gain proficiency with two of the following skills of your choice: Animal Handling, Nature, Perception, Stealth, and Survival."
+            },
+            {
+                name: "Natural Armor",
+                description: "You have tough, scaly skin. When you aren't wearing armor, your AC is 13 + your Dexterity modifier. You can use your natural armor to determine your AC if the armor you wear would leave you with a lower AC. A shield's benefits apply as normal while you use your natural armor."
+            },
+            {
+                name: "Hungry Jaws",
+                description: "In battle, you can throw yourself into a vicious feeding frenzy. As a bonus action, you can make a special attack with your bite. If the attack hits, it deals its normal damage, and you gain temporary hit points (minimum of 1) equal to your Constitution modifier, and you can't use this trait again until you finish a short or long rest."
+            }
+        ],
+        naturalArmor: {
+            base: 13,
+            modifier: "dex"
+        },
+        naturalWeapons: {
+            bite: {
+                damage: "1d6",
+                damageType: "piercing",
+                modifier: "str"
+            }
+        },
+        skillProficiencyChoices: {
+            count: 2,
+            from: ["Animal Handling", "Nature", "Perception", "Stealth", "Survival"]
+        },
+        specialAbilities: {
+            hungryJaws: {
+                name: "Hungry Jaws",
+                usesPerRest: 1,
+                restType: "short",
+                effect: "Bonus action bite attack, gain temp HP equal to CON mod on hit"
+            }
+        },
+        languages: ["Common", "Draconic"]
+    },
+    triton: {
+        name: "Triton",
+        description: "Tritons guard the ocean depths, building small settlements beside deep trenches, portals to the elemental planes, and other dangerous spots far from the eyes of land-bound folk. Long-established guardians of the deep ocean floor, the noble tritons have gradually become increasingly active in the world above.",
+        abilityScoreIncrease: { str: 1, con: 1, cha: 1 },
+        age: "Tritons reach maturity around age 15 and can live up to 200 years.",
+        alignment: "Tritons tend toward lawful good. As guardians of the darkest reaches of the sea, their culture pushes them toward order and benevolence.",
+        size: "Medium",
+        sizeDescription: "Tritons are slightly shorter than humans, averaging about 5 feet tall.",
+        speed: 30,
+        swimSpeed: 30,
+        traits: [
+            {
+                name: "Amphibious",
+                description: "You can breathe air and water."
+            },
+            {
+                name: "Control Air and Water",
+                description: "A child of the sea, you can call on the magic of elemental air and water. You can cast fog cloud with this trait. Starting at 3rd level, you can cast gust of wind with it, and starting at 5th level, you can also cast wall of water with it. Once you cast a spell with this trait, you can't cast it again until you finish a long rest. Charisma is your spellcasting ability for these spells."
+            },
+            {
+                name: "Darkvision",
+                description: "You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray."
+            },
+            {
+                name: "Emissary of the Sea",
+                description: "Aquatic beasts have an extraordinary affinity with your people. You can communicate simple ideas with beasts that can breathe water. They can understand the meaning of your words, though you have no special ability to understand them in return."
+            },
+            {
+                name: "Guardians of the Depths",
+                description: "Adapted to even the most extreme ocean depths, you have resistance to cold damage."
+            }
+        ],
+        resistances: ["cold"],
+        spellcasting: {
+            ability: "cha",
+            innate: true,
+            spells: [
+                { name: "fog cloud", level: 1, uses: 1, recharge: "long rest" },
+                { name: "gust of wind", characterLevel: 3, uses: 1, recharge: "long rest" },
+                { name: "wall of water", characterLevel: 5, uses: 1, recharge: "long rest" }
+            ]
+        },
+        languages: ["Common", "Primordial"]
+    },
+    bugbear: {
+        name: "Bugbear",
+        description: "Bugbears are born for battle and mayhem. Surviving by raiding and hunting, they bully the weak and despise being bossed around, but their love of carnage means they will fight for powerful masters if bloodshed and treasure are assured.",
+        abilityScoreIncrease: { str: 2, dex: 1 },
+        age: "Bugbears reach adulthood at age 16 and live up to 80 years.",
+        alignment: "Bugbears endure a harsh existence that demands each of them to remain self-sufficient, even at the expense of their fellows. They tend to be chaotic evil.",
+        size: "Medium",
+        sizeDescription: "Bugbears are between 6 and 8 feet tall and weigh between 250 and 350 pounds.",
+        speed: 30,
+        traits: [
+            {
+                name: "Darkvision",
+                description: "You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray."
+            },
+            {
+                name: "Long-Limbed",
+                description: "When you make a melee attack on your turn, your reach for it is 5 feet greater than normal."
+            },
+            {
+                name: "Powerful Build",
+                description: "You count as one size larger when determining your carrying capacity and the weight you can push, drag, or lift."
+            },
+            {
+                name: "Sneaky",
+                description: "You are proficient in the Stealth skill."
+            },
+            {
+                name: "Surprise Attack",
+                description: "If you surprise a creature and hit it with an attack on your first turn in combat, the attack deals an extra 2d6 damage to it. You can use this trait only once per combat."
+            }
+        ],
+        skillProficiencies: ["Stealth"],
+        languages: ["Common", "Goblin"]
+    },
+    goblin: {
+        name: "Goblin",
+        description: "Goblins occupy an uneasy place in a dangerous world, and they react by lashing out at any creatures they believe they can bully. Cunning in battle and cruel in victory, goblins are fawning and servile in defeat.",
+        abilityScoreIncrease: { dex: 2, con: 1 },
+        age: "Goblins reach adulthood at age 8 and live up to 60 years.",
+        alignment: "Goblins are typically neutral evil, as they care only for their own needs.",
+        size: "Small",
+        sizeDescription: "Goblins are between 3 and 4 feet tall and weigh between 40 and 80 pounds.",
+        speed: 30,
+        traits: [
+            {
+                name: "Darkvision",
+                description: "You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray."
+            },
+            {
+                name: "Fury of the Small",
+                description: "When you damage a creature with an attack or a spell and the creature's size is larger than yours, you can cause the attack or spell to deal extra damage to the creature. The extra damage equals your level. Once you use this trait, you can't use it again until you finish a short or long rest."
+            },
+            {
+                name: "Nimble Escape",
+                description: "You can take the Disengage or Hide action as a bonus action on each of your turns."
+            }
+        ],
+        specialAbilities: {
+            furyOfTheSmall: {
+                name: "Fury of the Small",
+                usesPerRest: 1,
+                restType: "short",
+                effect: "Deal extra damage equal to your level to larger creatures"
+            }
+        },
+        languages: ["Common", "Goblin"]
+    },
+    hobgoblin: {
+        name: "Hobgoblin",
+        description: "War is the lifeblood of hobgoblins. Its glories are the dreams that inspire them. Its horrors don'tف their resolve. They are trained to fight from birth, and the martial skill of hobgoblin soldiers is feared throughout the multiverse.",
+        abilityScoreIncrease: { con: 2, int: 1 },
+        age: "Hobgoblins mature at the same rate as humans and have lifespans similar in length to theirs.",
+        alignment: "Hobgoblin society is built on fidelity to a rigid, unforgiving code of conduct. As such, they tend toward lawful evil.",
+        size: "Medium",
+        sizeDescription: "Hobgoblins are between 5 and 6 feet tall and weigh between 150 and 200 pounds.",
+        speed: 30,
+        traits: [
+            {
+                name: "Darkvision",
+                description: "You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray."
+            },
+            {
+                name: "Martial Training",
+                description: "You are proficient with two martial weapons of your choice and with light armor."
+            },
+            {
+                name: "Saving Face",
+                description: "Hobgoblins are careful not to show weakness in front of their allies, for fear of losing status. If you miss with an attack roll or fail an ability check or a saving throw, you can gain a bonus to the roll equal to the number of allies you can see within 30 feet of you (maximum bonus of +5). Once you use this trait, you can't use it again until you finish a short or long rest."
+            }
+        ],
+        armorProficiencies: ["light"],
+        weaponProficiencyChoices: {
+            count: 2,
+            from: "martial"
+        },
+        specialAbilities: {
+            savingFace: {
+                name: "Saving Face",
+                usesPerRest: 1,
+                restType: "short",
+                trigger: "Miss attack, fail check, or fail save",
+                effect: "Add bonus equal to number of visible allies (max +5)"
+            }
+        },
+        languages: ["Common", "Goblin"]
+    },
+    kobold: {
+        name: "Kobold",
+        description: "Kobolds are craven reptilian humanoids that worship evil dragons as demigods and serve them as minions and toadies. Kobolds inhabit dragons' lairs when they can but more commonly infest dungeons, gathering treasures and trinkets to add to their own tiny hoards.",
+        abilityScoreIncrease: { dex: 2 },
+        abilityScoreDecrease: { str: -2 },
+        age: "Kobolds reach adulthood at age 6 and can live up to 120 years but rarely do so.",
+        alignment: "Kobolds are fundamentally selfish, making them evil, but their reliance on the strength of their group makes them trend toward law.",
+        size: "Small",
+        sizeDescription: "Kobolds are between 2 and 3 feet tall and weigh between 25 and 35 pounds.",
+        speed: 30,
+        traits: [
+            {
+                name: "Darkvision",
+                description: "You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray."
+            },
+            {
+                name: "Grovel, Cower, and Beg",
+                description: "As an action on your turn, you can cower pathetically to distract nearby foes. Until the end of your next turn, your allies gain advantage on attack rolls against enemies within 10 feet of you that can see you. Once you use this trait, you can't use it again until you finish a short or long rest."
+            },
+            {
+                name: "Pack Tactics",
+                description: "You have advantage on an attack roll against a creature if at least one of your allies is within 5 feet of the creature and the ally isn't incapacitated."
+            },
+            {
+                name: "Sunlight Sensitivity",
+                description: "You have disadvantage on attack rolls and on Wisdom (Perception) checks that rely on sight when you, the target of your attack, or whatever you are trying to perceive is in direct sunlight."
+            }
+        ],
+        specialAbilities: {
+            grovelCowerBeg: {
+                name: "Grovel, Cower, and Beg",
+                usesPerRest: 1,
+                restType: "short",
+                effect: "Allies gain advantage on attacks against enemies within 10 ft"
+            }
+        },
+        sunlightSensitivity: true,
+        languages: ["Common", "Draconic"]
+    },
+    orc: {
+        name: "Orc",
+        description: "Orcs live a life that has no place for weakness, and every warrior must be strong enough to take what is needed by force. Orcs worship Gruumsh, the mightiest of their deities, and they believe that they are destined to one day rule the world.",
+        abilityScoreIncrease: { str: 2, con: 1 },
+        abilityScoreDecrease: { int: -2 },
+        age: "Orcs reach adulthood at age 12 and live up to 50 years.",
+        alignment: "Orcs are vicious raiders, who believe that the world should be theirs. They also respect strength above all else and believe the strong must bully the weak to ensure that weakness does not spread like a disease. They are usually chaotic evil.",
+        size: "Medium",
+        sizeDescription: "Orcs are usually over 6 feet tall and weigh between 230 and 280 pounds.",
+        speed: 30,
+        traits: [
+            {
+                name: "Darkvision",
+                description: "You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray."
+            },
+            {
+                name: "Aggressive",
+                description: "As a bonus action, you can move up to your speed toward an enemy of your choice that you can see or hear. You must end this move closer to the enemy than you started."
+            },
+            {
+                name: "Menacing",
+                description: "You are proficient in the Intimidation skill."
+            },
+            {
+                name: "Powerful Build",
+                description: "You count as one size larger when determining your carrying capacity and the weight you can push, drag, or lift."
+            }
+        ],
+        skillProficiencies: ["Intimidation"],
+        languages: ["Common", "Orc"]
+    },
+    yuantiPureblood: {
+        name: "Yuan-ti Pureblood",
+        description: "The serpent creatures known as yuan-ti are all that remains of an ancient, decadent human empire. Ages ago their dark gods taught them profane, cannibalistic rituals to mix their flesh with that of snakes, producing a caste-based society of hybrids in which the weights of true snake to human form are a measure of status and power.",
+        abilityScoreIncrease: { cha: 2, int: 1 },
+        age: "Purebloods mature at the same rate as humans and have lifespans similar in length to theirs.",
+        alignment: "Purebloods are devoid of emotion and see others as tools to manipulate. They care little for law or chaos and are typically neutral evil.",
+        size: "Medium",
+        sizeDescription: "Purebloods match humans in average size and weight.",
+        speed: 30,
+        traits: [
+            {
+                name: "Darkvision",
+                description: "You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray."
+            },
+            {
+                name: "Innate Spellcasting",
+                description: "You know the poison spray cantrip. You can cast animal friendship an unlimited number of times with this trait, but you can target only snakes with it. Starting at 3rd level, you can also cast suggestion with this trait. Once you cast it, you can't do so again until you finish a long rest. Charisma is your spellcasting ability for these spells."
+            },
+            {
+                name: "Magic Resistance",
+                description: "You have advantage on saving throws against spells and other magical effects."
+            },
+            {
+                name: "Poison Immunity",
+                description: "You are immune to poison damage and the poisoned condition."
+            }
+        ],
+        immunities: ["poison", "poisoned condition"],
+        savingThrowAdvantages: ["spells", "magical effects"],
+        spellcasting: {
+            ability: "cha",
+            innate: true,
+            spells: [
+                { name: "poison spray", type: "cantrip" },
+                { name: "animal friendship", type: "spell", notes: "snakes only", uses: "unlimited" },
+                { name: "suggestion", characterLevel: 3, uses: 1, recharge: "long rest" }
+            ]
+        },
+        languages: ["Common", "Abyssal", "Draconic"]
+    },
+
+    // ==========================================
+    // EBERRON RACES
+    // ==========================================
+
+    changeling: {
+        name: "Changeling",
+        description: "Changelings are subtle shapeshifters capable of disguising their appearance. Their ability to adopt other creatures' guises makes them consummate spies and criminals, though many find more respectable work as entertainers, inquisitives, and adventurers.",
+        abilityScoreIncrease: { cha: 2 },
+        abilityScoreIncreaseChoice: {
+            count: 1,
+            amount: 1,
+            exclude: ["cha"],
+            description: "One other ability score of your choice increases by 1."
+        },
+        age: "Changelings mature slightly faster than humans but share a similar lifespan - typically a century or less.",
+        alignment: "Changelings tend toward pragmatic neutrality, and few changelings embrace evil.",
+        size: "Medium",
+        sizeDescription: "In their natural forms, changelings average between 5 and 6 feet tall, with a slender build.",
+        speed: 30,
+        traits: [
+            {
+                name: "Shapechanger",
+                description: "As an action, you can change your appearance and your voice. You determine the specifics of the changes, including your coloration, hair length, and sex. You can also adjust your height and weight, but not so much that your size changes. You can make yourself appear as a member of another race, though none of your game statistics change. You can't duplicate the appearance of a creature you've never seen, and you must adopt a form that has the same basic arrangement of limbs that you have. Your clothing and equipment aren't changed by this trait. You stay in the new form until you use an action to revert to your true form or until you die."
+            },
+            {
+                name: "Changeling Instincts",
+                description: "You gain proficiency with two of the following skills of your choice: Deception, Insight, Intimidation, and Persuasion."
+            }
+        ],
+        skillProficiencyChoices: {
+            count: 2,
+            from: ["Deception", "Insight", "Intimidation", "Persuasion"]
+        },
+        languages: ["Common"],
+        extraLanguages: 2
+    },
+    warforged: {
+        name: "Warforged",
+        description: "The warforged were built to fight in the Last War. The first warforged were mindless automatons, but House Cannith devoted vast resources to improving these steel soldiers. An unexpected breakthrough produced fully sentient soldiers, blending organic and inorganic materials.",
+        abilityScoreIncrease: { con: 2 },
+        abilityScoreIncreaseChoice: {
+            count: 1,
+            amount: 1,
+            exclude: ["con"],
+            description: "One other ability score of your choice increases by 1."
+        },
+        age: "A typical warforged is between two and thirty years old. The maximum lifespan of the warforged remains a mystery; so far, warforged have shown no signs of deterioration due to age.",
+        alignment: "Most warforged take comfort in order and discipline, tending toward law and neutrality. But some have absorbed the morality - or lack thereof - of the beings they served with.",
+        size: "Medium",
+        sizeDescription: "Your size is Medium. Most warforged stand between 5 and 6 1/2 feet tall.",
+        speed: 30,
+        traits: [
+            {
+                name: "Constructed Resilience",
+                description: "You were created to have remarkable fortitude, represented by the following benefits: You have advantage on saving throws against being poisoned, and you have resistance to poison damage. You don't need to eat, drink, or breathe. You are immune to disease. You don't need to sleep, and magic can't put you to sleep."
+            },
+            {
+                name: "Sentry's Rest",
+                description: "When you take a long rest, you must spend at least six hours in an inactive, motionless state, rather than sleeping. In this state, you appear inert, but it doesn't render you unconscious, and you can see and hear as normal."
+            },
+            {
+                name: "Integrated Protection",
+                description: "Your body has built-in defensive layers, which can be enhanced with armor. You gain a +1 bonus to Armor Class. You can don only armor with which you have proficiency. To don armor, you must incorporate it into your body over the course of 1 hour, during which you remain in contact with the armor. To doff armor, you must spend 1 hour removing it. You can rest while donning or doffing armor in this way. While you live, your armor can't be removed from your body against your will."
+            },
+            {
+                name: "Specialized Design",
+                description: "You gain one skill proficiency and one tool proficiency of your choice."
+            }
+        ],
+        resistances: ["poison"],
+        savingThrowAdvantages: ["poisoned"],
+        immunities: ["disease", "magical sleep"],
+        armorClassBonus: 1,
+        skillProficiencyChoices: {
+            count: 1,
+            from: "any"
+        },
+        toolProficiencyChoices: {
+            count: 1,
+            from: "any"
+        },
+        languages: ["Common"],
+        extraLanguages: 1
+    },
+    kalashtar: {
+        name: "Kalashtar",
+        description: "The kalashtar are a compound race created from the union of humanity and renegade spirits from the plane of dreams - spirits called quori. Kalashtar are often seen as wise, spiritual people with great compassion for others.",
+        abilityScoreIncrease: { wis: 2, cha: 1 },
+        age: "Kalashtar mature and age at the same rate as humans.",
+        alignment: "The noble spirit tied to a kalashtar drives it toward lawful and good behavior. Most kalashtar combine strong self-discipline with compassion for all beings, but some kalashtar resist the virtuous influence of their spirit.",
+        size: "Medium",
+        sizeDescription: "Kalashtar are similar in build to humans, though they are typically a few inches taller.",
+        speed: 30,
+        traits: [
+            {
+                name: "Dual Mind",
+                description: "You have advantage on all Wisdom saving throws."
+            },
+            {
+                name: "Mental Discipline",
+                description: "You have resistance to psychic damage."
+            },
+            {
+                name: "Mind Link",
+                description: "You can speak telepathically to any creature you can see, provided the creature is within a number of feet of you equal to 10 times your level. You don't need to share a language with the creature for it to understand your telepathic utterances, but the creature must be able to understand at least one language. When you're using this trait to speak telepathically to a creature, you can use your action to give that creature the ability to speak telepathically with you for 1 hour or until you end this effect as an action. To use this ability, the creature must be able to see you and must be within this trait's range. You can give this ability to only one creature at a time; giving it to a creature takes it away from another creature who has it."
+            },
+            {
+                name: "Severed from Dreams",
+                description: "Kalashtar sleep, but they don't connect to the plane of dreams as other creatures do. Instead, their minds draw from the memories of their otherworldly spirit while they sleep. As such, you are immune to spells and other magical effects that require you to dream, like dream, but not to spells and other magical effects that put you to sleep, like sleep."
+            }
+        ],
+        resistances: ["psychic"],
+        savingThrowAdvantages: ["Wisdom"],
+        languages: ["Common", "Quori"],
+        extraLanguages: 1
+    },
+    shifter: {
+        name: "Shifter",
+        description: "Shifters are sometimes called the weretouched, as many believe they are the descendants of humans and lycanthropes. They are humanoids with a bestial aspect; while they cannot fully change shape, they can temporarily enhance their animalistic features - a state they call shifting.",
+        abilityScoreIncrease: {},
+        age: "Shifters are quick to mature both physically and emotionally, reaching young adulthood at age 10. They rarely live to be more than 70 years old.",
+        alignment: "Shifters tend toward neutrality, being more focused on survival than concepts of good and evil. A love of personal freedom can drive shifters toward chaotic alignments.",
+        size: "Medium",
+        sizeDescription: "Shifters range from 5 to almost 7 feet tall, depending on their subrace.",
+        speed: 30,
+        traits: [
+            {
+                name: "Darkvision",
+                description: "You have superior vision in dark and dim conditions. You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray."
+            },
+            {
+                name: "Shifting",
+                description: "As a bonus action, you can assume a more bestial appearance. This transformation lasts for 1 minute, until you die, or until you revert to your normal appearance as a bonus action. When you shift, you gain temporary hit points equal to your level + your Constitution modifier (minimum of 1 temporary hit point). You also gain additional benefits that depend on your shifter subrace. Once you shift, you can't do so again until you finish a short or long rest."
+            }
+        ],
+        specialAbilities: {
+            shifting: {
+                name: "Shifting",
+                usesPerRest: 1,
+                restType: "short",
+                duration: "1 minute",
+                effect: "Gain temp HP equal to level + CON mod, plus subrace benefits"
+            }
+        },
+        languages: ["Common"],
+        subraces: {
+            beasthide: {
+                name: "Beasthide",
+                description: "Stoic and solid, a beasthide shifter draws strength and stability from the beast within. Beasthide shifters are typically tied to the bear or the boar, but any creature known for its toughness could apply.",
+                abilityScoreIncrease: { con: 2, str: 1 },
+                traits: [
+                    {
+                        name: "Natural Athlete",
+                        description: "You have proficiency in the Athletics skill."
+                    },
+                    {
+                        name: "Shifting Feature",
+                        description: "Whenever you shift, you gain 1d6 additional temporary hit points, and while shifted, you have a +1 bonus to your Armor Class."
+                    }
+                ],
+                skillProficiencies: ["Athletics"]
+            },
+            longtooth: {
+                name: "Longtooth",
+                description: "Longtooth shifters are fierce and aggressive, but they form deep bonds with their friends. Many longtooth shifters have canine traits that become more pronounced as they shift, but they might instead draw on tigers, hyenas, or other predators.",
+                abilityScoreIncrease: { str: 2, dex: 1 },
+                traits: [
+                    {
+                        name: "Fierce",
+                        description: "You have proficiency in the Intimidation skill."
+                    },
+                    {
+                        name: "Shifting Feature",
+                        description: "While shifted, you can use your elongated fangs to make an unarmed strike as a bonus action. If you hit with your fangs, you can deal piercing damage equal to 1d6 + your Strength modifier, instead of the bludgeoning damage normal for an unarmed strike."
+                    }
+                ],
+                skillProficiencies: ["Intimidation"]
+            },
+            swiftstride: {
+                name: "Swiftstride",
+                description: "Swiftstride shifters are graceful and quick. Typically feline in nature, swiftstride shifters are often aloof and difficult to pin down physically or emotionally.",
+                abilityScoreIncrease: { dex: 2, cha: 1 },
+                traits: [
+                    {
+                        name: "Graceful",
+                        description: "You have proficiency in the Acrobatics skill."
+                    },
+                    {
+                        name: "Shifting Feature",
+                        description: "While shifted, your walking speed increases by 10 feet. Additionally, you can move up to 10 feet as a reaction when an enemy ends its turn within 5 feet of you. This movement doesn't provoke opportunity attacks."
+                    }
+                ],
+                skillProficiencies: ["Acrobatics"]
+            },
+            wildhunt: {
+                name: "Wildhunt",
+                description: "Wildhunt shifters are sharp and insightful. Some are constantly alert, always sniffing the air for potential threats. Others focus on their intuition, relying on their gut feelings.",
+                abilityScoreIncrease: { wis: 2, dex: 1 },
+                traits: [
+                    {
+                        name: "Natural Tracker",
+                        description: "You have proficiency in the Survival skill."
+                    },
+                    {
+                        name: "Shifting Feature",
+                        description: "While shifted, you have advantage on Wisdom checks, and no creature within 30 feet of you can make an attack roll with advantage against you, unless you're incapacitated."
+                    }
+                ],
+                skillProficiencies: ["Survival"]
+            }
+        }
     }
 };
 

@@ -20,6 +20,7 @@
             <a href="monster-builder.html" class="nav-link">Monster Builder</a>
             <a href="combat.html" class="nav-link">Combat</a>
             <a href="inventory.html" class="nav-link">Inventory</a>
+            <a href="maps.html" class="nav-link">Maps</a>
         </nav>
     </header>
 
@@ -115,11 +116,6 @@
                         <p id="class-description" class="details-description"></p>
 
                         <div id="class-info" class="class-info-container"></div>
-
-                        <div id="subclass-selection" class="subclass-container" style="display: none;">
-                            <h4>Choose a Subclass (at level 3)</h4>
-                            <div id="subclass-options" class="subclass-options" role="radiogroup" aria-label="Subclass options"></div>
-                        </div>
                     </div>
                 </div>
             </section>
@@ -326,6 +322,13 @@
                             </div>
                         </div>
 
+                        <!-- Subclass Selection (shown when level >= 3) -->
+                        <div id="details-subclass-selection" class="subclass-container" style="display: none;">
+                            <h4>Choose a Subclass</h4>
+                            <p class="subclass-hint">Subclasses are available at level 3 and above. Click to select, click again to deselect.</p>
+                            <div id="details-subclass-options" class="subclass-options" role="radiogroup" aria-label="Subclass options"></div>
+                        </div>
+
                         <div class="form-row triple">
                             <div class="form-group">
                                 <label for="char-age">Age</label>
@@ -452,6 +455,13 @@
                 <h3 id="summary-heading">Character Summary</h3>
             </div>
             <div class="summary-content">
+                <!-- Character Portrait -->
+                <div class="character-portrait" id="character-portrait">
+                    <div class="portrait-placeholder" id="portrait-placeholder">&#9876;</div>
+                    <img id="portrait-image" class="portrait-image" src="" alt="Character portrait" style="display: none;">
+                    <div class="portrait-label" id="portrait-label">Select a race</div>
+                </div>
+
                 <div class="summary-section">
                     <div class="summary-item">
                         <span class="summary-label">Name</span>
@@ -521,6 +531,95 @@
                         <span class="stat-icon">&#10132;</span>
                         <span class="stat-label">Speed</span>
                         <span class="stat-value" id="sum-speed">30 ft</span>
+                    </div>
+                </div>
+
+                <div class="summary-divider"></div>
+
+                <!-- Features & Traits Section -->
+                <div class="summary-features-section" id="features-section">
+                    <div class="features-section-header" data-section="active-abilities">
+                        <h4>Active Abilities</h4>
+                        <span class="section-toggle" aria-hidden="true">&#9660;</span>
+                    </div>
+                    <div class="features-section-content" id="active-abilities-content">
+                        <div class="no-features-msg">Select a race and class to see abilities</div>
+                    </div>
+                </div>
+
+                <div class="summary-features-section" id="racial-traits-section">
+                    <div class="features-section-header" data-section="racial-traits">
+                        <h4>Racial Traits</h4>
+                        <span class="section-toggle" aria-hidden="true">&#9660;</span>
+                    </div>
+                    <div class="features-section-content" id="racial-traits-content">
+                        <div class="no-features-msg">Select a race to see traits</div>
+                    </div>
+                </div>
+
+                <div class="summary-features-section" id="class-features-section">
+                    <div class="features-section-header" data-section="class-features">
+                        <h4>Class Features</h4>
+                        <span class="section-toggle" aria-hidden="true">&#9660;</span>
+                    </div>
+                    <div class="features-section-content" id="class-features-content">
+                        <div class="no-features-msg">Select a class to see features</div>
+                    </div>
+                </div>
+
+                <div class="summary-divider"></div>
+
+                <!-- Proficiencies Section -->
+                <div class="summary-proficiencies-section" id="proficiencies-section">
+                    <div class="features-section-header" data-section="proficiencies">
+                        <h4>Proficiencies</h4>
+                        <span class="section-toggle" aria-hidden="true">&#9660;</span>
+                    </div>
+                    <div class="features-section-content" id="proficiencies-content">
+                        <div class="proficiency-group" id="prof-skills">
+                            <span class="proficiency-label">Skills</span>
+                            <span class="proficiency-value">-</span>
+                        </div>
+                        <div class="proficiency-group" id="prof-weapons">
+                            <span class="proficiency-label">Weapons</span>
+                            <span class="proficiency-value">-</span>
+                        </div>
+                        <div class="proficiency-group" id="prof-armor">
+                            <span class="proficiency-label">Armor</span>
+                            <span class="proficiency-value">-</span>
+                        </div>
+                        <div class="proficiency-group" id="prof-tools">
+                            <span class="proficiency-label">Tools</span>
+                            <span class="proficiency-value">-</span>
+                        </div>
+                        <div class="proficiency-group" id="prof-languages">
+                            <span class="proficiency-label">Languages</span>
+                            <span class="proficiency-value">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-divider"></div>
+
+                <!-- Resistances & Immunities -->
+                <div class="summary-resistances-section" id="resistances-section">
+                    <div class="features-section-header" data-section="resistances">
+                        <h4>Defenses</h4>
+                        <span class="section-toggle" aria-hidden="true">&#9660;</span>
+                    </div>
+                    <div class="features-section-content" id="resistances-content">
+                        <div class="defense-group" id="def-resistances">
+                            <span class="defense-label">Resistances</span>
+                            <span class="defense-value">-</span>
+                        </div>
+                        <div class="defense-group" id="def-immunities">
+                            <span class="defense-label">Immunities</span>
+                            <span class="defense-value">-</span>
+                        </div>
+                        <div class="defense-group" id="def-advantages">
+                            <span class="defense-label">Save Advantages</span>
+                            <span class="defense-value">-</span>
+                        </div>
                     </div>
                 </div>
             </div>

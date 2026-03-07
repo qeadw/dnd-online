@@ -53,6 +53,55 @@ const pointBuyCosts = {
     8: 0, 9: 1, 10: 2, 11: 3, 12: 4, 13: 5, 14: 7, 15: 9
 };
 
+// Race Image Mappings
+const RACE_IMAGES = {
+    // SRD Races
+    'dragonborn': 'assets/races/dragonborn.png',
+    'dwarf': 'assets/races/dwarf.png',
+    'elf': 'assets/races/elf.png',
+    'gnome': 'assets/races/gnome.png',
+    'halfElf': 'assets/races/half-elf.png',
+    'halfling': 'assets/races/halfling.png',
+    'halfOrc': 'assets/races/half-orc.png',
+    'human': 'assets/races/human.png',
+    'tiefling': 'assets/races/tiefling.png',
+    // Volo's Guide Races
+    'aasimar': 'assets/races/aasimar.png',
+    'goliath': 'assets/races/goliath.png',
+    'firbolg': 'assets/races/firbolg.png',
+    'tabaxi': 'assets/races/tabaxi.png',
+    'kenku': 'assets/races/kenku.png',
+    'lizardfolk': 'assets/races/lizardfolk.png',
+    'triton': 'assets/races/triton.png',
+    'bugbear': 'assets/races/bugbear.png',
+    'goblin': 'assets/races/goblin.png',
+    'hobgoblin': 'assets/races/hobgoblin.png',
+    'kobold': 'assets/races/kobold.png',
+    'orc': 'assets/races/orc.png',
+    'yuantiPureblood': 'assets/races/yuan-ti.png',
+    // Eberron Races
+    'changeling': 'assets/races/changeling.png',
+    'warforged': 'assets/races/warforged.png',
+    'kalashtar': 'assets/races/kalashtar.png',
+    'shifter': 'assets/races/shifter.png'
+};
+
+// Class Image Mappings
+const CLASS_IMAGES = {
+    'barbarian': 'assets/classes/barbarian.png',
+    'bard': 'assets/classes/bard.png',
+    'cleric': 'assets/classes/cleric.png',
+    'druid': 'assets/classes/druid.png',
+    'fighter': 'assets/classes/fighter.png',
+    'monk': 'assets/classes/monk.png',
+    'paladin': 'assets/classes/paladin.png',
+    'ranger': 'assets/classes/ranger.png',
+    'rogue': 'assets/classes/rogue.png',
+    'sorcerer': 'assets/classes/sorcerer.png',
+    'warlock': 'assets/classes/warlock.png',
+    'wizard': 'assets/classes/wizard.png'
+};
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     initRaceSelection();
@@ -73,9 +122,17 @@ function initRaceSelection() {
         const card = document.createElement('div');
         card.className = 'selection-card';
         card.dataset.race = key;
+
+        // Get image path or use a default
+        const imagePath = RACE_IMAGES[key] || '';
+        const imageStyle = imagePath ? `background-image: url('${imagePath}')` : '';
+
         card.innerHTML = `
-            <h4>${race.name}</h4>
-            <p>${getAbilityBonusText(race.abilityScoreIncrease)}</p>
+            <div class="card-image" style="${imageStyle}"></div>
+            <div class="card-content">
+                <h4>${race.name}</h4>
+                <p>${getAbilityBonusText(race.abilityScoreIncrease)}</p>
+            </div>
         `;
         card.addEventListener('click', () => selectRace(key));
         grid.appendChild(card);
@@ -293,9 +350,17 @@ function initClassSelection() {
         const card = document.createElement('div');
         card.className = 'selection-card';
         card.dataset.class = key;
+
+        // Get image path or use a default
+        const imagePath = CLASS_IMAGES[key] || '';
+        const imageStyle = imagePath ? `background-image: url('${imagePath}')` : '';
+
         card.innerHTML = `
-            <h4>${cls.name}</h4>
-            <p>d${cls.hitDie} HD</p>
+            <div class="card-image" style="${imageStyle}"></div>
+            <div class="card-content">
+                <h4>${cls.name}</h4>
+                <p>d${cls.hitDie} Hit Die • ${cls.primaryAbility}</p>
+            </div>
         `;
         card.addEventListener('click', () => selectClass(key));
         grid.appendChild(card);
@@ -367,37 +432,27 @@ function selectClass(classKey) {
         });
     }
 
-    // Subclass selection
-    const subclassContainer = document.getElementById('subclass-selection');
-    const subclassOptions = document.getElementById('subclass-options');
-
-    if (cls.subclasses) {
-        subclassContainer.style.display = 'block';
-        subclassOptions.innerHTML = '';
-
-        Object.entries(cls.subclasses).forEach(([key, subclass]) => {
-            const option = document.createElement('div');
-            option.className = 'subclass-option';
-            option.dataset.subclass = key;
-            option.innerHTML = `
-                <strong>${subclass.name}</strong>
-                <p>${subclass.description}</p>
-            `;
-            option.addEventListener('click', () => selectSubclass(key));
-            subclassOptions.appendChild(option);
-        });
-    } else {
-        subclassContainer.style.display = 'none';
-    }
-
     updateSummary();
 }
 
 function selectSubclass(subclassKey) {
+    const selectedOption = document.querySelector(`[data-subclass="${subclassKey}"]`);
+
+    // Toggle functionality: if already selected, deselect it
+    if (selectedOption && selectedOption.classList.contains('selected')) {
+        selectedOption.classList.remove('selected');
+        character.subclass = null;
+        updateSummary();
+        return;
+    }
+
+    // Otherwise, select the new subclass
     document.querySelectorAll('.subclass-option').forEach(opt => {
         opt.classList.remove('selected');
     });
-    document.querySelector(`[data-subclass="${subclassKey}"]`).classList.add('selected');
+    if (selectedOption) {
+        selectedOption.classList.add('selected');
+    }
 
     character.subclass = subclassKey;
     updateSummary();
@@ -604,13 +659,36 @@ function initBackgroundSelection() {
     const grid = document.getElementById('background-grid');
     grid.innerHTML = '';
 
+    // Background icons (using emoji for now, can be replaced with images)
+    const BG_ICONS = {
+        'acolyte': '🙏',
+        'charlatan': '🎭',
+        'criminal': '🗡️',
+        'entertainer': '🎪',
+        'folk-hero': '🦸',
+        'guild-artisan': '🔨',
+        'hermit': '🏔️',
+        'noble': '👑',
+        'outlander': '🌲',
+        'sage': '📚',
+        'sailor': '⚓',
+        'soldier': '⚔️',
+        'urchin': '🏚️'
+    };
+
     Object.entries(BACKGROUNDS).forEach(([key, bg]) => {
         const card = document.createElement('div');
-        card.className = 'selection-card';
+        card.className = 'selection-card background-card';
         card.dataset.background = key;
+
+        const icon = BG_ICONS[key] || '📜';
+
         card.innerHTML = `
-            <h4>${bg.name}</h4>
-            <p>${bg.skillProficiencies.join(', ')}</p>
+            <div class="card-icon">${icon}</div>
+            <div class="card-content">
+                <h4>${bg.name}</h4>
+                <p>${bg.skillProficiencies.join(', ')}</p>
+            </div>
         `;
         card.addEventListener('click', () => selectBackground(key));
         grid.appendChild(card);
@@ -733,7 +811,7 @@ function nextStep() {
             generateCharacterPreview();
         }
 
-        // Check for variant human feat
+        // Check for variant human feat and subclass selection
         if (currentStep === 5) {
             const featSection = document.getElementById('variant-human-feat');
             if (character.race === 'human' && RACES.human.variant) {
@@ -741,6 +819,9 @@ function nextStep() {
             } else {
                 featSection.style.display = 'none';
             }
+
+            // Update subclass visibility based on current level
+            updateSubclassVisibility();
         }
     }
 }
@@ -806,11 +887,47 @@ function updateNavButtons() {
     document.getElementById('next-btn').textContent = currentStep === totalSteps ? 'Finish' : 'Next';
 }
 
+// ==================== CHARACTER PORTRAIT ====================
+
+function updateCharacterPortrait() {
+    const portraitContainer = document.getElementById('character-portrait');
+    const portraitImage = document.getElementById('portrait-image');
+    const portraitPlaceholder = document.getElementById('portrait-placeholder');
+    const portraitLabel = document.getElementById('portrait-label');
+
+    if (character.race && RACE_IMAGES[character.race]) {
+        // Show the race image
+        portraitImage.src = RACE_IMAGES[character.race];
+        portraitImage.style.display = 'block';
+        portraitPlaceholder.style.display = 'none';
+        portraitContainer.classList.add('has-image');
+
+        // Update label with race/class info
+        let labelText = RACES[character.race].name;
+        if (character.subrace && RACES[character.race].subraces) {
+            labelText = RACES[character.race].subraces[character.subrace].name;
+        }
+        if (character.class) {
+            labelText += ' ' + CLASSES[character.class].name;
+        }
+        portraitLabel.textContent = labelText;
+    } else {
+        // Show placeholder
+        portraitImage.style.display = 'none';
+        portraitPlaceholder.style.display = 'block';
+        portraitContainer.classList.remove('has-image');
+        portraitLabel.textContent = 'Select a race';
+    }
+}
+
 // ==================== SUMMARY ====================
 
 function updateSummary() {
     // Name
     document.getElementById('sum-name').textContent = character.name || '-';
+
+    // Update character portrait
+    updateCharacterPortrait();
 
     // Race
     let raceText = '-';
@@ -867,6 +984,9 @@ function updateSummary() {
         }
     }
     document.getElementById('sum-speed').textContent = speed;
+
+    // Update all sidebar sections (features, traits, proficiencies, etc.)
+    updateAllSidebarSections();
 }
 
 // Listen for name changes
@@ -884,9 +1004,70 @@ document.addEventListener('DOMContentLoaded', () => {
         levelInput.addEventListener('change', (e) => {
             character.level = parseInt(e.target.value) || 1;
             updateSummary();
+            updateSubclassVisibility();
+        });
+        // Also listen for input event for immediate feedback
+        levelInput.addEventListener('input', (e) => {
+            character.level = parseInt(e.target.value) || 1;
+            updateSummary();
+            updateSubclassVisibility();
         });
     }
 });
+
+// ==================== SUBCLASS SELECTION (Step 5) ====================
+
+function updateSubclassVisibility() {
+    const subclassContainer = document.getElementById('details-subclass-selection');
+    if (!subclassContainer) return;
+
+    const level = character.level || 1;
+    const cls = character.class ? CLASSES[character.class] : null;
+
+    // Show subclass options only if level >= 3 and class has subclasses
+    if (level >= 3 && cls && cls.subclasses) {
+        subclassContainer.style.display = 'block';
+        populateSubclassOptions();
+    } else {
+        subclassContainer.style.display = 'none';
+        // Clear subclass if level drops below 3
+        if (level < 3 && character.subclass) {
+            character.subclass = null;
+            updateSummary();
+        }
+    }
+}
+
+function populateSubclassOptions() {
+    const subclassOptions = document.getElementById('details-subclass-options');
+    if (!subclassOptions) return;
+
+    const cls = character.class ? CLASSES[character.class] : null;
+    if (!cls || !cls.subclasses) {
+        subclassOptions.innerHTML = '';
+        return;
+    }
+
+    subclassOptions.innerHTML = '';
+
+    Object.entries(cls.subclasses).forEach(([key, subclass]) => {
+        const option = document.createElement('div');
+        option.className = 'subclass-option';
+        option.dataset.subclass = key;
+
+        // Check if this subclass is already selected
+        if (character.subclass === key) {
+            option.classList.add('selected');
+        }
+
+        option.innerHTML = `
+            <strong>${subclass.name}</strong>
+            <p>${subclass.description}</p>
+        `;
+        option.addEventListener('click', () => selectSubclass(key));
+        subclassOptions.appendChild(option);
+    });
+}
 
 // ==================== CHARACTER PREVIEW ====================
 
@@ -1065,3 +1246,1035 @@ function exportCharacter() {
 function printCharacter() {
     window.print();
 }
+
+// ==================== SIDEBAR FEATURES & TRAITS ====================
+
+// Track feature uses (for abilities like Breath Weapon, Relentless Endurance)
+const featureUses = {};
+
+// Initialize sidebar section toggles and tooltips
+function initSidebarInteractions() {
+    // Section toggle functionality
+    document.querySelectorAll('.features-section-header').forEach(header => {
+        header.addEventListener('click', () => {
+            const section = header.dataset.section;
+            const content = document.getElementById(`${section}-content`);
+
+            header.classList.toggle('collapsed');
+            if (content) {
+                content.classList.toggle('collapsed');
+            }
+        });
+    });
+
+    // Create tooltip element
+    const tooltip = document.createElement('div');
+    tooltip.className = 'feature-tooltip';
+    tooltip.id = 'feature-tooltip';
+    document.body.appendChild(tooltip);
+}
+
+// Update the racial traits section in sidebar
+function updateSidebarRacialTraits() {
+    const container = document.getElementById('racial-traits-content');
+    if (!container) return;
+
+    if (!character.race) {
+        container.innerHTML = '<div class="no-features-msg">Select a race to see traits</div>';
+        return;
+    }
+
+    const race = RACES[character.race];
+    if (!race) return;
+
+    let traitsHtml = '';
+    const allTraits = [];
+
+    // Collect base race traits
+    if (race.traits) {
+        race.traits.forEach(trait => {
+            allTraits.push({ ...trait, source: race.name });
+        });
+    }
+
+    // Collect subrace traits
+    if (character.subrace && race.subraces && race.subraces[character.subrace]) {
+        const subrace = race.subraces[character.subrace];
+        if (subrace.traits) {
+            subrace.traits.forEach(trait => {
+                allTraits.push({ ...trait, source: subrace.name });
+            });
+        }
+    }
+
+    allTraits.forEach((trait, index) => {
+        const isPassive = !isActiveTrait(trait);
+        const featureClass = isPassive ? 'passive-ability' : 'active-ability';
+        const icon = getTraitIcon(trait.name);
+
+        traitsHtml += `
+            <div class="feature-item ${featureClass}" data-feature-id="racial-${index}">
+                <div class="feature-header" onclick="toggleFeatureExpand(this)">
+                    <div class="feature-name">
+                        <span class="feature-icon">${icon}</span>
+                        <span>${trait.name}</span>
+                    </div>
+                    <span class="feature-expand">&#9660;</span>
+                </div>
+                <div class="feature-description">
+                    <p>${trait.description}</p>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = traitsHtml || '<div class="no-features-msg">No racial traits</div>';
+}
+
+// Update the class features section in sidebar
+function updateSidebarClassFeatures() {
+    const container = document.getElementById('class-features-content');
+    if (!container) return;
+
+    if (!character.class) {
+        container.innerHTML = '<div class="no-features-msg">Select a class to see features</div>';
+        return;
+    }
+
+    const cls = CLASSES[character.class];
+    if (!cls) return;
+
+    let featuresHtml = '';
+    const level = character.level || 1;
+
+    // Collect features up to current level
+    for (let i = 1; i <= level; i++) {
+        if (cls.features && cls.features[i]) {
+            cls.features[i].forEach((feature, index) => {
+                const icon = getClassFeatureIcon(feature.name);
+
+                featuresHtml += `
+                    <div class="feature-item passive-ability" data-feature-id="class-${i}-${index}">
+                        <div class="feature-header" onclick="toggleFeatureExpand(this)">
+                            <div class="feature-name">
+                                <span class="feature-icon">${icon}</span>
+                                <span>${feature.name}</span>
+                            </div>
+                            <span class="feature-expand">&#9660;</span>
+                        </div>
+                        <div class="feature-description">
+                            <p>${feature.description}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    }
+
+    container.innerHTML = featuresHtml || '<div class="no-features-msg">No class features at this level</div>';
+}
+
+// Update the active abilities section in sidebar (abilities with limited uses)
+function updateSidebarActiveAbilities() {
+    const container = document.getElementById('active-abilities-content');
+    if (!container) return;
+
+    const activeAbilities = [];
+
+    // Check for racial active abilities
+    if (character.race) {
+        const race = RACES[character.race];
+
+        // Dragonborn Breath Weapon
+        if (character.race === 'dragonborn' && character.draconicAncestry) {
+            const ancestryKey = character.draconicAncestry.toLowerCase();
+            const ancestry = race.draconicAncestry ? race.draconicAncestry[ancestryKey] : null;
+            const ancestryLegacy = race.draconicAncestryList ?
+                race.draconicAncestryList.find(a => a.dragon.toLowerCase() === ancestryKey) : null;
+
+            const damageType = ancestry ? ancestry.damageType : (ancestryLegacy ? ancestryLegacy.damageType : 'Unknown');
+            const breathDesc = ancestry && ancestry.breathWeapon ?
+                `${ancestry.breathWeapon.size} ${ancestry.breathWeapon.shape} (${ancestry.breathWeapon.savingThrow} save)` :
+                (ancestryLegacy ? ancestryLegacy.breathWeapon : '');
+
+            activeAbilities.push({
+                id: 'breath-weapon',
+                name: 'Breath Weapon',
+                description: `You exhale destructive ${damageType.toLowerCase()} energy. ${breathDesc}. DC = 8 + CON mod + proficiency. Damage: 2d6 (scales at higher levels).`,
+                icon: '&#128293;',
+                uses: 1,
+                maxUses: 1,
+                recharge: 'Short Rest',
+                type: 'active'
+            });
+        }
+
+        // Half-Orc Relentless Endurance
+        if (character.race === 'halfOrc') {
+            activeAbilities.push({
+                id: 'relentless-endurance',
+                name: 'Relentless Endurance',
+                description: 'When you are reduced to 0 hit points but not killed outright, you can drop to 1 hit point instead.',
+                icon: '&#128170;',
+                uses: 1,
+                maxUses: 1,
+                recharge: 'Long Rest',
+                type: 'active'
+            });
+        }
+
+        // Tiefling Infernal Legacy spells (at higher levels)
+        if (character.race === 'tiefling') {
+            const level = character.level || 1;
+            if (level >= 3) {
+                activeAbilities.push({
+                    id: 'hellish-rebuke',
+                    name: 'Hellish Rebuke',
+                    description: 'Cast Hellish Rebuke as a 2nd-level spell. The creature that damaged you takes 3d10 fire damage on a failed Dex save.',
+                    icon: '&#128165;',
+                    uses: 1,
+                    maxUses: 1,
+                    recharge: 'Long Rest',
+                    type: 'spell'
+                });
+            }
+            if (level >= 5) {
+                activeAbilities.push({
+                    id: 'darkness-spell',
+                    name: 'Darkness',
+                    description: 'Cast Darkness spell. Magical darkness fills a 15-foot-radius sphere.',
+                    icon: '&#127761;',
+                    uses: 1,
+                    maxUses: 1,
+                    recharge: 'Long Rest',
+                    type: 'spell'
+                });
+            }
+        }
+
+        // Drow Magic
+        if (character.subrace === 'dark') {
+            const level = character.level || 1;
+            if (level >= 3) {
+                activeAbilities.push({
+                    id: 'faerie-fire',
+                    name: 'Faerie Fire',
+                    description: 'Cast Faerie Fire once per day. Objects and creatures in a 20-foot cube are outlined in light.',
+                    icon: '&#10024;',
+                    uses: 1,
+                    maxUses: 1,
+                    recharge: 'Long Rest',
+                    type: 'spell'
+                });
+            }
+            if (level >= 5) {
+                activeAbilities.push({
+                    id: 'drow-darkness',
+                    name: 'Darkness (Drow)',
+                    description: 'Cast Darkness spell once per day.',
+                    icon: '&#127761;',
+                    uses: 1,
+                    maxUses: 1,
+                    recharge: 'Long Rest',
+                    type: 'spell'
+                });
+            }
+        }
+    }
+
+    // Check for class active abilities
+    if (character.class) {
+        const cls = CLASSES[character.class];
+        const level = character.level || 1;
+
+        // Barbarian Rage
+        if (character.class === 'barbarian') {
+            let rageUses = 2;
+            if (level >= 3) rageUses = 3;
+            if (level >= 6) rageUses = 4;
+            if (level >= 12) rageUses = 5;
+            if (level >= 17) rageUses = 6;
+            if (level >= 20) rageUses = 999; // Unlimited
+
+            activeAbilities.push({
+                id: 'rage',
+                name: 'Rage',
+                description: 'Enter a battle rage as a bonus action. Gain advantage on STR checks/saves, bonus damage, and resistance to physical damage for 1 minute.',
+                icon: '&#128544;',
+                uses: rageUses,
+                maxUses: rageUses,
+                recharge: level >= 20 ? 'Unlimited' : 'Long Rest',
+                type: 'active'
+            });
+        }
+
+        // Fighter Second Wind
+        if (character.class === 'fighter') {
+            activeAbilities.push({
+                id: 'second-wind',
+                name: 'Second Wind',
+                description: 'Use a bonus action to regain hit points equal to 1d10 + your fighter level.',
+                icon: '&#128154;',
+                uses: 1,
+                maxUses: 1,
+                recharge: 'Short Rest',
+                type: 'active'
+            });
+
+            // Action Surge at level 2
+            if (level >= 2) {
+                activeAbilities.push({
+                    id: 'action-surge',
+                    name: 'Action Surge',
+                    description: 'Take one additional action on your turn.',
+                    icon: '&#9889;',
+                    uses: level >= 17 ? 2 : 1,
+                    maxUses: level >= 17 ? 2 : 1,
+                    recharge: 'Short Rest',
+                    type: 'active'
+                });
+            }
+        }
+
+        // Monk Ki Points
+        if (character.class === 'monk' && level >= 2) {
+            activeAbilities.push({
+                id: 'ki-points',
+                name: 'Ki Points',
+                description: 'Use ki to fuel various monk abilities like Flurry of Blows, Patient Defense, and Step of the Wind.',
+                icon: '&#9775;',
+                uses: level,
+                maxUses: level,
+                recharge: 'Short Rest',
+                type: 'resource'
+            });
+        }
+
+        // Paladin Divine Sense
+        if (character.class === 'paladin') {
+            const chaMod = Math.floor((character.abilities.cha + character.racialBonuses.cha - 10) / 2);
+            const divineSenseUses = Math.max(1, 1 + chaMod);
+
+            activeAbilities.push({
+                id: 'divine-sense',
+                name: 'Divine Sense',
+                description: 'Detect celestials, fiends, and undead within 60 feet.',
+                icon: '&#128302;',
+                uses: divineSenseUses,
+                maxUses: divineSenseUses,
+                recharge: 'Long Rest',
+                type: 'active'
+            });
+
+            activeAbilities.push({
+                id: 'lay-on-hands',
+                name: 'Lay on Hands',
+                description: `Heal creatures by touch. You have a pool of ${level * 5} hit points.`,
+                icon: '&#10084;',
+                uses: level * 5,
+                maxUses: level * 5,
+                recharge: 'Long Rest',
+                type: 'resource'
+            });
+        }
+
+        // Sorcerer Sorcery Points
+        if (character.class === 'sorcerer' && level >= 2) {
+            activeAbilities.push({
+                id: 'sorcery-points',
+                name: 'Sorcery Points',
+                description: 'Use sorcery points to create spell slots or fuel Metamagic.',
+                icon: '&#10031;',
+                uses: level,
+                maxUses: level,
+                recharge: 'Long Rest',
+                type: 'resource'
+            });
+        }
+
+        // Warlock spell slots
+        if (character.class === 'warlock') {
+            let slotLevel = 1;
+            let numSlots = 1;
+            if (level >= 2) numSlots = 2;
+            if (level >= 3) slotLevel = 2;
+            if (level >= 5) slotLevel = 3;
+            if (level >= 7) slotLevel = 4;
+            if (level >= 9) slotLevel = 5;
+            if (level >= 11) numSlots = 3;
+            if (level >= 17) numSlots = 4;
+
+            activeAbilities.push({
+                id: 'pact-magic',
+                name: 'Pact Magic',
+                description: `${numSlots} spell slot(s) at level ${slotLevel}. All slots are the same level.`,
+                icon: '&#128156;',
+                uses: numSlots,
+                maxUses: numSlots,
+                recharge: 'Short Rest',
+                type: 'resource'
+            });
+        }
+
+        // Cleric Channel Divinity
+        if (character.class === 'cleric' && level >= 2) {
+            let channelUses = 1;
+            if (level >= 6) channelUses = 2;
+            if (level >= 18) channelUses = 3;
+
+            activeAbilities.push({
+                id: 'channel-divinity',
+                name: 'Channel Divinity',
+                description: 'Channel divine energy for special effects like Turn Undead.',
+                icon: '&#9764;',
+                uses: channelUses,
+                maxUses: channelUses,
+                recharge: 'Short Rest',
+                type: 'active'
+            });
+        }
+
+        // Bard Bardic Inspiration
+        if (character.class === 'bard') {
+            const chaMod = Math.max(1, Math.floor((character.abilities.cha + character.racialBonuses.cha - 10) / 2));
+
+            activeAbilities.push({
+                id: 'bardic-inspiration',
+                name: 'Bardic Inspiration',
+                description: 'Grant an ally a d6 to add to one ability check, attack roll, or saving throw.',
+                icon: '&#127926;',
+                uses: chaMod,
+                maxUses: chaMod,
+                recharge: level >= 5 ? 'Short Rest' : 'Long Rest',
+                type: 'active'
+            });
+        }
+
+        // Druid Wild Shape
+        if (character.class === 'druid' && level >= 2) {
+            activeAbilities.push({
+                id: 'wild-shape',
+                name: 'Wild Shape',
+                description: 'Transform into a beast you have seen before.',
+                icon: '&#128058;',
+                uses: 2,
+                maxUses: 2,
+                recharge: 'Short Rest',
+                type: 'active'
+            });
+        }
+
+        // Rogue Cunning Action is a bonus action feature, no uses to track
+    }
+
+    // Initialize feature uses if not already set
+    activeAbilities.forEach(ability => {
+        if (featureUses[ability.id] === undefined) {
+            featureUses[ability.id] = 0;
+        }
+    });
+
+    // Render active abilities
+    if (activeAbilities.length === 0) {
+        container.innerHTML = '<div class="no-features-msg">Select a race and class to see abilities</div>';
+        return;
+    }
+
+    let html = '';
+    activeAbilities.forEach(ability => {
+        const usesRemaining = ability.maxUses - (featureUses[ability.id] || 0);
+        const isUnlimited = ability.recharge === 'Unlimited';
+
+        html += `
+            <div class="feature-item has-uses" data-feature-id="${ability.id}">
+                <div class="feature-header" onclick="toggleFeatureExpand(this)">
+                    <div class="feature-name">
+                        <span class="feature-icon">${ability.icon}</span>
+                        <span>${ability.name}</span>
+                    </div>
+                    <span class="feature-expand">&#9660;</span>
+                </div>
+                <div class="feature-description">
+                    <p>${ability.description}</p>
+                </div>
+                ${!isUnlimited ? `
+                <div class="feature-uses">
+                    <span class="uses-label">Uses</span>
+                    <div class="uses-tracker">
+                        ${generateUsesTracker(ability.id, ability.maxUses, featureUses[ability.id] || 0)}
+                    </div>
+                    <span class="recharge-info">${ability.recharge}</span>
+                </div>
+                ` : ''}
+                <div class="feature-actions">
+                    <button class="action-btn use-ability"
+                            onclick="useAbility('${ability.id}')"
+                            ${usesRemaining <= 0 && !isUnlimited ? 'disabled' : ''}>
+                        ${isUnlimited ? 'Use' : `Use (${usesRemaining}/${ability.maxUses})`}
+                    </button>
+                    ${!isUnlimited ? `
+                    <button class="action-btn reset-uses" onclick="resetAbilityUses('${ability.id}')">
+                        Reset
+                    </button>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+// Generate uses tracker checkboxes
+function generateUsesTracker(abilityId, maxUses, usedCount) {
+    let html = '';
+    const displayMax = Math.min(maxUses, 10); // Cap display at 10 for UI reasons
+
+    for (let i = 0; i < displayMax; i++) {
+        const isUsed = i < usedCount;
+        html += `<button class="use-slot ${isUsed ? 'used' : ''}"
+                         onclick="toggleUseSlot('${abilityId}', ${i})"
+                         aria-label="${isUsed ? 'Used' : 'Available'}"></button>`;
+    }
+
+    if (maxUses > 10) {
+        html += `<span class="recharge-info">(${usedCount}/${maxUses})</span>`;
+    }
+
+    return html;
+}
+
+// Toggle a use slot
+function toggleUseSlot(abilityId, slotIndex) {
+    const currentUsed = featureUses[abilityId] || 0;
+
+    if (slotIndex < currentUsed) {
+        // Clicking on a used slot - unuse it and all after
+        featureUses[abilityId] = slotIndex;
+    } else {
+        // Clicking on an unused slot - use up to and including this slot
+        featureUses[abilityId] = slotIndex + 1;
+    }
+
+    updateSidebarActiveAbilities();
+}
+
+// Use an ability
+function useAbility(abilityId) {
+    const abilities = getActiveAbilitiesData();
+    const ability = abilities.find(a => a.id === abilityId);
+
+    if (!ability) return;
+
+    const currentUsed = featureUses[abilityId] || 0;
+
+    if (ability.recharge !== 'Unlimited' && currentUsed >= ability.maxUses) {
+        return; // No uses remaining
+    }
+
+    if (ability.recharge !== 'Unlimited') {
+        featureUses[abilityId] = currentUsed + 1;
+    }
+
+    updateSidebarActiveAbilities();
+
+    // Optional: Show a brief notification
+    showAbilityNotification(ability.name, ability.icon);
+}
+
+// Reset ability uses
+function resetAbilityUses(abilityId) {
+    featureUses[abilityId] = 0;
+    updateSidebarActiveAbilities();
+}
+
+// Get active abilities data (helper for useAbility)
+function getActiveAbilitiesData() {
+    const abilities = [];
+
+    // This would be the same logic as in updateSidebarActiveAbilities
+    // For brevity, we'll get max uses from the DOM or recalculate
+    if (character.race === 'dragonborn') {
+        abilities.push({ id: 'breath-weapon', maxUses: 1, recharge: 'Short Rest' });
+    }
+    if (character.race === 'halfOrc') {
+        abilities.push({ id: 'relentless-endurance', maxUses: 1, recharge: 'Long Rest' });
+    }
+    if (character.class === 'barbarian') {
+        const level = character.level || 1;
+        let rageUses = 2;
+        if (level >= 3) rageUses = 3;
+        if (level >= 6) rageUses = 4;
+        if (level >= 12) rageUses = 5;
+        if (level >= 17) rageUses = 6;
+        if (level >= 20) rageUses = 999;
+        abilities.push({ id: 'rage', maxUses: rageUses, recharge: level >= 20 ? 'Unlimited' : 'Long Rest' });
+    }
+    // Add other abilities as needed...
+
+    return abilities;
+}
+
+// Show ability notification
+function showAbilityNotification(name, icon) {
+    // Create a brief notification
+    const notification = document.createElement('div');
+    notification.className = 'ability-notification';
+    notification.innerHTML = `<span>${icon}</span> ${name} used!`;
+    notification.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, rgba(201, 162, 39, 0.95), rgba(240, 208, 80, 0.95));
+        color: #1a1a2e;
+        border-radius: 8px;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        z-index: 10000;
+        animation: slideIn 0.3s ease, fadeOut 0.3s ease 1.5s forwards;
+    `;
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.remove();
+    }, 2000);
+}
+
+// Update proficiencies section in sidebar
+function updateSidebarProficiencies() {
+    const skillsContainer = document.querySelector('#prof-skills .proficiency-value');
+    const weaponsContainer = document.querySelector('#prof-weapons .proficiency-value');
+    const armorContainer = document.querySelector('#prof-armor .proficiency-value');
+    const toolsContainer = document.querySelector('#prof-tools .proficiency-value');
+    const languagesContainer = document.querySelector('#prof-languages .proficiency-value');
+
+    // Collect proficiencies
+    const skills = [];
+    const weapons = [];
+    const armor = [];
+    const tools = [];
+    const languages = [];
+
+    // Race proficiencies
+    if (character.race) {
+        const race = RACES[character.race];
+
+        // Racial skill proficiencies
+        if (race.skillProficiencies) {
+            skills.push(...race.skillProficiencies);
+        }
+
+        // Racial weapon proficiencies
+        if (race.weaponProficiencies) {
+            weapons.push(...race.weaponProficiencies);
+        }
+
+        // Languages
+        if (race.languages) {
+            languages.push(...race.languages);
+        }
+
+        // Extra languages
+        if (race.extraLanguages) {
+            languages.push(`+${race.extraLanguages} choice`);
+        }
+
+        // Tool proficiency choices
+        if (race.toolProficiencyChoices) {
+            tools.push(`Choice: ${race.toolProficiencyChoices.join(' / ')}`);
+        }
+
+        // Subrace proficiencies
+        if (character.subrace && race.subraces && race.subraces[character.subrace]) {
+            const subrace = race.subraces[character.subrace];
+            if (subrace.weaponProficiencies) {
+                weapons.push(...subrace.weaponProficiencies);
+            }
+            if (subrace.armorProficiencies) {
+                armor.push(...subrace.armorProficiencies);
+            }
+            if (subrace.toolProficiencies) {
+                tools.push(...subrace.toolProficiencies);
+            }
+            if (subrace.extraLanguages) {
+                languages.push(`+${subrace.extraLanguages} choice`);
+            }
+        }
+    }
+
+    // Class proficiencies
+    if (character.class) {
+        const cls = CLASSES[character.class];
+
+        if (cls.armorProficiencies) {
+            armor.push(...cls.armorProficiencies);
+        }
+        if (cls.weaponProficiencies) {
+            weapons.push(...cls.weaponProficiencies);
+        }
+        if (cls.skillChoices) {
+            skills.push(`Choose ${cls.skillChoices.count}: ${cls.skillChoices.options.slice(0, 3).join(', ')}...`);
+        }
+    }
+
+    // Background proficiencies
+    if (character.background) {
+        const bg = BACKGROUNDS[character.background];
+
+        if (bg.skillProficiencies) {
+            skills.push(...bg.skillProficiencies);
+        }
+        if (bg.toolProficiencies) {
+            tools.push(...bg.toolProficiencies);
+        }
+        if (bg.languages) {
+            languages.push(`+${bg.languages} choice`);
+        }
+    }
+
+    // Remove duplicates
+    const uniqueSkills = [...new Set(skills)];
+    const uniqueWeapons = [...new Set(weapons)];
+    const uniqueArmor = [...new Set(armor)];
+    const uniqueTools = [...new Set(tools)];
+    const uniqueLanguages = [...new Set(languages)];
+
+    // Update DOM
+    if (skillsContainer) {
+        skillsContainer.innerHTML = uniqueSkills.length > 0 ?
+            createProficiencyTags(uniqueSkills, 'skill') :
+            '<span class="empty">-</span>';
+    }
+    if (weaponsContainer) {
+        weaponsContainer.innerHTML = uniqueWeapons.length > 0 ?
+            createProficiencyTags(uniqueWeapons, '') :
+            '<span class="empty">-</span>';
+    }
+    if (armorContainer) {
+        armorContainer.innerHTML = uniqueArmor.length > 0 ?
+            createProficiencyTags(uniqueArmor, '') :
+            '<span class="empty">-</span>';
+    }
+    if (toolsContainer) {
+        toolsContainer.innerHTML = uniqueTools.length > 0 ?
+            createProficiencyTags(uniqueTools, 'tool') :
+            '<span class="empty">-</span>';
+    }
+    if (languagesContainer) {
+        languagesContainer.innerHTML = uniqueLanguages.length > 0 ?
+            createProficiencyTags(uniqueLanguages, 'language') :
+            '<span class="empty">-</span>';
+    }
+}
+
+// Create proficiency tags HTML
+function createProficiencyTags(items, type) {
+    return `<div class="proficiency-tags">${items.map(item =>
+        `<span class="prof-tag ${type}">${item}</span>`
+    ).join('')}</div>`;
+}
+
+// Update defenses section in sidebar
+function updateSidebarDefenses() {
+    const resistancesContainer = document.querySelector('#def-resistances .defense-value');
+    const immunitiesContainer = document.querySelector('#def-immunities .defense-value');
+    const advantagesContainer = document.querySelector('#def-advantages .defense-value');
+
+    const resistances = [];
+    const immunities = [];
+    const advantages = [];
+
+    // Race defenses
+    if (character.race) {
+        const race = RACES[character.race];
+
+        if (race.resistances) {
+            resistances.push(...race.resistances);
+        }
+        if (race.immunities) {
+            immunities.push(...race.immunities);
+        }
+        if (race.savingThrowAdvantages) {
+            advantages.push(...race.savingThrowAdvantages);
+        }
+
+        // Subrace defenses
+        if (character.subrace && race.subraces && race.subraces[character.subrace]) {
+            const subrace = race.subraces[character.subrace];
+            if (subrace.resistances) {
+                resistances.push(...subrace.resistances);
+            }
+            if (subrace.immunities) {
+                immunities.push(...subrace.immunities);
+            }
+            if (subrace.savingThrowAdvantages) {
+                advantages.push(...subrace.savingThrowAdvantages);
+            }
+        }
+
+        // Dragonborn damage resistance based on ancestry
+        if (character.race === 'dragonborn' && character.draconicAncestry) {
+            const ancestryKey = character.draconicAncestry.toLowerCase();
+            const ancestry = race.draconicAncestry ? race.draconicAncestry[ancestryKey] : null;
+            if (ancestry && ancestry.resistance) {
+                resistances.push(ancestry.resistance);
+            }
+        }
+    }
+
+    // Class defenses (Barbarian rage resistance, etc.)
+    if (character.class === 'barbarian') {
+        resistances.push('Bludgeoning (while raging)');
+        resistances.push('Piercing (while raging)');
+        resistances.push('Slashing (while raging)');
+    }
+
+    // Remove duplicates
+    const uniqueResistances = [...new Set(resistances)];
+    const uniqueImmunities = [...new Set(immunities)];
+    const uniqueAdvantages = [...new Set(advantages)];
+
+    // Update DOM
+    if (resistancesContainer) {
+        resistancesContainer.innerHTML = uniqueResistances.length > 0 ?
+            createDefenseTags(uniqueResistances, 'resistance') :
+            '<span class="empty">-</span>';
+    }
+    if (immunitiesContainer) {
+        immunitiesContainer.innerHTML = uniqueImmunities.length > 0 ?
+            createDefenseTags(uniqueImmunities, 'immunity') :
+            '<span class="empty">-</span>';
+    }
+    if (advantagesContainer) {
+        advantagesContainer.innerHTML = uniqueAdvantages.length > 0 ?
+            createDefenseTags(uniqueAdvantages, 'advantage') :
+            '<span class="empty">-</span>';
+    }
+}
+
+// Create defense tags HTML
+function createDefenseTags(items, type) {
+    return `<div class="defense-tags">${items.map(item =>
+        `<span class="defense-tag ${type}">${item}</span>`
+    ).join('')}</div>`;
+}
+
+// Toggle feature expand/collapse
+function toggleFeatureExpand(headerElement) {
+    const featureItem = headerElement.closest('.feature-item');
+    if (featureItem) {
+        featureItem.classList.toggle('expanded');
+    }
+}
+
+// Helper function to check if a trait is active (has uses or is usable)
+function isActiveTrait(trait) {
+    const activeKeywords = ['breath weapon', 'once per', 'uses per', 'can use', 'action to'];
+    const nameLower = trait.name.toLowerCase();
+    const descLower = trait.description.toLowerCase();
+
+    return activeKeywords.some(keyword =>
+        nameLower.includes(keyword) || descLower.includes(keyword)
+    );
+}
+
+// Get icon for racial trait
+function getTraitIcon(traitName) {
+    const iconMap = {
+        'darkvision': '&#128065;',
+        'superior darkvision': '&#128065;',
+        'dwarven resilience': '&#128170;',
+        'dwarven combat training': '&#9876;',
+        'tool proficiency': '&#128295;',
+        'stonecunning': '&#128204;',
+        'dwarven toughness': '&#10084;',
+        'dwarven armor training': '&#128737;',
+        'keen senses': '&#128066;',
+        'fey ancestry': '&#10024;',
+        'trance': '&#128164;',
+        'elf weapon training': '&#127993;',
+        'cantrip': '&#10024;',
+        'extra language': '&#128172;',
+        'fleet of foot': '&#128099;',
+        'mask of the wild': '&#127795;',
+        'drow magic': '&#10024;',
+        'drow weapon training': '&#128481;',
+        'sunlight sensitivity': '&#9728;',
+        'lucky': '&#127808;',
+        'brave': '&#129409;',
+        'halfling nimbleness': '&#128099;',
+        'naturally stealthy': '&#128065;',
+        'stout resilience': '&#128170;',
+        'draconic ancestry': '&#128009;',
+        'breath weapon': '&#128293;',
+        'damage resistance': '&#128737;',
+        'gnome cunning': '&#129504;',
+        'natural illusionist': '&#10024;',
+        'speak with small beasts': '&#128054;',
+        'artificer\'s lore': '&#128214;',
+        'tinker': '&#128295;',
+        'skill versatility': '&#10024;',
+        'menacing': '&#128544;',
+        'relentless endurance': '&#128170;',
+        'savage attacks': '&#9876;',
+        'hellish resistance': '&#128293;',
+        'infernal legacy': '&#128520;'
+    };
+
+    const nameLower = traitName.toLowerCase();
+    return iconMap[nameLower] || '&#10038;';
+}
+
+// Get icon for class feature
+function getClassFeatureIcon(featureName) {
+    const iconMap = {
+        'rage': '&#128544;',
+        'unarmored defense': '&#128737;',
+        'reckless attack': '&#9876;',
+        'danger sense': '&#128680;',
+        'extra attack': '&#9876;',
+        'fast movement': '&#128099;',
+        'feral instinct': '&#128058;',
+        'brutal critical': '&#128165;',
+        'relentless rage': '&#128170;',
+        'persistent rage': '&#128293;',
+        'indomitable might': '&#128170;',
+        'primal champion': '&#129409;',
+        'bardic inspiration': '&#127926;',
+        'jack of all trades': '&#10024;',
+        'song of rest': '&#127925;',
+        'expertise': '&#128218;',
+        'font of inspiration': '&#127926;',
+        'countercharm': '&#127925;',
+        'magical secrets': '&#10024;',
+        'superior inspiration': '&#127926;',
+        'spellcasting': '&#10024;',
+        'divine domain': '&#9764;',
+        'channel divinity': '&#9764;',
+        'destroy undead': '&#128128;',
+        'divine intervention': '&#128591;',
+        'druidic': '&#127795;',
+        'wild shape': '&#128058;',
+        'wild shape improvement': '&#128058;',
+        'timeless body': '&#128337;',
+        'beast spells': '&#128058;',
+        'archdruid': '&#127795;',
+        'fighting style': '&#9876;',
+        'second wind': '&#128154;',
+        'action surge': '&#9889;',
+        'martial archetype': '&#9876;',
+        'indomitable': '&#128170;',
+        'unarmored movement': '&#128099;',
+        'ki': '&#9775;',
+        'deflect missiles': '&#127993;',
+        'slow fall': '&#128099;',
+        'stunning strike': '&#128165;',
+        'ki-empowered strikes': '&#10038;',
+        'evasion': '&#128099;',
+        'stillness of mind': '&#128591;',
+        'purity of body': '&#10084;',
+        'tongue of the sun and moon': '&#128172;',
+        'diamond soul': '&#128142;',
+        'empty body': '&#128112;',
+        'perfect self': '&#10024;',
+        'divine sense': '&#128302;',
+        'lay on hands': '&#10084;',
+        'divine smite': '&#9876;',
+        'divine health': '&#10084;',
+        'sacred oath': '&#9764;',
+        'aura of protection': '&#128737;',
+        'aura of courage': '&#129409;',
+        'improved divine smite': '&#9876;',
+        'cleansing touch': '&#10084;',
+        'favored enemy': '&#128065;',
+        'natural explorer': '&#127795;',
+        'primeval awareness': '&#128065;',
+        'ranger archetype': '&#127993;',
+        'land\'s stride': '&#128099;',
+        'hide in plain sight': '&#128065;',
+        'vanish': '&#128065;',
+        'feral senses': '&#128066;',
+        'foe slayer': '&#9876;',
+        'sneak attack': '&#128481;',
+        'thieves\' cant': '&#128172;',
+        'cunning action': '&#128099;',
+        'roguish archetype': '&#128481;',
+        'uncanny dodge': '&#128099;',
+        'reliable talent': '&#10024;',
+        'blindsense': '&#128065;',
+        'slippery mind': '&#129504;',
+        'elusive': '&#128099;',
+        'stroke of luck': '&#127808;',
+        'sorcerous origin': '&#10024;',
+        'font of magic': '&#10024;',
+        'metamagic': '&#10024;',
+        'sorcerous restoration': '&#10024;',
+        'otherworldly patron': '&#128156;',
+        'pact magic': '&#128156;',
+        'eldritch invocations': '&#10024;',
+        'pact boon': '&#128156;',
+        'mystic arcanum': '&#10024;',
+        'eldritch master': '&#10024;',
+        'arcane recovery': '&#10024;',
+        'arcane tradition': '&#10024;',
+        'spell mastery': '&#10024;',
+        'signature spells': '&#10024;'
+    };
+
+    const nameLower = featureName.toLowerCase();
+
+    // Check for exact matches first
+    if (iconMap[nameLower]) {
+        return iconMap[nameLower];
+    }
+
+    // Check for partial matches
+    for (const [key, icon] of Object.entries(iconMap)) {
+        if (nameLower.includes(key)) {
+            return icon;
+        }
+    }
+
+    return '&#10038;'; // Default star icon
+}
+
+// Update all sidebar sections
+function updateAllSidebarSections() {
+    updateSidebarRacialTraits();
+    updateSidebarClassFeatures();
+    updateSidebarActiveAbilities();
+    updateSidebarProficiencies();
+    updateSidebarDefenses();
+}
+
+// Add CSS animation for notification
+const notificationStyles = document.createElement('style');
+notificationStyles.textContent = `
+@keyframes slideIn {
+    from {
+        transform: translateX(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+`;
+document.head.appendChild(notificationStyles);
+
+// Initialize sidebar interactions when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    initSidebarInteractions();
+});

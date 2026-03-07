@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&D Online - Battle Maps</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Map Page Layout */
+        .map-page-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 15px;
+            max-width: 100%;
+            height: calc(100vh - 120px);
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        /* Sidebar Panel */
+        .map-sidebar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(201, 162, 39, 0.3);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sidebar-section {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .sidebar-section h3 {
+            color: #c9a227;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(201, 162, 39, 0.3);
+        }
+
+        /* Map Container */
+        .map-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(201, 162, 39, 0.3);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Map Toolbar */
+        .map-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(201, 162, 39, 0.3);
+            align-items: center;
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 5px;
+            padding-right: 10px;
+            border-right: 1px solid rgba(201, 162, 39, 0.2);
+        }
+
+        .toolbar-group:last-child {
+            border-right: none;
+        }
+
+        .tool-btn {
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            background: rgba(139, 0, 0, 0.6);
+            color: #fff;
+            border: 1px solid rgba(201, 162, 39, 0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tool-btn:hover {
+            background: rgba(139, 0, 0, 0.9);
+            transform: translateY(-1px);
+        }
+
+        .tool-btn.active {
+            background: #c9a227;
+            color: #1a1a2e;
+        }
+
+        .tool-btn.secondary {
+            background: rgba(50, 50, 80, 0.6);
+        }
+
+        .tool-btn.secondary:hover {
+            background: rgba(70, 70, 100, 0.8);
+        }
+
+        /* Map Canvas Area */
+        .map-canvas-wrapper {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: #1a1a2e;
+        }
+
+        #mapCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: grab;
+        }
+
+        #mapCanvas.grabbing {
+            cursor: grabbing;
+        }
+
+        #mapCanvas.placing {
+            cursor: crosshair;
+        }
+
+        /* Grid overlay canvas */
+        #gridCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        /* Token canvas for characters/monsters */
+        #tokenCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        /* Fog of War canvas */
+        #fogCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        /* Map Info Bar */
+        .map-info-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(201, 162, 39, 0.3);
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+
+        .map-info-bar span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Token List */
+        .token-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .token-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .token-item:hover {
+            background: rgba(201, 162, 39, 0.2);
+        }
+
+        .token-item.selected {
+            border: 1px solid #c9a227;
+            background: rgba(201, 162, 39, 0.15);
+        }
+
+        .token-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+        }
+
+        .token-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .token-name {
+            font-weight: bold;
+            color: #fff;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .token-type {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .token-remove {
+            background: rgba(139, 0, 0, 0.6);
+            border: none;
+            color: #fff;
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .token-remove:hover {
+            background: rgba(200, 0, 0, 0.8);
+        }
+
+        /* Add Token Form */
+        .add-token-form {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .form-row input,
+        .form-row select {
+            flex: 1;
+            padding: 8px 10px;
+            border-radius: 5px;
+            border: 1px solid rgba(201, 162, 39, 0.3);
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 0.85rem;
+        }
+
+        .form-row input[type="color"] {
+            width: 40px;
+            padding: 2px;
+            cursor: pointer;
+        }
+
+        .add-token-btn {
+            padding: 10px;
+            background: linear-gradient(145deg, #228b22, #165016);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .add-token-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(34, 139, 34, 0.4);
+        }
+
+        /* Grid Settings */
+        .grid-settings {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .setting-row label {
+            color: #ccc;
+            font-size: 0.85rem;
+        }
+
+        .setting-row input[type="range"] {
+            flex: 1;
+            max-width: 100px;
+        }
+
+        .setting-row input[type="number"] {
+            width: 60px;
+            padding: 5px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(201, 162, 39, 0.3);
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            text-align: center;
+        }
+
+        .setting-row select {
+            padding: 5px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(201, 162, 39, 0.3);
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+        }
+
+        /* Checkbox toggle */
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(100, 100, 100, 0.5);
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: #c9a227;
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Map Library */
+        .map-library {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .map-thumbnail {
+            aspect-ratio: 16/9;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 0.75rem;
+        }
+
+        .map-thumbnail:hover {
+            border-color: rgba(201, 162, 39, 0.5);
+        }
+
+        .map-thumbnail.active {
+            border-color: #c9a227;
+        }
+
+        .map-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Upload Map Button */
+        .upload-map-btn {
+            grid-column: span 2;
+            padding: 15px;
+            background: rgba(50, 50, 80, 0.6);
+            color: #ccc;
+            border: 2px dashed rgba(201, 162, 39, 0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .upload-map-btn:hover {
+            background: rgba(70, 70, 100, 0.6);
+            border-color: rgba(201, 162, 39, 0.5);
+            color: #fff;
+        }
+
+        #mapFileInput {
+            display: none;
+        }
+
+        /* Measurement Display */
+        .measurement-display {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.85);
+            color: #c9a227;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 100;
+            border: 1px solid rgba(201, 162, 39, 0.5);
+            display: none;
+        }
+
+        /* Context Menu */
+        .context-menu {
+            position: absolute;
+            background: rgba(30, 30, 50, 0.95);
+            border: 1px solid rgba(201, 162, 39, 0.5);
+            border-radius: 8px;
+            padding: 5px 0;
+            min-width: 150px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .context-menu-item {
+            padding: 8px 15px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+
+        .context-menu-item:hover {
+            background: rgba(201, 162, 39, 0.2);
+        }
+
+        .context-menu-divider {
+            height: 1px;
+            background: rgba(201, 162, 39, 0.2);
+            margin: 5px 0;
+        }
+
+        /* Zoom Controls */
+        .zoom-controls {
+            position: absolute;
+            bottom: 50px;
+            right: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 50;
+        }
+
+        .zoom-btn {
+            width: 36px;
+            height: 36px;
+            background: rgba(30, 30, 50, 0.9);
+            border: 1px solid rgba(201, 162, 39, 0.3);
+            color: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .zoom-btn:hover {
+            background: rgba(201, 162, 39, 0.3);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 900px) {
+            .map-page-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .map-sidebar {
+                order: 2;
+                max-height: 300px;
+            }
+
+            .map-container {
+                order: 1;
+                height: 60vh;
+                min-height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>D&D Online</h1>
+        <nav class="main-nav">
+            <a href="index.html" class="nav-link">Game Tools</a>
+            <a href="character-creator.html" class="nav-link">Character Creator</a>
+            <a href="characters.html" class="nav-link">My Characters</a>
+            <a href="spells.html" class="nav-link">Spells</a>
+            <a href="monsters.html" class="nav-link">Monsters</a>
+            <a href="monster-builder.html" class="nav-link">Monster Builder</a>
+            <a href="combat.html" class="nav-link">Combat</a>
+            <a href="inventory.html" class="nav-link">Inventory</a>
+            <a href="maps.html" class="nav-link active">Maps</a>
+        </nav>
+    </header>
+
+    <main class="map-page-container">
+        <!-- Sidebar -->
+        <aside class="map-sidebar">
+            <!-- Map Library Section -->
+            <section class="sidebar-section">
+                <h3>Map Library</h3>
+                <div class="map-library" id="mapLibrary">
+                    <div class="map-thumbnail" data-map="blank">Blank Grid</div>
+                    <div class="map-thumbnail" data-map="tavern">Tavern</div>
+                    <div class="map-thumbnail" data-map="dungeon">Dungeon</div>
+                    <div class="map-thumbnail" data-map="forest">Forest</div>
+                    <label class="upload-map-btn">
+                        Upload Custom Map
+                        <input type="file" id="mapFileInput" accept="image/*">
+                    </label>
+                </div>
+            </section>
+
+            <!-- Tokens Section -->
+            <section class="sidebar-section">
+                <h3>Tokens</h3>
+                <div class="add-token-form">
+                    <div class="form-row">
+                        <input type="text" id="tokenName" placeholder="Token name">
+                        <input type="color" id="tokenColor" value="#c9a227">
+                    </div>
+                    <div class="form-row">
+                        <select id="tokenType">
+                            <option value="pc">Player Character</option>
+                            <option value="npc">NPC</option>
+                            <option value="monster">Monster</option>
+                            <option value="object">Object</option>
+                        </select>
+                        <select id="tokenSize">
+                            <option value="1">Medium (1x1)</option>
+                            <option value="0.5">Small (0.5x0.5)</option>
+                            <option value="2">Large (2x2)</option>
+                            <option value="3">Huge (3x3)</option>
+                            <option value="4">Gargantuan (4x4)</option>
+                        </select>
+                    </div>
+                    <button class="add-token-btn" onclick="addToken()">Add Token</button>
+                </div>
+                <div class="token-list" id="tokenList">
+                    <!-- Tokens will be added here dynamically -->
+                </div>
+            </section>
+
+            <!-- Grid Settings Section -->
+            <section class="sidebar-section">
+                <h3>Grid Settings</h3>
+                <div class="grid-settings">
+                    <div class="setting-row">
+                        <label>Show Grid</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="showGrid" checked onchange="updateGrid()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-row">
+                        <label>Grid Size (px)</label>
+                        <input type="number" id="gridSize" value="40" min="20" max="100" onchange="updateGrid()">
+                    </div>
+                    <div class="setting-row">
+                        <label>Grid Type</label>
+                        <select id="gridType" onchange="updateGrid()">
+                            <option value="square">Square</option>
+                            <option value="hex">Hexagonal</option>
+                        </select>
+                    </div>
+                    <div class="setting-row">
+                        <label>Grid Color</label>
+                        <input type="color" id="gridColor" value="#444444" onchange="updateGrid()">
+                    </div>
+                    <div class="setting-row">
+                        <label>Snap to Grid</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="snapToGrid" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Fog of War Section -->
+            <section class="sidebar-section">
+                <h3>Fog of War</h3>
+                <div class="grid-settings">
+                    <div class="setting-row">
+                        <label>Enable Fog</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="enableFog" onchange="toggleFog()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-row">
+                        <label>Brush Size</label>
+                        <input type="range" id="fogBrushSize" min="1" max="5" value="2">
+                    </div>
+                    <div class="form-row">
+                        <button class="tool-btn secondary" onclick="setFogMode('reveal')">Reveal</button>
+                        <button class="tool-btn secondary" onclick="setFogMode('hide')">Hide</button>
+                        <button class="tool-btn secondary" onclick="resetFog()">Reset</button>
+                    </div>
+                </div>
+            </section>
+        </aside>
+
+        <!-- Map Area -->
+        <div class="map-container">
+            <!-- Toolbar -->
+            <div class="map-toolbar">
+                <div class="toolbar-group">
+                    <button class="tool-btn active" id="selectTool" onclick="setTool('select')" title="Select/Move">
+                        <span>Select</span>
+                    </button>
+                    <button class="tool-btn" id="panTool" onclick="setTool('pan')" title="Pan Map">
+                        <span>Pan</span>
+                    </button>
+                    <button class="tool-btn" id="measureTool" onclick="setTool('measure')" title="Measure Distance">
+                        <span>Measure</span>
+                    </button>
+                </div>
+                <div class="toolbar-group">
+                    <button class="tool-btn secondary" onclick="centerMap()" title="Center Map">Center</button>
+                    <button class="tool-btn secondary" onclick="fitToScreen()" title="Fit to Screen">Fit</button>
+                </div>
+                <div class="toolbar-group">
+                    <button class="tool-btn secondary" onclick="clearAllTokens()" title="Clear All Tokens">Clear Tokens</button>
+                    <button class="tool-btn secondary" onclick="saveMapState()" title="Save Map">Save</button>
+                    <button class="tool-btn secondary" onclick="loadMapState()" title="Load Map">Load</button>
+                </div>
+            </div>
+
+            <!-- Canvas Wrapper -->
+            <div class="map-canvas-wrapper" id="canvasWrapper">
+                <canvas id="mapCanvas"></canvas>
+                <canvas id="gridCanvas"></canvas>
+                <canvas id="tokenCanvas"></canvas>
+                <canvas id="fogCanvas"></canvas>
+
+                <!-- Zoom Controls -->
+                <div class="zoom-controls">
+                    <button class="zoom-btn" onclick="zoomIn()" title="Zoom In">+</button>
+                    <button class="zoom-btn" onclick="zoomOut()" title="Zoom Out">-</button>
+                    <button class="zoom-btn" onclick="resetZoom()" title="Reset Zoom">1:1</button>
+                </div>
+
+                <!-- Measurement Display -->
+                <div class="measurement-display" id="measurementDisplay"></div>
+            </div>
+
+            <!-- Info Bar -->
+            <div class="map-info-bar">
+                <span id="coordDisplay">Position: 0, 0</span>
+                <span id="zoomDisplay">Zoom: 100%</span>
+                <span id="gridInfo">Grid: 5ft squares</span>
+            </div>
+        </div>
+
+        <!-- Context Menu -->
+        <div class="context-menu" id="contextMenu">
+            <div class="context-menu-item" onclick="editToken()">Edit Token</div>
+            <div class="context-menu-item" onclick="duplicateToken()">Duplicate</div>
+            <div class="context-menu-divider"></div>
+            <div class="context-menu-item" onclick="bringToFront()">Bring to Front</div>
+            <div class="context-menu-item" onclick="sendToBack()">Send to Back</div>
+            <div class="context-menu-divider"></div>
+            <div class="context-menu-item" onclick="deleteToken()">Delete</div>
+        </div>
+    </main>
+
+    <script>
+        // ==========================================
+        // MAP SYSTEM - STATE & CONFIGURATION
+        // ==========================================
+
+        const state = {
+            // Canvas elements
+            mapCanvas: null,
+            gridCanvas: null,
+            tokenCanvas: null,
+            fogCanvas: null,
+            mapCtx: null,
+            gridCtx: null,
+            tokenCtx: null,
+            fogCtx: null,
+
+            // Map state
+            mapImage: null,
+            mapOffset: { x: 0, y: 0 },
+            zoom: 1,
+            minZoom: 0.25,
+            maxZoom: 4,
+
+            // Grid settings
+            gridSize: 40,
+            showGrid: true,
+            gridType: 'square',
+            gridColor: '#444444',
+            snapToGrid: true,
+
+            // Tools
+            currentTool: 'select',
+            isDragging: false,
+            dragStart: { x: 0, y: 0 },
+            lastMousePos: { x: 0, y: 0 },
+
+            // Tokens
+            tokens: [],
+            selectedToken: null,
+            hoveredToken: null,
+
+            // Measurement
+            measureStart: null,
+            measureEnd: null,
+
+            // Fog of War
+            fogEnabled: false,
+            fogMode: 'reveal',
+            fogBrushSize: 2,
+            fogData: null
+        };
+
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+
+        function init() {
+            // Get canvas elements
+            state.mapCanvas = document.getElementById('mapCanvas');
+            state.gridCanvas = document.getElementById('gridCanvas');
+            state.tokenCanvas = document.getElementById('tokenCanvas');
+            state.fogCanvas = document.getElementById('fogCanvas');
+
+            state.mapCtx = state.mapCanvas.getContext('2d');
+            state.gridCtx = state.gridCanvas.getContext('2d');
+            state.tokenCtx = state.tokenCanvas.getContext('2d');
+            state.fogCtx = state.fogCanvas.getContext('2d');
+
+            // Set canvas sizes
+            resizeCanvases();
+            window.addEventListener('resize', resizeCanvases);
+
+            // Set up event listeners
+            setupEventListeners();
+
+            // Initial render
+            render();
+
+            // Load saved state if exists
+            loadFromLocalStorage();
+        }
+
+        function resizeCanvases() {
+            const wrapper = document.getElementById('canvasWrapper');
+            const width = wrapper.clientWidth;
+            const height = wrapper.clientHeight;
+
+            [state.mapCanvas, state.gridCanvas, state.tokenCanvas, state.fogCanvas].forEach(canvas => {
+                canvas.width = width;
+                canvas.height = height;
+            });
+
+            render();
+        }
+
+        function setupEventListeners() {
+            const tokenCanvas = state.tokenCanvas;
+
+            // Mouse events
+            tokenCanvas.addEventListener('mousedown', handleMouseDown);
+            tokenCanvas.addEventListener('mousemove', handleMouseMove);
+            tokenCanvas.addEventListener('mouseup', handleMouseUp);
+            tokenCanvas.addEventListener('mouseleave', handleMouseUp);
+            tokenCanvas.addEventListener('wheel', handleWheel);
+            tokenCanvas.addEventListener('contextmenu', handleContextMenu);
+
+            // Double click for editing
+            tokenCanvas.addEventListener('dblclick', handleDoubleClick);
+
+            // Map upload
+            document.getElementById('mapFileInput').addEventListener('change', handleMapUpload);
+
+            // Map thumbnails
+            document.querySelectorAll('.map-thumbnail').forEach(thumb => {
+                thumb.addEventListener('click', () => selectMapPreset(thumb.dataset.map));
+            });
+
+            // Close context menu on click elsewhere
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.context-menu')) {
+                    document.getElementById('contextMenu').style.display = 'none';
+                }
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', handleKeyDown);
+        }
+
+        // ==========================================
+        // EVENT HANDLERS
+        // ==========================================
+
+        function handleMouseDown(e) {
+            const pos = getMousePos(e);
+            state.dragStart = pos;
+            state.isDragging = true;
+
+            if (state.currentTool === 'select') {
+                const token = getTokenAtPosition(pos);
+                if (token) {
+                    selectToken(token);
+                    state.tokenDragOffset = {
+                        x: pos.x - token.x,
+                        y: pos.y - token.y
+                    };
+                } else {
+                    state.selectedToken = null;
+                    updateTokenList();
+                }
+            } else if (state.currentTool === 'measure') {
+                state.measureStart = pos;
+                state.measureEnd = pos;
+            } else if (state.currentTool === 'pan') {
+                state.tokenCanvas.classList.add('grabbing');
+            }
+
+            render();
+        }
+
+        function handleMouseMove(e) {
+            const pos = getMousePos(e);
+            state.lastMousePos = pos;
+
+            // Update coordinate display
+            const gridX = Math.floor(pos.x / state.gridSize);
+            const gridY = Math.floor(pos.y / state.gridSize);
+            document.getElementById('coordDisplay').textContent = `Position: ${gridX}, ${gridY}`;
+
+            if (state.isDragging) {
+                if (state.currentTool === 'select' && state.selectedToken) {
+                    // Move selected token
+                    let newX = pos.x - state.tokenDragOffset.x;
+                    let newY = pos.y - state.tokenDragOffset.y;
+
+                    if (state.snapToGrid) {
+                        newX = Math.round(newX / state.gridSize) * state.gridSize;
+                        newY = Math.round(newY / state.gridSize) * state.gridSize;
+                    }
+
+                    state.selectedToken.x = newX;
+                    state.selectedToken.y = newY;
+                } else if (state.currentTool === 'pan') {
+                    // Pan the map
+                    const dx = pos.x - state.dragStart.x;
+                    const dy = pos.y - state.dragStart.y;
+                    state.mapOffset.x += dx;
+                    state.mapOffset.y += dy;
+                    state.dragStart = pos;
+                } else if (state.currentTool === 'measure') {
+                    state.measureEnd = pos;
+                    updateMeasurement();
+                }
+
+                render();
+            } else {
+                // Hover detection
+                const token = getTokenAtPosition(pos);
+                if (token !== state.hoveredToken) {
+                    state.hoveredToken = token;
+                    state.tokenCanvas.style.cursor = token ? 'pointer' : 'default';
+                }
+            }
+
+            // Fog of war painting
+            if (state.fogEnabled && state.isDragging && (state.currentTool === 'select' || state.currentTool === 'pan')) {
+                // Could add fog painting here
+            }
+        }
+
+        function handleMouseUp(e) {
+            state.isDragging = false;
+            state.tokenCanvas.classList.remove('grabbing');
+
+            if (state.currentTool === 'measure' && state.measureStart) {
+                // Keep measurement visible for a moment
+                setTimeout(() => {
+                    state.measureStart = null;
+                    state.measureEnd = null;
+                    document.getElementById('measurementDisplay').style.display = 'none';
+                    render();
+                }, 2000);
+            }
+
+            saveToLocalStorage();
+        }
+
+        function handleWheel(e) {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            const newZoom = Math.max(state.minZoom, Math.min(state.maxZoom, state.zoom + delta));
+
+            if (newZoom !== state.zoom) {
+                const pos = getMousePos(e);
+                // Zoom towards mouse position
+                const zoomFactor = newZoom / state.zoom;
+                state.mapOffset.x = pos.x - (pos.x - state.mapOffset.x) * zoomFactor;
+                state.mapOffset.y = pos.y - (pos.y - state.mapOffset.y) * zoomFactor;
+                state.zoom = newZoom;
+
+                document.getElementById('zoomDisplay').textContent = `Zoom: ${Math.round(state.zoom * 100)}%`;
+                render();
+            }
+        }
+
+        function handleContextMenu(e) {
+            e.preventDefault();
+            const pos = getMousePos(e);
+            const token = getTokenAtPosition(pos);
+
+            if (token) {
+                selectToken(token);
+                const menu = document.getElementById('contextMenu');
+                menu.style.left = e.pageX + 'px';
+                menu.style.top = e.pageY + 'px';
+                menu.style.display = 'block';
+            }
+        }
+
+        function handleDoubleClick(e) {
+            const pos = getMousePos(e);
+            const token = getTokenAtPosition(pos);
+
+            if (token) {
+                editToken(token);
+            }
+        }
+
+        function handleKeyDown(e) {
+            if (e.key === 'Delete' && state.selectedToken) {
+                deleteToken();
+            } else if (e.key === 'Escape') {
+                state.selectedToken = null;
+                document.getElementById('contextMenu').style.display = 'none';
+                render();
+            } else if (e.key === '1') {
+                setTool('select');
+            } else if (e.key === '2') {
+                setTool('pan');
+            } else if (e.key === '3') {
+                setTool('measure');
+            }
+        }
+
+        function handleMapUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        state.mapImage = img;
+                        centerMap();
+                        render();
+                        saveToLocalStorage();
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // ==========================================
+        // UTILITY FUNCTIONS
+        // ==========================================
+
+        function getMousePos(e) {
+            const rect = state.tokenCanvas.getBoundingClientRect();
+            return {
+                x: (e.clientX - rect.left - state.mapOffset.x) / state.zoom,
+                y: (e.clientY - rect.top - state.mapOffset.y) / state.zoom
+            };
+        }
+
+        function getTokenAtPosition(pos) {
+            // Check in reverse order (top tokens first)
+            for (let i = state.tokens.length - 1; i >= 0; i--) {
+                const token = state.tokens[i];
+                const size = token.size * state.gridSize;
+                if (pos.x >= token.x && pos.x <= token.x + size &&
+                    pos.y >= token.y && pos.y <= token.y + size) {
+                    return token;
+                }
+            }
+            return null;
+        }
+
+        // ==========================================
+        // RENDERING
+        // ==========================================
+
+        function render() {
+            renderMap();
+            renderGrid();
+            renderTokens();
+            renderFog();
+            renderMeasurement();
+        }
+
+        function renderMap() {
+            const ctx = state.mapCtx;
+            const canvas = state.mapCanvas;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            if (state.mapImage) {
+                ctx.save();
+                ctx.translate(state.mapOffset.x, state.mapOffset.y);
+                ctx.scale(state.zoom, state.zoom);
+                ctx.drawImage(state.mapImage, 0, 0);
+                ctx.restore();
+            }
+        }
+
+        function renderGrid() {
+            if (!state.showGrid) {
+                state.gridCtx.clearRect(0, 0, state.gridCanvas.width, state.gridCanvas.height);
+                return;
+            }
+
+            const ctx = state.gridCtx;
+            const canvas = state.gridCanvas;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+            ctx.translate(state.mapOffset.x, state.mapOffset.y);
+            ctx.scale(state.zoom, state.zoom);
+
+            ctx.strokeStyle = state.gridColor;
+            ctx.lineWidth = 1 / state.zoom;
+
+            const gridSize = state.gridSize;
+            const startX = Math.floor(-state.mapOffset.x / state.zoom / gridSize) * gridSize;
+            const startY = Math.floor(-state.mapOffset.y / state.zoom / gridSize) * gridSize;
+            const endX = startX + canvas.width / state.zoom + gridSize * 2;
+            const endY = startY + canvas.height / state.zoom + gridSize * 2;
+
+            if (state.gridType === 'square') {
+                ctx.beginPath();
+                for (let x = startX; x <= endX; x += gridSize) {
+                    ctx.moveTo(x, startY);
+                    ctx.lineTo(x, endY);
+                }
+                for (let y = startY; y <= endY; y += gridSize) {
+                    ctx.moveTo(startX, y);
+                    ctx.lineTo(endX, y);
+                }
+                ctx.stroke();
+            } else {
+                // Hexagonal grid
+                const hexHeight = gridSize;
+                const hexWidth = hexHeight * Math.sqrt(3);
+                const vertDist = hexHeight * 0.75;
+
+                for (let row = Math.floor(startY / vertDist) - 1; row <= Math.ceil(endY / vertDist) + 1; row++) {
+                    for (let col = Math.floor(startX / hexWidth) - 1; col <= Math.ceil(endX / hexWidth) + 1; col++) {
+                        const offsetX = (row % 2) * (hexWidth / 2);
+                        const x = col * hexWidth + offsetX;
+                        const y = row * vertDist;
+                        drawHexagon(ctx, x, y, gridSize / 2);
+                    }
+                }
+            }
+
+            ctx.restore();
+        }
+
+        function drawHexagon(ctx, x, y, size) {
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const angle = (Math.PI / 3) * i - Math.PI / 6;
+                const hx = x + size * Math.cos(angle);
+                const hy = y + size * Math.sin(angle);
+                if (i === 0) {
+                    ctx.moveTo(hx, hy);
+                } else {
+                    ctx.lineTo(hx, hy);
+                }
+            }
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        function renderTokens() {
+            const ctx = state.tokenCtx;
+            const canvas = state.tokenCanvas;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+            ctx.translate(state.mapOffset.x, state.mapOffset.y);
+            ctx.scale(state.zoom, state.zoom);
+
+            state.tokens.forEach(token => {
+                const size = token.size * state.gridSize;
+                const centerX = token.x + size / 2;
+                const centerY = token.y + size / 2;
+                const radius = size / 2 - 2;
+
+                // Token circle
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.fillStyle = token.color;
+                ctx.fill();
+
+                // Border
+                ctx.strokeStyle = token === state.selectedToken ? '#fff' : 'rgba(0,0,0,0.5)';
+                ctx.lineWidth = token === state.selectedToken ? 3 / state.zoom : 2 / state.zoom;
+                ctx.stroke();
+
+                // Token type indicator
+                if (token.type === 'pc') {
+                    ctx.strokeStyle = '#4a9eff';
+                    ctx.lineWidth = 2 / state.zoom;
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius + 3, 0, Math.PI * 2);
+                    ctx.stroke();
+                } else if (token.type === 'monster') {
+                    ctx.strokeStyle = '#ff4a4a';
+                    ctx.lineWidth = 2 / state.zoom;
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius + 3, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+
+                // Token name
+                const fontSize = Math.max(10, 12 / state.zoom);
+                ctx.font = `bold ${fontSize}px Arial`;
+                ctx.fillStyle = '#fff';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                // Shorten name if needed
+                let name = token.name;
+                if (name.length > 8 && size < 80) {
+                    name = name.substring(0, 6) + '...';
+                }
+
+                // Text shadow for readability
+                ctx.strokeStyle = 'rgba(0,0,0,0.7)';
+                ctx.lineWidth = 3 / state.zoom;
+                ctx.strokeText(name, centerX, centerY);
+                ctx.fillText(name, centerX, centerY);
+            });
+
+            ctx.restore();
+        }
+
+        function renderFog() {
+            if (!state.fogEnabled) {
+                state.fogCtx.clearRect(0, 0, state.fogCanvas.width, state.fogCanvas.height);
+                return;
+            }
+
+            const ctx = state.fogCtx;
+            const canvas = state.fogCanvas;
+
+            if (!state.fogData) {
+                initFog();
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.translate(state.mapOffset.x, state.mapOffset.y);
+            ctx.scale(state.zoom, state.zoom);
+
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+
+            const gridSize = state.gridSize;
+            for (let y = 0; y < state.fogData.length; y++) {
+                for (let x = 0; x < state.fogData[y].length; x++) {
+                    if (state.fogData[y][x]) {
+                        ctx.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);
+                    }
+                }
+            }
+
+            ctx.restore();
+        }
+
+        function renderMeasurement() {
+            if (!state.measureStart || !state.measureEnd) return;
+
+            const ctx = state.tokenCtx;
+            ctx.save();
+            ctx.translate(state.mapOffset.x, state.mapOffset.y);
+            ctx.scale(state.zoom, state.zoom);
+
+            // Draw measurement line
+            ctx.beginPath();
+            ctx.moveTo(state.measureStart.x, state.measureStart.y);
+            ctx.lineTo(state.measureEnd.x, state.measureEnd.y);
+            ctx.strokeStyle = '#c9a227';
+            ctx.lineWidth = 3 / state.zoom;
+            ctx.setLineDash([10 / state.zoom, 5 / state.zoom]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw endpoints
+            ctx.fillStyle = '#c9a227';
+            ctx.beginPath();
+            ctx.arc(state.measureStart.x, state.measureStart.y, 5 / state.zoom, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(state.measureEnd.x, state.measureEnd.y, 5 / state.zoom, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function updateMeasurement() {
+            if (!state.measureStart || !state.measureEnd) return;
+
+            const dx = state.measureEnd.x - state.measureStart.x;
+            const dy = state.measureEnd.y - state.measureStart.y;
+            const pixelDistance = Math.sqrt(dx * dx + dy * dy);
+            const squares = pixelDistance / state.gridSize;
+            const feet = Math.round(squares * 5);
+
+            const display = document.getElementById('measurementDisplay');
+            display.textContent = `${feet} ft (${squares.toFixed(1)} squares)`;
+            display.style.display = 'block';
+
+            // Position near the end point
+            const rect = state.tokenCanvas.getBoundingClientRect();
+            display.style.left = (state.measureEnd.x * state.zoom + state.mapOffset.x + 15) + 'px';
+            display.style.top = (state.measureEnd.y * state.zoom + state.mapOffset.y - 15) + 'px';
+        }
+
+        // ==========================================
+        // TOKEN FUNCTIONS
+        // ==========================================
+
+        function addToken() {
+            const name = document.getElementById('tokenName').value.trim() || 'Token';
+            const color = document.getElementById('tokenColor').value;
+            const type = document.getElementById('tokenType').value;
+            const size = parseFloat(document.getElementById('tokenSize').value);
+
+            const token = {
+                id: Date.now(),
+                name: name,
+                color: color,
+                type: type,
+                size: size,
+                x: state.gridSize * 2,
+                y: state.gridSize * 2
+            };
+
+            state.tokens.push(token);
+            selectToken(token);
+            updateTokenList();
+            render();
+            saveToLocalStorage();
+
+            // Clear input
+            document.getElementById('tokenName').value = '';
+        }
+
+        function selectToken(token) {
+            state.selectedToken = token;
+            updateTokenList();
+            render();
+        }
+
+        function updateTokenList() {
+            const list = document.getElementById('tokenList');
+            list.innerHTML = '';
+
+            state.tokens.forEach(token => {
+                const item = document.createElement('div');
+                item.className = 'token-item' + (token === state.selectedToken ? ' selected' : '');
+                item.innerHTML = `
+                    <div class="token-color" style="background-color: ${token.color}"></div>
+                    <div class="token-info">
+                        <div class="token-name">${token.name}</div>
+                        <div class="token-type">${token.type.toUpperCase()}</div>
+                    </div>
+                    <button class="token-remove" onclick="removeToken(${token.id})">&times;</button>
+                `;
+                item.onclick = (e) => {
+                    if (!e.target.closest('.token-remove')) {
+                        selectToken(token);
+                    }
+                };
+                list.appendChild(item);
+            });
+        }
+
+        function removeToken(id) {
+            state.tokens = state.tokens.filter(t => t.id !== id);
+            if (state.selectedToken && state.selectedToken.id === id) {
+                state.selectedToken = null;
+            }
+            updateTokenList();
+            render();
+            saveToLocalStorage();
+        }
+
+        function deleteToken() {
+            if (state.selectedToken) {
+                removeToken(state.selectedToken.id);
+            }
+            document.getElementById('contextMenu').style.display = 'none';
+        }
+
+        function editToken(token = state.selectedToken) {
+            if (!token) return;
+
+            const newName = prompt('Token name:', token.name);
+            if (newName !== null) {
+                token.name = newName;
+                updateTokenList();
+                render();
+                saveToLocalStorage();
+            }
+            document.getElementById('contextMenu').style.display = 'none';
+        }
+
+        function duplicateToken() {
+            if (!state.selectedToken) return;
+
+            const newToken = {
+                ...state.selectedToken,
+                id: Date.now(),
+                name: state.selectedToken.name + ' (copy)',
+                x: state.selectedToken.x + state.gridSize,
+                y: state.selectedToken.y + state.gridSize
+            };
+
+            state.tokens.push(newToken);
+            selectToken(newToken);
+            updateTokenList();
+            render();
+            saveToLocalStorage();
+            document.getElementById('contextMenu').style.display = 'none';
+        }
+
+        function bringToFront() {
+            if (!state.selectedToken) return;
+            const index = state.tokens.indexOf(state.selectedToken);
+            if (index > -1) {
+                state.tokens.splice(index, 1);
+                state.tokens.push(state.selectedToken);
+                render();
+                saveToLocalStorage();
+            }
+            document.getElementById('contextMenu').style.display = 'none';
+        }
+
+        function sendToBack() {
+            if (!state.selectedToken) return;
+            const index = state.tokens.indexOf(state.selectedToken);
+            if (index > -1) {
+                state.tokens.splice(index, 1);
+                state.tokens.unshift(state.selectedToken);
+                render();
+                saveToLocalStorage();
+            }
+            document.getElementById('contextMenu').style.display = 'none';
+        }
+
+        function clearAllTokens() {
+            if (confirm('Remove all tokens from the map?')) {
+                state.tokens = [];
+                state.selectedToken = null;
+                updateTokenList();
+                render();
+                saveToLocalStorage();
+            }
+        }
+
+        // ==========================================
+        // TOOL FUNCTIONS
+        // ==========================================
+
+        function setTool(tool) {
+            state.currentTool = tool;
+            document.querySelectorAll('.toolbar-group .tool-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(tool + 'Tool').classList.add('active');
+
+            // Update cursor
+            if (tool === 'pan') {
+                state.tokenCanvas.style.cursor = 'grab';
+            } else if (tool === 'measure') {
+                state.tokenCanvas.style.cursor = 'crosshair';
+            } else {
+                state.tokenCanvas.style.cursor = 'default';
+            }
+        }
+
+        // ==========================================
+        // VIEW FUNCTIONS
+        // ==========================================
+
+        function zoomIn() {
+            state.zoom = Math.min(state.maxZoom, state.zoom + 0.25);
+            document.getElementById('zoomDisplay').textContent = `Zoom: ${Math.round(state.zoom * 100)}%`;
+            render();
+        }
+
+        function zoomOut() {
+            state.zoom = Math.max(state.minZoom, state.zoom - 0.25);
+            document.getElementById('zoomDisplay').textContent = `Zoom: ${Math.round(state.zoom * 100)}%`;
+            render();
+        }
+
+        function resetZoom() {
+            state.zoom = 1;
+            document.getElementById('zoomDisplay').textContent = 'Zoom: 100%';
+            render();
+        }
+
+        function centerMap() {
+            const canvas = state.mapCanvas;
+            if (state.mapImage) {
+                state.mapOffset.x = (canvas.width - state.mapImage.width * state.zoom) / 2;
+                state.mapOffset.y = (canvas.height - state.mapImage.height * state.zoom) / 2;
+            } else {
+                state.mapOffset.x = 0;
+                state.mapOffset.y = 0;
+            }
+            render();
+        }
+
+        function fitToScreen() {
+            if (!state.mapImage) return;
+
+            const canvas = state.mapCanvas;
+            const scaleX = canvas.width / state.mapImage.width;
+            const scaleY = canvas.height / state.mapImage.height;
+            state.zoom = Math.min(scaleX, scaleY) * 0.9;
+            state.zoom = Math.max(state.minZoom, Math.min(state.maxZoom, state.zoom));
+
+            centerMap();
+            document.getElementById('zoomDisplay').textContent = `Zoom: ${Math.round(state.zoom * 100)}%`;
+        }
+
+        // ==========================================
+        // GRID FUNCTIONS
+        // ==========================================
+
+        function updateGrid() {
+            state.showGrid = document.getElementById('showGrid').checked;
+            state.gridSize = parseInt(document.getElementById('gridSize').value) || 40;
+            state.gridType = document.getElementById('gridType').value;
+            state.gridColor = document.getElementById('gridColor').value;
+            state.snapToGrid = document.getElementById('snapToGrid').checked;
+
+            const unit = state.gridSize === 40 ? '5ft' : `${Math.round(state.gridSize / 8)}ft`;
+            document.getElementById('gridInfo').textContent = `Grid: ${unit} ${state.gridType}s`;
+
+            render();
+            saveToLocalStorage();
+        }
+
+        // ==========================================
+        // FOG OF WAR FUNCTIONS
+        // ==========================================
+
+        function initFog() {
+            const cols = Math.ceil(state.mapCanvas.width / state.gridSize) + 10;
+            const rows = Math.ceil(state.mapCanvas.height / state.gridSize) + 10;
+            state.fogData = Array(rows).fill(null).map(() => Array(cols).fill(true));
+        }
+
+        function toggleFog() {
+            state.fogEnabled = document.getElementById('enableFog').checked;
+            if (state.fogEnabled && !state.fogData) {
+                initFog();
+            }
+            render();
+        }
+
+        function setFogMode(mode) {
+            state.fogMode = mode;
+        }
+
+        function resetFog() {
+            initFog();
+            render();
+        }
+
+        // ==========================================
+        // MAP PRESETS
+        // ==========================================
+
+        function selectMapPreset(mapType) {
+            document.querySelectorAll('.map-thumbnail').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-map="${mapType}"]`).classList.add('active');
+
+            if (mapType === 'blank') {
+                state.mapImage = null;
+            } else {
+                // For now, create colored placeholder backgrounds
+                const canvas = document.createElement('canvas');
+                canvas.width = 800;
+                canvas.height = 600;
+                const ctx = canvas.getContext('2d');
+
+                const colors = {
+                    tavern: '#4a3728',
+                    dungeon: '#2a2a2a',
+                    forest: '#2d4a2d'
+                };
+
+                ctx.fillStyle = colors[mapType] || '#333';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Add some texture/pattern
+                ctx.fillStyle = 'rgba(0,0,0,0.1)';
+                for (let i = 0; i < 100; i++) {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height;
+                    ctx.fillRect(x, y, 5, 5);
+                }
+
+                const img = new Image();
+                img.src = canvas.toDataURL();
+                img.onload = () => {
+                    state.mapImage = img;
+                    centerMap();
+                    render();
+                };
+            }
+
+            render();
+        }
+
+        // ==========================================
+        // SAVE/LOAD FUNCTIONS
+        // ==========================================
+
+        function saveToLocalStorage() {
+            const data = {
+                tokens: state.tokens,
+                gridSize: state.gridSize,
+                showGrid: state.showGrid,
+                gridType: state.gridType,
+                gridColor: state.gridColor,
+                snapToGrid: state.snapToGrid,
+                mapImage: state.mapImage ? state.mapImage.src : null,
+                mapOffset: state.mapOffset,
+                zoom: state.zoom
+            };
+            localStorage.setItem('dnd-map-state', JSON.stringify(data));
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('dnd-map-state');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    state.tokens = data.tokens || [];
+                    state.gridSize = data.gridSize || 40;
+                    state.showGrid = data.showGrid !== false;
+                    state.gridType = data.gridType || 'square';
+                    state.gridColor = data.gridColor || '#444444';
+                    state.snapToGrid = data.snapToGrid !== false;
+                    state.mapOffset = data.mapOffset || { x: 0, y: 0 };
+                    state.zoom = data.zoom || 1;
+
+                    // Update UI
+                    document.getElementById('showGrid').checked = state.showGrid;
+                    document.getElementById('gridSize').value = state.gridSize;
+                    document.getElementById('gridType').value = state.gridType;
+                    document.getElementById('gridColor').value = state.gridColor;
+                    document.getElementById('snapToGrid').checked = state.snapToGrid;
+                    document.getElementById('zoomDisplay').textContent = `Zoom: ${Math.round(state.zoom * 100)}%`;
+
+                    if (data.mapImage) {
+                        const img = new Image();
+                        img.onload = () => {
+                            state.mapImage = img;
+                            render();
+                        };
+                        img.src = data.mapImage;
+                    }
+
+                    updateTokenList();
+                    render();
+                } catch (e) {
+                    console.error('Error loading map state:', e);
+                }
+            }
+        }
+
+        function saveMapState() {
+            const data = {
+                tokens: state.tokens,
+                gridSettings: {
+                    size: state.gridSize,
+                    type: state.gridType,
+                    color: state.gridColor,
+                    show: state.showGrid,
+                    snap: state.snapToGrid
+                }
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'dnd-map-' + new Date().toISOString().slice(0, 10) + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function loadMapState() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const data = JSON.parse(event.target.result);
+                            state.tokens = data.tokens || [];
+                            if (data.gridSettings) {
+                                state.gridSize = data.gridSettings.size || 40;
+                                state.gridType = data.gridSettings.type || 'square';
+                                state.gridColor = data.gridSettings.color || '#444444';
+                                state.showGrid = data.gridSettings.show !== false;
+                                state.snapToGrid = data.gridSettings.snap !== false;
+
+                                // Update UI
+                                document.getElementById('showGrid').checked = state.showGrid;
+                                document.getElementById('gridSize').value = state.gridSize;
+                                document.getElementById('gridType').value = state.gridType;
+                                document.getElementById('gridColor').value = state.gridColor;
+                                document.getElementById('snapToGrid').checked = state.snapToGrid;
+                            }
+                            updateTokenList();
+                            render();
+                            saveToLocalStorage();
+                        } catch (err) {
+                            alert('Error loading map file');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
