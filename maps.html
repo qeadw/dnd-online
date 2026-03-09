@@ -1642,7 +1642,8 @@
 
         function selectMapPreset(mapType) {
             document.querySelectorAll('.map-thumbnail').forEach(t => t.classList.remove('active'));
-            document.querySelector(`[data-map="${mapType}"]`).classList.add('active');
+            const mapEl = document.querySelector(`[data-map="${mapType}"]`);
+            if (mapEl) mapEl.classList.add('active');
 
             if (mapType === 'blank') {
                 state.mapImage = null;

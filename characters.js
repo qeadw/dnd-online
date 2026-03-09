@@ -434,7 +434,7 @@ function renderProficiencies(char) {
         <div class="sheet-section">
             <h3>Proficiencies</h3>
             <ul>
-                <li><strong>Saving Throws:</strong> ${cls ? cls.savingThrows.map(s => s.toUpperCase()).join(', ') : '-'}</li>
+                <li><strong>Saving Throws:</strong> ${cls && cls.savingThrows ? cls.savingThrows.map(s => s.toUpperCase()).join(', ') : '-'}</li>
                 <li><strong>Armor:</strong> ${armor.length ? armor.join(', ') : 'None'}</li>
                 <li><strong>Weapons:</strong> ${weapons.length ? [...new Set(weapons)].join(', ') : 'None'}</li>
                 <li><strong>Tools:</strong> ${tools.length ? tools.join(', ') : 'None'}</li>
@@ -463,12 +463,12 @@ function renderRacialTraits(char) {
     // Dragonborn ancestry
     let ancestryInfo = '';
     if (char.race === 'dragonborn' && char.draconicAncestry) {
-        const ancestry = race.draconicAncestry.find(a => a.dragon === char.draconicAncestry);
+        const ancestry = race.draconicAncestry[char.draconicAncestry.toLowerCase()];
         if (ancestry) {
             ancestryInfo = `
                 <div class="feature-item">
-                    <h4>Draconic Ancestry: ${ancestry.dragon}</h4>
-                    <p>Damage Type: ${ancestry.damageType}<br>Breath Weapon: ${ancestry.breathWeapon}</p>
+                    <h4>Draconic Ancestry: ${ancestry.name}</h4>
+                    <p>Damage Type: ${ancestry.damageType}<br>Breath Weapon: ${ancestry.breathWeapon && typeof ancestry.breathWeapon === 'object' ? `${ancestry.breathWeapon.size} ${ancestry.breathWeapon.shape} (${ancestry.breathWeapon.savingThrow} save)` : ancestry.breathWeapon}</p>
                 </div>
             `;
         }
@@ -616,7 +616,7 @@ function renderSpellcasting(char, abilities) {
         slotType = 'warlock';
     }
 
-    const slots = SPELL_SLOTS[slotType][level] || [0,0,0,0,0,0,0,0,0];
+    const slots = (SPELL_SLOTS[slotType] || {})[level] || [0,0,0,0,0,0,0,0,0];
 
     // Get cantrips known
     let cantrips = 0;

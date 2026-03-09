@@ -262,17 +262,24 @@ function selectRace(raceKey) {
         const select = document.getElementById('ancestry-select');
         select.innerHTML = '<option value="">-- Select Ancestry --</option>';
 
-        race.draconicAncestry.forEach(ancestry => {
-            select.innerHTML += `<option value="${ancestry.dragon}">${ancestry.dragon} - ${ancestry.damageType}</option>`;
+        Object.entries(race.draconicAncestry).forEach(([key, ancestry]) => {
+            select.innerHTML += `<option value="${ancestry.name}">${ancestry.name} - ${ancestry.damageType}</option>`;
         });
 
-        select.addEventListener('change', (e) => {
+        // Remove old listener to prevent accumulation
+        const newSelect = select.cloneNode(true);
+        select.parentNode.replaceChild(newSelect, select);
+        newSelect.addEventListener('change', (e) => {
             character.draconicAncestry = e.target.value;
-            const ancestry = race.draconicAncestry.find(a => a.dragon === e.target.value);
+            const ancestryKey = e.target.value.toLowerCase();
+            const ancestry = race.draconicAncestry[ancestryKey];
             if (ancestry) {
+                const breathDesc = ancestry.breathWeapon
+                    ? `${ancestry.breathWeapon.size} ${ancestry.breathWeapon.shape} (${ancestry.breathWeapon.savingThrow} save)`
+                    : '';
                 document.getElementById('ancestry-details').innerHTML = `
                     <strong>Damage Type:</strong> ${ancestry.damageType}<br>
-                    <strong>Breath Weapon:</strong> ${ancestry.breathWeapon}
+                    <strong>Breath Weapon:</strong> ${breathDesc}
                 `;
             }
             updateSummary();
@@ -1332,7 +1339,7 @@ function updateSummary() {
             speed += RACES[character.race].subraces[character.subrace].speedBonus;
         }
     }
-    document.getElementById('sum-speed').textContent = speed;
+    document.getElementById('sum-speed').textContent = speed + ' ft';
 
     // Update all sidebar sections (features, traits, proficiencies, etc.)
     updateAllSidebarSections();
