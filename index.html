@@ -215,10 +215,19 @@
                 loadedFrames[currentPage].classList.remove('active');
             }
 
+            // Deliver pending data to the target iframe
+            function deliverPendingData(frame) {
+                if (pendingPageData && pendingPageData.target === pageKey) {
+                    frame.contentWindow.postMessage({ type: 'spa-page-data', data: pendingPageData.data }, '*');
+                    pendingPageData = null;
+                }
+            }
+
             // Show or create the iframe
             if (loadedFrames[pageKey]) {
                 loadedFrames[pageKey].classList.add('active');
                 loadingEl.classList.remove('active');
+                deliverPendingData(loadedFrames[pageKey]);
             } else {
                 // Lazy-load: create iframe on first visit
                 loadingEl.classList.add('active');
@@ -230,6 +239,7 @@
                 iframe.addEventListener('load', () => {
                     loadingEl.classList.remove('active');
                     iframe.classList.add('active');
+                    deliverPendingData(iframe);
                 });
                 container.appendChild(iframe);
                 loadedFrames[pageKey] = iframe;
@@ -244,11 +254,18 @@
             history.replaceState(null, '', '#' + pageKey);
         }
 
+        // Pending data to deliver to a page after navigation
+        let pendingPageData = null;
+
         // Listen for navigation messages from iframes
         window.addEventListener('message', (e) => {
             if (e.data && e.data.type === 'spa-navigate') {
                 const pageKey = PAGE_URL_TO_KEY[e.data.page];
                 if (pageKey) {
+                    // If the message includes data, store it to relay to the target page
+                    if (e.data.data) {
+                        pendingPageData = { target: pageKey, data: e.data.data };
+                    }
                     navigateTo(pageKey);
                 }
             }

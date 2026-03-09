@@ -102,6 +102,16 @@ const CLASS_IMAGES = {
     'wizard': 'assets/classes/wizard.png'
 };
 
+// Track return intent (set when navigated from session page)
+window._creatorReturnTo = null;
+
+// Listen for SPA navigation data (e.g. returnTo from session page)
+window.addEventListener('spa-incoming-data', (e) => {
+    if (e.detail && e.detail.returnTo) {
+        window._creatorReturnTo = e.detail.returnTo;
+    }
+});
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     initRaceSelection();
@@ -854,6 +864,151 @@ function initFeatSelection() {
 
 // ==================== NAVIGATION ====================
 
+// ========== EQUIPMENT SELECTION (Step 6) ==========
+
+// Starting gold ranges by class
+const STARTING_GOLD = {
+    barbarian: '2d4 x 10',
+    bard: '5d4 x 10',
+    cleric: '5d4 x 10',
+    druid: '2d4 x 10',
+    fighter: '5d4 x 10',
+    monk: '5d4',
+    paladin: '5d4 x 10',
+    ranger: '5d4 x 10',
+    rogue: '4d4 x 10',
+    sorcerer: '3d4 x 10',
+    warlock: '4d4 x 10',
+    wizard: '4d4 x 10'
+};
+
+function initEquipmentSelection() {
+    const container = document.getElementById('equipment-choices');
+    const cls = CLASSES[character.class];
+    if (!container || !cls) return;
+
+    container.innerHTML = '';
+
+    const equipmentLines = cls.startingEquipment || [];
+    if (equipmentLines.length === 0) {
+        container.innerHTML = '<p class="no-equipment">No equipment choices defined for this class.</p>';
+        return;
+    }
+
+    // Parse each equipment line into choices
+    equipmentLines.forEach((line, index) => {
+        const choiceDiv = document.createElement('div');
+        choiceDiv.className = 'equipment-choice';
+
+        if (line.toUpperCase().includes(' OR ')) {
+            // This is a choice line - split on " OR " (case insensitive)
+            const options = line.split(/\s+OR\s+/i);
+            choiceDiv.innerHTML = `<h4 class="equipment-choice-title">Choice ${index + 1}</h4>`;
+
+            options.forEach((option, optIdx) => {
+                const label = document.createElement('label');
+                label.className = 'equipment-option';
+                label.innerHTML = `
+                    <input type="radio" name="equip-choice-${index}" value="${option.trim()}"
+                           ${optIdx === 0 ? 'checked' : ''}
+                           onchange="updateEquipmentList()">
+                    <span class="option-text">${option.trim()}</span>
+                `;
+                choiceDiv.appendChild(label);
+            });
+        } else {
+            // Fixed equipment - no choice needed
+            choiceDiv.innerHTML = `
+                <h4 class="equipment-choice-title">Included</h4>
+                <div class="equipment-fixed">
+                    <span class="option-text">${line}</span>
+                    <input type="hidden" name="equip-choice-${index}" value="${line}">
+                </div>
+            `;
+        }
+
+        container.appendChild(choiceDiv);
+    });
+
+    // Add background equipment
+    if (character.background && BACKGROUNDS[character.background]) {
+        const bg = BACKGROUNDS[character.background];
+        if (bg.equipment && bg.equipment.length > 0) {
+            const bgDiv = document.createElement('div');
+            bgDiv.className = 'equipment-choice';
+            bgDiv.innerHTML = `
+                <h4 class="equipment-choice-title">From Background: ${bg.name}</h4>
+                <div class="equipment-fixed">
+                    <span class="option-text">${bg.equipment.join(', ')}</span>
+                </div>
+            `;
+            container.appendChild(bgDiv);
+        }
+    }
+
+    // Setup gold toggle
+    const useGoldCheckbox = document.getElementById('use-gold');
+    const goldDisplay = document.getElementById('starting-gold');
+    const goldAmount = document.getElementById('gold-amount');
+
+    if (useGoldCheckbox) {
+        useGoldCheckbox.checked = false;
+        useGoldCheckbox.onchange = () => {
+            if (useGoldCheckbox.checked) {
+                container.style.opacity = '0.3';
+                container.style.pointerEvents = 'none';
+                goldDisplay.style.display = 'flex';
+                goldAmount.textContent = STARTING_GOLD[character.class] || '5d4 x 10';
+                character.equipment = [`Starting gold: ${STARTING_GOLD[character.class] || '5d4 x 10'} gp`];
+            } else {
+                container.style.opacity = '1';
+                container.style.pointerEvents = 'auto';
+                goldDisplay.style.display = 'none';
+                updateEquipmentList();
+            }
+        };
+    }
+
+    updateEquipmentList();
+}
+
+function updateEquipmentList() {
+    const finalList = document.getElementById('final-equipment');
+    if (!finalList) return;
+
+    const equipment = [];
+    const cls = CLASSES[character.class];
+    if (!cls) return;
+
+    const equipmentLines = cls.startingEquipment || [];
+
+    // Gather selected equipment
+    equipmentLines.forEach((line, index) => {
+        const inputs = document.querySelectorAll(`[name="equip-choice-${index}"]`);
+        inputs.forEach(input => {
+            if (input.type === 'hidden' || input.checked) {
+                equipment.push(input.value);
+            }
+        });
+    });
+
+    // Add background equipment
+    if (character.background && BACKGROUNDS[character.background]) {
+        const bg = BACKGROUNDS[character.background];
+        if (bg.equipment) {
+            bg.equipment.forEach(item => equipment.push(item));
+        }
+    }
+
+    // Update display
+    finalList.innerHTML = equipment.map(item => `<li>${item}</li>`).join('');
+
+    // Store on character
+    character.equipment = equipment;
+}
+
+// ========== END EQUIPMENT SELECTION ==========
+
 function nextStep() {
     if (!validateStep(currentStep)) return;
 
@@ -863,6 +1018,10 @@ function nextStep() {
         document.getElementById(`step-${currentStep}`).style.display = 'block';
         updateProgressBar();
         updateNavButtons();
+
+        if (currentStep === 6) {
+            initEquipmentSelection();
+        }
 
         if (currentStep === 7) {
             generateCharacterPreview();
@@ -1276,6 +1435,15 @@ function saveCharacter() {
     localStorage.setItem('dndCharacters', JSON.stringify(savedCharacters));
 
     alert('Character saved successfully!');
+
+    // Navigate based on context
+    if (window._creatorReturnTo === 'session' && window.spaNavigate) {
+        // Came from session page - go back with the new character selected
+        window.spaNavigate('session.html', { action: 'select-new-character' });
+    } else if (window.spaNavigate) {
+        // Normal creator - go to My Characters
+        window.spaNavigate('characters.html');
+    }
 }
 
 function exportCharacter() {

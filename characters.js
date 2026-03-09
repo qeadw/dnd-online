@@ -10,6 +10,12 @@ let deleteCharacterIndex = null;
 document.addEventListener('DOMContentLoaded', () => {
     loadCharacters();
     renderCharacterList();
+
+    // Refresh character list when tab gains focus (new characters may have been created)
+    window.addEventListener('focus', () => {
+        loadCharacters();
+        renderCharacterList();
+    });
 });
 
 // Load characters from localStorage

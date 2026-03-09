@@ -670,7 +670,7 @@
                         <select id="joinCharacterSelect">
                             <option value="">-- Select a Character --</option>
                         </select>
-                        <a href="character-creator.html" class="char-link">+ Create New Character</a>
+                        <a href="character-creator.html" class="char-link" id="createCharLink">+ Create New Character</a>
                     </div>
 
                     <button class="btn-primary" id="btnJoinSession" onclick="joinSession()">Join Session</button>
@@ -785,6 +785,35 @@
             // Enter key on session code copy
             document.getElementById('sessionCodeCopyable').addEventListener('keyup', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') copySessionCode();
+            });
+
+            // "Create New Character" link - navigate via SPA with return intent
+            document.getElementById('createCharLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                if (window.spaNavigate) {
+                    window.spaNavigate('character-creator.html', { returnTo: 'session' });
+                } else {
+                    window.location.href = 'character-creator.html';
+                }
+            });
+
+            // Listen for data from SPA shell (e.g. newly created character index)
+            window.addEventListener('spa-incoming-data', (e) => {
+                if (e.detail && e.detail.action === 'select-new-character') {
+                    populateCharacterDropdown();
+                    const select = document.getElementById('joinCharacterSelect');
+                    // Select the last character (the one just created)
+                    if (select.options.length > 1) {
+                        select.value = select.options.length - 2; // -2 because first option is placeholder
+                        // Correct: value is the index, last added = length - 2
+                        select.selectedIndex = select.options.length - 1;
+                    }
+                }
+            });
+
+            // Also refresh character list when this page gets focus (coming back from creator)
+            window.addEventListener('focus', () => {
+                populateCharacterDropdown();
             });
         });
 
