@@ -1,6 +1,32 @@
 // Dice Rolling
 let rollHistory = [];
 let customMacros = [];
+let secretRollMode = false; // DM secret roll toggle
+
+// Multiplayer broadcast helper — sends dice roll data if a session is active
+function broadcastDiceRoll(notation, result, rolls, modifier, description) {
+    if (window.Multiplayer && window.Multiplayer.getSessionCode()) {
+        const isSecret = secretRollMode && window.Multiplayer.isDM && window.Multiplayer.isDM();
+        window.Multiplayer.broadcast('dice-roll', {
+            notation: notation,
+            result: result,
+            rolls: rolls,
+            modifier: modifier,
+            description: description,
+            secret: isSecret
+        });
+    }
+}
+
+// Toggle secret roll mode (DM only)
+function toggleSecretRoll() {
+    secretRollMode = !secretRollMode;
+    const btn = document.getElementById('secretRollToggle');
+    if (btn) {
+        btn.classList.toggle('active', secretRollMode);
+        btn.textContent = secretRollMode ? 'Secret Roll: ON' : 'Secret Roll: OFF';
+    }
+}
 
 // Roll a single die with animation
 function rollDice(sides) {
@@ -11,6 +37,7 @@ function rollDice(sides) {
 
         displayResult(result, `1d${sides}`, [result], 0, { isCritical, isFumble });
         addToHistory(`d${sides}: ${result}`, { isCritical, isFumble });
+        broadcastDiceRoll(`1d${sides}`, result, [result], 0, `d${sides}`);
     });
 }
 
@@ -39,6 +66,7 @@ function customRoll() {
         const notation = `${numDice}d${diceType}${modifier >= 0 ? '+' : ''}${modifier}`;
         displayResult(total, notation, rolls, modifier, { isCritical, isFumble });
         addToHistory(`${notation}: ${total} (${rolls.join(', ')})`, { isCritical, isFumble });
+        broadcastDiceRoll(notation, total, rolls, modifier, 'Custom Roll');
     });
 }
 
@@ -57,6 +85,7 @@ function rollWithAdvantage() {
 
         displayAdvantageResult(roll1, roll2, chosen, total, modifier, 'advantage', { isCritical, isFumble });
         addToHistory(`Advantage: ${total} [${roll1}, ${roll2}] -> ${chosen}${modifier !== 0 ? (modifier >= 0 ? '+' : '') + modifier : ''}`, { isCritical, isFumble });
+        broadcastDiceRoll('2d20 (Advantage)', total, [roll1, roll2], modifier, 'Advantage Roll');
     });
 }
 
@@ -75,6 +104,7 @@ function rollWithDisadvantage() {
 
         displayAdvantageResult(roll1, roll2, chosen, total, modifier, 'disadvantage', { isCritical, isFumble });
         addToHistory(`Disadvantage: ${total} [${roll1}, ${roll2}] -> ${chosen}${modifier !== 0 ? (modifier >= 0 ? '+' : '') + modifier : ''}`, { isCritical, isFumble });
+        broadcastDiceRoll('2d20 (Disadvantage)', total, [roll1, roll2], modifier, 'Disadvantage Roll');
     });
 }
 
@@ -92,6 +122,7 @@ function parseDiceExpression() {
         animateDiceRoll(20, () => {
             displayResult(result.total, expression, result.allRolls, result.staticModifier, result.flags);
             addToHistory(`${expression}: ${result.total} (${result.breakdown})`, result.flags);
+            broadcastDiceRoll(expression, result.total, result.allRolls, result.staticModifier, 'Dice Expression');
         });
     } catch (e) {
         alert('Invalid dice expression. Use format like: 2d6+3+1d4-2');
@@ -179,6 +210,7 @@ function rollMacro(type) {
 
         displayResult(total, `${labels[type]} (1d20${modifier >= 0 ? '+' : ''}${modifier})`, [roll], modifier, { isCritical, isFumble, rollType: type });
         addToHistory(`${labels[type]}: ${total} (${roll}${modifier !== 0 ? (modifier >= 0 ? '+' : '') + modifier : ''})`, { isCritical, isFumble });
+        broadcastDiceRoll(`1d20${modifier >= 0 ? '+' : ''}${modifier}`, total, [roll], modifier, labels[type]);
     });
 }
 
@@ -201,6 +233,7 @@ function rollDamage(numDice, sides) {
         const notation = `${numDice}d${sides} Damage`;
         displayResult(total, notation, rolls, modifier, { isDamage: true });
         addToHistory(`Damage ${numDice}d${sides}${modifier !== 0 ? (modifier >= 0 ? '+' : '') + modifier : ''}: ${total} (${rolls.join(', ')})`, { isDamage: true });
+        broadcastDiceRoll(`${numDice}d${sides}`, total, rolls, modifier, 'Damage Roll');
     });
 }
 
@@ -240,6 +273,7 @@ function rollCustomMacro(id) {
         animateDiceRoll(20, () => {
             displayResult(result.total, `${macro.name} (${macro.expression})`, result.allRolls, result.staticModifier, result.flags);
             addToHistory(`${macro.name}: ${result.total} (${result.breakdown})`, result.flags);
+            broadcastDiceRoll(macro.expression, result.total, result.allRolls, result.staticModifier, macro.name);
         });
     } catch (e) {
         alert('Error executing macro');
@@ -400,6 +434,18 @@ function clearRollHistory() {
 // Initiative Tracker
 let initiative = [];
 let currentTurn = 0;
+let roundNumber = 1;
+
+// Broadcast the full initiative state (DM only)
+function broadcastInitiativeState() {
+    if (window.Multiplayer && window.Multiplayer.getSessionCode() && window.Multiplayer.isDM && window.Multiplayer.isDM()) {
+        window.Multiplayer.broadcast('initiative-update', {
+            initiative: initiative,
+            currentTurn: currentTurn,
+            roundNumber: roundNumber
+        });
+    }
+}
 
 function addToInitiative() {
     const name = document.getElementById('charName').value.trim();
@@ -414,37 +460,61 @@ function addToInitiative() {
     initiative.sort((a, b) => b.init - a.init);
     currentTurn = 0;
     renderInitiative();
+    broadcastInitiativeState();
 
     document.getElementById('charName').value = '';
     document.getElementById('charInit').value = '';
 }
 
 function removeFromInitiative(id) {
+    // Players can only remove if not in a multiplayer session, or if DM
+    if (window.Multiplayer && window.Multiplayer.getSessionCode() && window.Multiplayer.isDM && !window.Multiplayer.isDM()) {
+        return; // players cannot remove entries
+    }
     initiative = initiative.filter(c => c.id !== id);
     if (currentTurn >= initiative.length) currentTurn = 0;
     renderInitiative();
+    broadcastInitiativeState();
 }
 
 function renderInitiative() {
     const list = document.getElementById('initiativeList');
+    const isMultiplayerPlayer = window.Multiplayer && window.Multiplayer.getSessionCode() && window.Multiplayer.isDM && !window.Multiplayer.isDM();
+
     list.innerHTML = initiative.map((char, index) => `
         <li class="${index === currentTurn ? 'active' : ''}">
             <span><strong>${char.init}</strong> - ${char.name}</span>
-            <button onclick="removeFromInitiative(${char.id})">X</button>
+            ${isMultiplayerPlayer ? '' : `<button onclick="removeFromInitiative(${char.id})">X</button>`}
         </li>
     `).join('');
+
+    // Hide DM-only initiative buttons for players in multiplayer
+    const nextTurnBtn = document.getElementById('nextTurnBtn');
+    const clearInitBtn = document.getElementById('clearInitBtn');
+    if (nextTurnBtn) nextTurnBtn.style.display = isMultiplayerPlayer ? 'none' : '';
+    if (clearInitBtn) clearInitBtn.style.display = isMultiplayerPlayer ? 'none' : '';
 }
 
 function clearInitiative() {
+    if (window.Multiplayer && window.Multiplayer.getSessionCode() && window.Multiplayer.isDM && !window.Multiplayer.isDM()) {
+        return; // players cannot clear
+    }
     initiative = [];
     currentTurn = 0;
+    roundNumber = 1;
     renderInitiative();
+    broadcastInitiativeState();
 }
 
 function nextTurn() {
     if (initiative.length === 0) return;
+    if (window.Multiplayer && window.Multiplayer.getSessionCode() && window.Multiplayer.isDM && !window.Multiplayer.isDM()) {
+        return; // players cannot advance turn
+    }
     currentTurn = (currentTurn + 1) % initiative.length;
+    if (currentTurn === 0) roundNumber++;
     renderInitiative();
+    broadcastInitiativeState();
 }
 
 // Character Stats
@@ -643,3 +713,45 @@ function collapseAllConditions() {
         item.classList.remove('expanded');
     });
 }
+
+// =============================================
+// Multiplayer Integration
+// =============================================
+
+// Listen for remote dice rolls and initiative updates
+function initMultiplayerListeners() {
+    if (!window.Multiplayer) return;
+
+    // Receive remote dice rolls
+    window.Multiplayer.on('dice-roll', (msg) => {
+        // Skip our own broadcasts
+        if (msg.senderId === window.Multiplayer.getMyTabId()) return;
+
+        // If it's a secret roll, only show to DM tabs
+        if (msg.payload.secret) {
+            if (!window.Multiplayer.isDM || !window.Multiplayer.isDM()) return;
+            addToHistory(`[SECRET] ${msg.senderName} rolled ${msg.payload.notation}: ${msg.payload.result}`, { isRemote: true });
+        } else {
+            addToHistory(`${msg.senderName} rolled ${msg.payload.notation}: ${msg.payload.result}`, { isRemote: true });
+        }
+    });
+
+    // Receive initiative updates (players update their local state from DM)
+    window.Multiplayer.on('initiative-update', (msg) => {
+        if (msg.senderId === window.Multiplayer.getMyTabId()) return;
+
+        // Players accept initiative state from DM
+        if (!window.Multiplayer.isDM || !window.Multiplayer.isDM()) {
+            initiative = msg.payload.initiative || [];
+            currentTurn = msg.payload.currentTurn || 0;
+            roundNumber = msg.payload.roundNumber || 1;
+            renderInitiative();
+        }
+    });
+}
+
+// Initialize multiplayer listeners when the page loads
+// Use a short delay to ensure Multiplayer module has loaded
+window.addEventListener('load', () => {
+    setTimeout(initMultiplayerListeners, 500);
+});
