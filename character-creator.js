@@ -109,6 +109,14 @@ window._creatorReturnTo = null;
 window.addEventListener('spa-incoming-data', (e) => {
     if (e.detail && e.detail.returnTo) {
         window._creatorReturnTo = e.detail.returnTo;
+        // Reset to step 1 for a fresh start
+        if (currentStep !== 1) {
+            document.getElementById(`step-${currentStep}`).style.display = 'none';
+            currentStep = 1;
+            document.getElementById('step-1').style.display = 'block';
+            updateProgressBar();
+            updateNavButtons();
+        }
     }
 });
 
@@ -1411,6 +1419,8 @@ function saveCharacter() {
     const charData = {
         ...character,
         name: document.getElementById('char-name').value,
+        raceName: character.race ? RACES[character.race].name : '',
+        className: character.class ? CLASSES[character.class].name : '',
         alignment: document.getElementById('char-alignment').value,
         level: parseInt(document.getElementById('char-level').value) || 1,
         age: document.getElementById('char-age').value,
