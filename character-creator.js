@@ -66,24 +66,24 @@ const RACE_IMAGES = {
     'human': 'assets/races/human.png',
     'tiefling': 'assets/races/tiefling.png',
     // Volo's Guide Races
-    'aasimar': 'assets/races/aasimar.png',
-    'goliath': 'assets/races/goliath.png',
-    'firbolg': 'assets/races/firbolg.png',
-    'tabaxi': 'assets/races/tabaxi.png',
-    'kenku': 'assets/races/kenku.png',
-    'lizardfolk': 'assets/races/lizardfolk.png',
-    'triton': 'assets/races/triton.png',
-    'bugbear': 'assets/races/bugbear.png',
-    'goblin': 'assets/races/goblin.png',
-    'hobgoblin': 'assets/races/hobgoblin.png',
-    'kobold': 'assets/races/kobold.png',
-    'orc': 'assets/races/orc.png',
-    'yuantiPureblood': 'assets/races/yuan-ti.png',
+    'aasimar': 'assets/races/aasimar.svg',
+    'goliath': 'assets/races/goliath.svg',
+    'firbolg': 'assets/races/firbolg.svg',
+    'tabaxi': 'assets/races/tabaxi.svg',
+    'kenku': 'assets/races/kenku.svg',
+    'lizardfolk': 'assets/races/lizardfolk.svg',
+    'triton': 'assets/races/triton.svg',
+    'bugbear': 'assets/races/bugbear.svg',
+    'goblin': 'assets/races/goblin.svg',
+    'hobgoblin': 'assets/races/hobgoblin.svg',
+    'kobold': 'assets/races/kobold.svg',
+    'orc': 'assets/races/orc.svg',
+    'yuantiPureblood': 'assets/races/yuan-ti.svg',
     // Eberron Races
-    'changeling': 'assets/races/changeling.png',
-    'warforged': 'assets/races/warforged.png',
-    'kalashtar': 'assets/races/kalashtar.png',
-    'shifter': 'assets/races/shifter.png'
+    'changeling': 'assets/races/changeling.svg',
+    'warforged': 'assets/races/warforged.svg',
+    'kalashtar': 'assets/races/kalashtar.svg',
+    'shifter': 'assets/races/shifter.svg'
 };
 
 // Class Image Mappings

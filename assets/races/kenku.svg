@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect width="200" height="200" fill="#1a1a2e"/>
+  <!-- Bird head -->
+  <ellipse cx="100" cy="58" rx="20" ry="22" fill="#2a3a5a" opacity="0.9"/>
+  <!-- Beak -->
+  <path d="M95 62 L100 78 L105 62 Z" fill="#3a3a3a" opacity="0.9"/>
+  <path d="M95 62 L100 72 L105 62 Z" fill="#4a4a4a" opacity="0.9"/>
+  <!-- Feathery body -->
+  <path d="M78 75 L70 148 L130 148 L122 75 Z" fill="#1a2a4a" opacity="0.8"/>
+  <!-- Feather texture on body -->
+  <path d="M85 85 Q100 90 115 85 Q100 95 85 85 Z" fill="#2a3a5a" opacity="0.4"/>
+  <path d="M82 100 Q100 105 118 100 Q100 110 82 100 Z" fill="#2a3a5a" opacity="0.35"/>
+  <path d="M80 115 Q100 120 120 115 Q100 125 80 115 Z" fill="#2a3a5a" opacity="0.3"/>
+  <!-- Eyes - beady and dark -->
+  <circle cx="90" cy="52" r="3.5" fill="#1a2a4a"/>
+  <circle cx="110" cy="52" r="3.5" fill="#1a2a4a"/>
+  <circle cx="90" cy="52" r="2" fill="#4a6a9a"/>
+  <circle cx="110" cy="52" r="2" fill="#4a6a9a"/>
+  <circle cx="91" cy="51" r="0.8" fill="#ffffff" opacity="0.6"/>
+  <circle cx="111" cy="51" r="0.8" fill="#ffffff" opacity="0.6"/>
+  <!-- Head feather tufts -->
+  <path d="M85 38 Q80 28 88 35" fill="#2a3a5a" opacity="0.7"/>
+  <path d="M115 38 Q120 28 112 35" fill="#2a3a5a" opacity="0.7"/>
+  <text x="100" y="175" text-anchor="middle" font-family="Georgia, serif" font-size="16" fill="#c9a227" font-weight="bold">Kenku</text>
+</svg>

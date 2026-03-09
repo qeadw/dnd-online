@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <radialGradient id="nature-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2d5a1e" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#1a1a2e" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="200" height="200" fill="#1a1a2e"/>
+  <rect width="200" height="200" fill="url(#nature-glow)"/>
+  <!-- Tall figure -->
+  <ellipse cx="100" cy="55" rx="20" ry="24" fill="#c4a882" opacity="0.9"/>
+  <!-- Large nose (firbolg trait) -->
+  <ellipse cx="100" cy="64" rx="5" ry="7" fill="#b89870" opacity="0.7"/>
+  <!-- Body -->
+  <path d="M78 74 L70 148 L130 148 L122 74 Z" fill="#5a3a1a" opacity="0.8"/>
+  <!-- Leafy hair/crown -->
+  <path d="M80 42 Q75 25 85 30 Q80 20 95 28 Q90 15 100 22 Q105 15 110 28 Q120 20 115 30 Q125 25 120 42 Z" fill="#3a7a2a" opacity="0.8"/>
+  <!-- Leaf details on shoulders -->
+  <path d="M72 80 Q60 70 65 85 Q58 78 70 88" fill="#4a8a3a" opacity="0.6"/>
+  <path d="M128 80 Q140 70 135 85 Q142 78 130 88" fill="#4a8a3a" opacity="0.6"/>
+  <!-- Small leaves floating -->
+  <path d="M40 60 Q45 55 48 60 Q45 65 40 60 Z" fill="#5a9a4a" opacity="0.4"/>
+  <path d="M155 45 Q160 40 163 45 Q160 50 155 45 Z" fill="#5a9a4a" opacity="0.4"/>
+  <!-- Eyes - gentle -->
+  <circle cx="92" cy="52" r="2" fill="#6ab04c"/>
+  <circle cx="108" cy="52" r="2" fill="#6ab04c"/>
+  <text x="100" y="175" text-anchor="middle" font-family="Georgia, serif" font-size="16" fill="#c9a227" font-weight="bold">Firbolg</text>
+</svg>

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect width="200" height="200" fill="#1a1a2e"/>
+  <!-- Small head with big features -->
+  <ellipse cx="100" cy="65" rx="20" ry="18" fill="#6a8a3a" opacity="0.9"/>
+  <!-- Big pointed ears -->
+  <path d="M80 62 L52 48 L78 58 Z" fill="#6a8a3a" opacity="0.85"/>
+  <path d="M120 62 L148 48 L122 58 Z" fill="#6a8a3a" opacity="0.85"/>
+  <path d="M80 62 L56 50 L78 58 Z" fill="#5a7a2a" opacity="0.4"/>
+  <path d="M120 62 L144 50 L122 58 Z" fill="#5a7a2a" opacity="0.4"/>
+  <!-- Small body -->
+  <path d="M84 80 L80 148 L120 148 L116 80 Z" fill="#5a7a2a" opacity="0.7"/>
+  <!-- Big eyes -->
+  <circle cx="90" cy="60" r="6" fill="#dada1a"/>
+  <circle cx="110" cy="60" r="6" fill="#dada1a"/>
+  <circle cx="90" cy="60" r="3" fill="#1a1a2e"/>
+  <circle cx="110" cy="60" r="3" fill="#1a1a2e"/>
+  <circle cx="92" cy="58" r="1.2" fill="#fff" opacity="0.5"/>
+  <circle cx="112" cy="58" r="1.2" fill="#fff" opacity="0.5"/>
+  <!-- Pointy nose -->
+  <path d="M97 66 L100 72 L103 66" fill="#5a7a2a" opacity="0.7"/>
+  <!-- Toothy grin -->
+  <path d="M90 76 Q100 82 110 76" fill="none" stroke="#4a6a1a" stroke-width="1.5"/>
+  <rect x="94" y="76" width="3" height="3" fill="#ddd" opacity="0.6" rx="0.5"/>
+  <rect x="100" y="76" width="3" height="3" fill="#ddd" opacity="0.6" rx="0.5"/>
+  <rect x="106" y="76" width="3" height="3" fill="#ddd" opacity="0.6" rx="0.5"/>
+  <text x="100" y="175" text-anchor="middle" font-family="Georgia, serif" font-size="16" fill="#c9a227" font-weight="bold">Goblin</text>
+</svg>

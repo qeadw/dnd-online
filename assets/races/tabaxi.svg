@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect width="200" height="200" fill="#1a1a2e"/>
+  <!-- Cat-like head -->
+  <ellipse cx="100" cy="62" rx="22" ry="20" fill="#d4a040" opacity="0.9"/>
+  <!-- Pointed ears -->
+  <path d="M78 52 L72 28 L88 46 Z" fill="#d4a040" opacity="0.9"/>
+  <path d="M122 52 L128 28 L112 46 Z" fill="#d4a040" opacity="0.9"/>
+  <!-- Inner ears -->
+  <path d="M80 50 L76 34 L87 47 Z" fill="#c48030" opacity="0.6"/>
+  <path d="M120 50 L124 34 L113 47 Z" fill="#c48030" opacity="0.6"/>
+  <!-- Body -->
+  <path d="M78 78 L72 145 L128 145 L122 78 Z" fill="#c49030" opacity="0.7"/>
+  <!-- Fur stripes -->
+  <path d="M88 48 L92 42 L96 48" fill="none" stroke="#8a6020" stroke-width="1.5" opacity="0.6"/>
+  <path d="M104 48 L108 42 L112 48" fill="none" stroke="#8a6020" stroke-width="1.5" opacity="0.6"/>
+  <!-- Cat eyes - almond shaped -->
+  <ellipse cx="90" cy="58" rx="5" ry="3" fill="#ffbf00"/>
+  <ellipse cx="110" cy="58" rx="5" ry="3" fill="#ffbf00"/>
+  <ellipse cx="90" cy="58" rx="1.5" ry="3" fill="#1a1a2e"/>
+  <ellipse cx="110" cy="58" rx="1.5" ry="3" fill="#1a1a2e"/>
+  <!-- Nose -->
+  <path d="M97 66 L100 63 L103 66 Z" fill="#c48030" opacity="0.8"/>
+  <!-- Whiskers -->
+  <line x1="85" y1="68" x2="65" y2="65" stroke="#d4a040" stroke-width="0.8" opacity="0.5"/>
+  <line x1="85" y1="70" x2="65" y2="72" stroke="#d4a040" stroke-width="0.8" opacity="0.5"/>
+  <line x1="115" y1="68" x2="135" y2="65" stroke="#d4a040" stroke-width="0.8" opacity="0.5"/>
+  <line x1="115" y1="70" x2="135" y2="72" stroke="#d4a040" stroke-width="0.8" opacity="0.5"/>
+  <text x="100" y="175" text-anchor="middle" font-family="Georgia, serif" font-size="16" fill="#c9a227" font-weight="bold">Tabaxi</text>
+</svg>

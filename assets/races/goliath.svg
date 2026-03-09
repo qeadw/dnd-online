@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="stone" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#808080"/>
+      <stop offset="100%" stop-color="#555555"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" fill="#1a1a2e"/>
+  <!-- Large muscular body -->
+  <ellipse cx="100" cy="60" rx="22" ry="26" fill="url(#stone)" opacity="0.9"/>
+  <!-- Broad shoulders and torso -->
+  <path d="M70 78 L55 145 L145 145 L130 78 Z" fill="#707070" opacity="0.85"/>
+  <!-- Arms -->
+  <path d="M70 85 L48 125 L58 128 L75 95 Z" fill="#808080" opacity="0.7"/>
+  <path d="M130 85 L152 125 L142 128 L125 95 Z" fill="#808080" opacity="0.7"/>
+  <!-- Tribal markings -->
+  <path d="M85 50 L90 38 L95 50" fill="none" stroke="#a0a0a0" stroke-width="2" opacity="0.6"/>
+  <path d="M105 50 L110 38 L115 50" fill="none" stroke="#a0a0a0" stroke-width="2" opacity="0.6"/>
+  <line x1="88" y1="70" x2="88" y2="82" stroke="#a0a0a0" stroke-width="1.5" opacity="0.5"/>
+  <line x1="112" y1="70" x2="112" y2="82" stroke="#a0a0a0" stroke-width="1.5" opacity="0.5"/>
+  <!-- Eyes -->
+  <circle cx="92" cy="56" r="2.5" fill="#b0b0b0"/>
+  <circle cx="108" cy="56" r="2.5" fill="#b0b0b0"/>
+  <!-- Bald head highlight -->
+  <ellipse cx="100" cy="42" rx="14" ry="6" fill="#909090" opacity="0.3"/>
+  <text x="100" y="175" text-anchor="middle" font-family="Georgia, serif" font-size="16" fill="#c9a227" font-weight="bold">Goliath</text>
+</svg>
