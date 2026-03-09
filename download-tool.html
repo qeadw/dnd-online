@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Download Tool</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #e0e0e0; padding: 20px; }
+        h1 { color: #c9aa71; margin-bottom: 20px; }
+        .tool-container { max-width: 800px; margin: 0 auto; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #c9aa71; font-weight: bold; }
+        input[type="text"], input[type="url"] {
+            width: 100%; padding: 10px; background: #16213e; border: 1px solid #444;
+            color: #e0e0e0; border-radius: 4px; font-size: 14px;
+        }
+        .btn {
+            padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;
+            font-size: 14px; font-weight: bold; margin-right: 10px; margin-bottom: 10px;
+        }
+        .btn-primary { background: #c9aa71; color: #1a1a2e; }
+        .btn-primary:hover { background: #d4b87a; }
+        .btn-secondary { background: #16213e; color: #c9aa71; border: 1px solid #c9aa71; }
+        .btn-danger { background: #e74c3c; color: white; }
+        #preview { margin-top: 15px; }
+        #preview img { max-width: 300px; max-height: 300px; border-radius: 8px; border: 2px solid #444; }
+        .queue { margin-top: 20px; }
+        .queue-item {
+            display: flex; align-items: center; gap: 10px; padding: 10px;
+            background: #16213e; border-radius: 4px; margin-bottom: 8px;
+        }
+        .queue-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
+        .queue-item .info { flex: 1; }
+        .queue-item .filename { color: #c9aa71; font-weight: bold; }
+        .queue-item .url { font-size: 12px; color: #888; word-break: break-all; }
+        .status { padding: 5px 10px; border-radius: 4px; font-size: 12px; }
+        .status.pending { background: #444; }
+        .status.done { background: #27ae60; color: white; }
+        .status.error { background: #e74c3c; color: white; }
+        #log {
+            margin-top: 20px; padding: 15px; background: #0a0a1a; border-radius: 4px;
+            font-family: monospace; font-size: 13px; max-height: 300px; overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .instructions { background: #16213e; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .instructions p { margin-bottom: 8px; }
+        .instructions code { background: #0a0a1a; padding: 2px 6px; border-radius: 3px; color: #c9aa71; }
+        .batch-area { margin-top: 20px; }
+        textarea {
+            width: 100%; height: 150px; padding: 10px; background: #16213e; border: 1px solid #444;
+            color: #e0e0e0; border-radius: 4px; font-family: monospace; font-size: 13px; resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <div class="tool-container">
+        <h1>Image Download Tool</h1>
+
+        <div class="instructions">
+            <p><strong>How to use:</strong></p>
+            <p>1. Paste an image URL and set a filename</p>
+            <p>2. Click "Preview" to check the image loads</p>
+            <p>3. Click "Add to Queue" to queue it for download</p>
+            <p>4. When ready, click "Download All" — each image will save via your browser's download dialog</p>
+            <p>5. Save them to: <code>assets/races/</code> in the dnd-online folder</p>
+            <p><strong>Batch mode:</strong> Paste multiple lines in format: <code>filename.png|https://url.com/image.png</code></p>
+        </div>
+
+        <div class="input-group">
+            <label for="url-input">Image URL:</label>
+            <input type="url" id="url-input" placeholder="https://example.com/image.png">
+        </div>
+        <div class="input-group">
+            <label for="filename-input">Save as filename:</label>
+            <input type="text" id="filename-input" placeholder="aasimar.png">
+        </div>
+        <div>
+            <button class="btn btn-secondary" onclick="previewImage()">Preview</button>
+            <button class="btn btn-primary" onclick="addToQueue()">Add to Queue</button>
+        </div>
+        <div id="preview"></div>
+
+        <div class="batch-area">
+            <label>Batch Add (one per line: <code>filename|url</code>):</label>
+            <textarea id="batch-input" placeholder="aasimar.jpeg|https://www.dndbeyond.com/avatars/43940/407/638607447894976032.jpeg
+goliath.png|https://www.dndbeyond.com/avatars/43940/489/638607450041758398.png"></textarea>
+            <button class="btn btn-primary" onclick="batchAdd()">Add Batch to Queue</button>
+        </div>
+
+        <div class="queue">
+            <h2 style="color: #c9aa71; margin-bottom: 10px;">Download Queue (<span id="queue-count">0</span>)</h2>
+            <div id="queue-list"></div>
+            <button class="btn btn-primary" onclick="downloadAll()" id="download-all-btn" style="display:none;">Download All</button>
+            <button class="btn btn-danger" onclick="clearQueue()" id="clear-btn" style="display:none;">Clear Queue</button>
+        </div>
+
+        <div id="log"></div>
+    </div>
+
+    <script>
+        const queue = [];
+
+        function log(msg) {
+            const logEl = document.getElementById('log');
+            logEl.textContent += msg + '\n';
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function previewImage() {
+            const url = document.getElementById('url-input').value.trim();
+            if (!url) return;
+            const preview = document.getElementById('preview');
+            preview.innerHTML = `<p>Loading...</p>`;
+            const img = new Image();
+            img.onload = () => { preview.innerHTML = ''; preview.appendChild(img); log('Preview loaded: ' + url); };
+            img.onerror = () => { preview.innerHTML = '<p style="color:#e74c3c;">Failed to load image</p>'; log('ERROR: Could not load ' + url); };
+            img.src = url;
+        }
+
+        function addToQueue() {
+            const url = document.getElementById('url-input').value.trim();
+            const filename = document.getElementById('filename-input').value.trim();
+            if (!url || !filename) { alert('Need both URL and filename'); return; }
+            queue.push({ url, filename, status: 'pending' });
+            document.getElementById('url-input').value = '';
+            document.getElementById('filename-input').value = '';
+            renderQueue();
+            log('Queued: ' + filename);
+        }
+
+        function batchAdd() {
+            const text = document.getElementById('batch-input').value.trim();
+            if (!text) return;
+            const lines = text.split('\n').filter(l => l.trim());
+            let added = 0;
+            for (const line of lines) {
+                const [filename, url] = line.split('|').map(s => s.trim());
+                if (filename && url) {
+                    queue.push({ url, filename, status: 'pending' });
+                    added++;
+                }
+            }
+            document.getElementById('batch-input').value = '';
+            renderQueue();
+            log(`Batch added ${added} items`);
+        }
+
+        function renderQueue() {
+            const list = document.getElementById('queue-list');
+            const count = document.getElementById('queue-count');
+            count.textContent = queue.length;
+            document.getElementById('download-all-btn').style.display = queue.length ? '' : 'none';
+            document.getElementById('clear-btn').style.display = queue.length ? '' : 'none';
+            list.innerHTML = queue.map((item, i) => `
+                <div class="queue-item">
+                    <img src="${item.url}" onerror="this.style.display='none'">
+                    <div class="info">
+                        <div class="filename">${item.filename}</div>
+                        <div class="url">${item.url}</div>
+                    </div>
+                    <span class="status ${item.status}">${item.status}</span>
+                    ${item.status === 'pending' ? `<button class="btn btn-danger" style="padding:4px 8px;font-size:12px;" onclick="removeFromQueue(${i})">X</button>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function removeFromQueue(i) {
+            queue.splice(i, 1);
+            renderQueue();
+        }
+
+        function clearQueue() {
+            queue.length = 0;
+            renderQueue();
+        }
+
+        async function downloadAll() {
+            log('Starting downloads...');
+            for (let i = 0; i < queue.length; i++) {
+                const item = queue[i];
+                if (item.status === 'done') continue;
+                try {
+                    log(`Downloading: ${item.filename}...`);
+                    const response = await fetch(item.url);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const blob = await response.blob();
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = item.filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(a.href);
+                    item.status = 'done';
+                    log(`Downloaded: ${item.filename}`);
+                } catch (err) {
+                    item.status = 'error';
+                    log(`ERROR downloading ${item.filename}: ${err.message}`);
+                }
+                renderQueue();
+                // Small delay between downloads to not overwhelm browser
+                await new Promise(r => setTimeout(r, 500));
+            }
+            log('All downloads complete!');
+        }
+    </script>
+</body>
+</html>
