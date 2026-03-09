@@ -737,13 +737,15 @@
             font-size: 0.85rem;
         }
     </style>
+    <script src="spa-bridge.js"></script>
 </head>
 <body>
+    <div id="multiplayer-overlay"></div>
     <a href="#main" class="skip-link">Skip to content</a>
     <header>
         <h1>Monster Builder</h1>
         <nav class="main-nav">
-            <a href="index.html" class="nav-link">Game Tools</a>
+            <a href="game-tools.html" class="nav-link">Game Tools</a>
             <a href="character-creator.html" class="nav-link">Character Creator</a>
             <a href="characters.html" class="nav-link">My Characters</a>
             <a href="spells.html" class="nav-link">Spells</a>
@@ -752,6 +754,7 @@
             <a href="combat.html" class="nav-link">Combat</a>
             <a href="inventory.html" class="nav-link">Inventory</a>
             <a href="maps.html" class="nav-link">Maps</a>
+            <a href="session.html" class="nav-link">Session</a>
         </nav>
     </header>
 
@@ -1713,7 +1716,54 @@
         }
 
         // Update Preview
+        // Auto-save WIP to localStorage (debounced)
+        let _autoSaveTimer = null;
+        function autoSaveWIP() {
+            clearTimeout(_autoSaveTimer);
+            _autoSaveTimer = setTimeout(() => {
+                try {
+                    const data = getMonsterData();
+                    localStorage.setItem('monsterBuilderWIP', JSON.stringify(data));
+                } catch(e) {}
+            }, 1000);
+        }
+
+        // Restore WIP on load
+        function restoreWIP() {
+            try {
+                const wip = JSON.parse(localStorage.getItem('monsterBuilderWIP'));
+                if (wip && wip.name && wip.name !== 'Unnamed Monster') {
+                    if (confirm(`Restore unsaved monster "${wip.name}"?`)) {
+                        populateForm(wip);
+                    }
+                }
+            } catch(e) {}
+        }
+
+        function populateForm(data) {
+            if (data.name) document.getElementById('monsterName').value = data.name;
+            if (data.size) document.getElementById('monsterSize').value = data.size;
+            if (data.type) document.getElementById('monsterType').value = data.type;
+            if (data.subtype) document.getElementById('monsterSubtype').value = data.subtype;
+            if (data.alignment) document.getElementById('monsterAlignment').value = data.alignment;
+            if (data.ac) document.getElementById('monsterAC').value = data.ac;
+            if (data.acType) document.getElementById('monsterACType').value = data.acType;
+            if (data.cr) document.getElementById('monsterCR').value = data.cr;
+            const abilities = ['Str', 'Dex', 'Con', 'Int', 'Wis', 'Cha'];
+            abilities.forEach(a => {
+                const key = a.toLowerCase();
+                if (data.abilities && data.abilities[key] !== undefined) {
+                    document.getElementById('ability' + a).value = data.abilities[key];
+                }
+            });
+            updateModifiers();
+            updateXP();
+            updateHP();
+            updatePreview();
+        }
+
         function updatePreview() {
+            autoSaveWIP();
             const data = getMonsterData();
             const preview = document.getElementById('statBlockPreview');
 
@@ -1867,6 +1917,7 @@
             savedMonsters[key] = data;
             localStorage.setItem('customMonsters', JSON.stringify(savedMonsters));
 
+            localStorage.removeItem('monsterBuilderWIP');
             alert(`"${data.name}" has been saved to your browser!`);
             loadSavedMonsters();
         }
@@ -2177,8 +2228,11 @@
             updateModifiers();
             updateXP();
             loadSavedMonsters();
+            restoreWIP();
             updatePreview();
         });
     </script>
+    <script src="multiplayer.js"></script>
+    <script src="multiplayer-ui.js"></script>
 </body>
 </html>

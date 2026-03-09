@@ -970,13 +970,15 @@
             }
         }
     </style>
+    <script src="spa-bridge.js"></script>
 </head>
 <body>
+    <div id="multiplayer-overlay"></div>
     <a href="#main" class="skip-link">Skip to content</a>
     <header>
         <h1>Combat Tracker</h1>
         <nav class="main-nav">
-            <a href="index.html" class="nav-link">Game Tools</a>
+            <a href="game-tools.html" class="nav-link">Game Tools</a>
             <a href="character-creator.html" class="nav-link">Character Creator</a>
             <a href="characters.html" class="nav-link">My Characters</a>
             <a href="spells.html" class="nav-link">Spells</a>
@@ -985,6 +987,7 @@
             <a href="combat.html" class="nav-link active">Combat</a>
             <a href="inventory.html" class="nav-link">Inventory</a>
             <a href="maps.html" class="nav-link">Maps</a>
+            <a href="session.html" class="nav-link">Session</a>
         </nav>
     </header>
 
@@ -1053,6 +1056,77 @@
         let currentTurnIndex = 0;
         let roundNumber = 1;
 
+        // --- Multiplayer Helpers ---
+        function isMultiplayerDM() {
+            return window.Multiplayer && window.Multiplayer.isDM();
+        }
+
+        function isMultiplayerPlayer() {
+            return window.Multiplayer && !window.Multiplayer.isDM();
+        }
+
+        function broadcastCombatState() {
+            if (window.Multiplayer && window.Multiplayer.isDM()) {
+                window.Multiplayer.broadcast('combat-update', {
+                    combatants: combatants,
+                    currentTurnIndex: currentTurnIndex,
+                    roundNumber: roundNumber
+                });
+            }
+        }
+
+        function broadcastHpChange(id, newHp, tempHp) {
+            if (window.Multiplayer && window.Multiplayer.isDM()) {
+                window.Multiplayer.broadcast('hp-change', {
+                    combatantId: id,
+                    hpCurrent: newHp,
+                    hpTemp: tempHp
+                });
+            }
+        }
+
+        function broadcastConditionChange(id, conditions) {
+            if (window.Multiplayer && window.Multiplayer.isDM()) {
+                window.Multiplayer.broadcast('condition-change', {
+                    combatantId: id,
+                    conditions: conditions
+                });
+            }
+        }
+
+        // Listen for multiplayer combat updates (players receive DM state)
+        if (window.Multiplayer) {
+            window.Multiplayer.on('combat-update', (msg) => {
+                if (msg.senderId === window.Multiplayer.getMyTabId()) return;
+                combatants = msg.payload.combatants;
+                currentTurnIndex = msg.payload.currentTurnIndex;
+                roundNumber = msg.payload.roundNumber;
+                saveState();
+                render();
+            });
+
+            window.Multiplayer.on('hp-change', (msg) => {
+                if (msg.senderId === window.Multiplayer.getMyTabId()) return;
+                const combatant = combatants.find(c => c.id === msg.payload.combatantId);
+                if (combatant) {
+                    combatant.hpCurrent = msg.payload.hpCurrent;
+                    combatant.hpTemp = msg.payload.hpTemp;
+                    saveState();
+                    render();
+                }
+            });
+
+            window.Multiplayer.on('condition-change', (msg) => {
+                if (msg.senderId === window.Multiplayer.getMyTabId()) return;
+                const combatant = combatants.find(c => c.id === msg.payload.combatantId);
+                if (combatant) {
+                    combatant.conditions = msg.payload.conditions;
+                    saveState();
+                    render();
+                }
+            });
+        }
+
         // Load from localStorage
         function loadState() {
             const saved = localStorage.getItem('dnd-combat-tracker');
@@ -1112,6 +1186,7 @@
             sortByInitiative();
             saveState();
             render();
+            broadcastCombatState();
 
             // Clear form
             document.getElementById('combatant-name').value = '';
@@ -1142,6 +1217,7 @@
             combatants = combatants.filter(c => c.id !== id);
             saveState();
             render();
+            broadcastCombatState();
         }
 
         // Next turn
@@ -1155,6 +1231,7 @@
             }
             saveState();
             render();
+            broadcastCombatState();
         }
 
         // New encounter
@@ -1167,6 +1244,7 @@
             roundNumber = 1;
             saveState();
             render();
+            broadcastCombatState();
         }
 
         // Adjust HP
@@ -1194,6 +1272,16 @@
 
             saveState();
             render();
+            broadcastHpChange(id, combatant.hpCurrent, combatant.hpTemp);
+            broadcastCombatState();
+            // Players broadcast HP changes on their own character too
+            if (window.Multiplayer && !window.Multiplayer.isDM()) {
+                window.Multiplayer.broadcast('hp-change', {
+                    combatantId: id,
+                    hpCurrent: combatant.hpCurrent,
+                    hpTemp: combatant.hpTemp
+                });
+            }
         }
 
         // Set temp HP
@@ -1202,6 +1290,7 @@
             if (!combatant) return;
             combatant.hpTemp = Math.max(0, parseInt(value) || 0);
             saveState();
+            broadcastHpChange(id, combatant.hpCurrent, combatant.hpTemp);
         }
 
         // Add condition
@@ -1211,6 +1300,8 @@
             combatant.conditions.push(condition);
             saveState();
             render();
+            broadcastConditionChange(id, combatant.conditions);
+            broadcastCombatState();
         }
 
         // Remove condition
@@ -1220,6 +1311,8 @@
             combatant.conditions = combatant.conditions.filter(c => c !== condition);
             saveState();
             render();
+            broadcastConditionChange(id, combatant.conditions);
+            broadcastCombatState();
         }
 
         // Toggle concentration
@@ -1229,6 +1322,7 @@
             combatant.concentration = !combatant.concentration;
             saveState();
             render();
+            broadcastCombatState();
         }
 
         // Toggle death save
@@ -1247,6 +1341,7 @@
 
             saveState();
             render();
+            broadcastCombatState();
         }
 
         // Reset death saves
@@ -1256,6 +1351,7 @@
             combatant.deathSaves = { successes: 0, failures: 0 };
             saveState();
             render();
+            broadcastCombatState();
         }
 
         // Update notes
@@ -1264,6 +1360,7 @@
             if (!combatant) return;
             combatant.notes = notes;
             saveState();
+            broadcastCombatState();
         }
 
         // Get HP status class
@@ -1279,6 +1376,17 @@
             document.getElementById('round-number').textContent = roundNumber;
 
             const listEl = document.getElementById('combatant-list');
+            const playerMode = isMultiplayerPlayer();
+            const myName = (window.Multiplayer && window.Multiplayer.getMyName) ? window.Multiplayer.getMyName() : null;
+            const myTabId = (window.Multiplayer && window.Multiplayer.getMyTabId) ? window.Multiplayer.getMyTabId() : null;
+
+            // Role-based UI: hide DM-only controls for players
+            const addForm = document.querySelector('.add-combatant-form');
+            const nextTurnBtn = document.querySelector('.btn-next-turn');
+            const newEncounterBtn = document.querySelector('.btn-new-encounter');
+            if (addForm) addForm.style.display = playerMode ? 'none' : '';
+            if (nextTurnBtn) nextTurnBtn.style.display = playerMode ? 'none' : '';
+            if (newEncounterBtn) newEncounterBtn.style.display = playerMode ? 'none' : '';
 
             if (combatants.length === 0) {
                 listEl.innerHTML = `
@@ -1291,6 +1399,12 @@
             }
 
             let html = '';
+            if (playerMode) {
+                const hasOwnChar = myName && combatants.some(c => c.name.toLowerCase() === myName.toLowerCase());
+                html += `<div style="background: rgba(201, 162, 39, 0.15); border: 1px solid rgba(201, 162, 39, 0.4); border-radius: 8px; padding: 10px 18px; margin-bottom: 15px; color: #c9a227; font-size: 0.9rem; text-align: center;">
+                    <strong>Read-Only View</strong> &mdash; Combat is managed by the DM${hasOwnChar ? '. You can adjust HP on your own character.' : '.'}
+                </div>`;
+            }
             combatants.forEach((c, index) => {
                 const isActive = index === currentTurnIndex;
                 const isDead = c.hpCurrent <= 0 && c.deathSaves.failures >= 3;
@@ -1299,6 +1413,9 @@
                 const hpClass = getHpStatusClass(c.hpCurrent, c.hpMax);
 
                 const availableConditions = CONDITIONS.filter(cond => !c.conditions.includes(cond));
+                const isOwnCharacter = playerMode && myName && c.name.toLowerCase() === myName.toLowerCase();
+                const canEditHp = !playerMode || isOwnCharacter;
+                const canEditConditions = !playerMode;
 
                 html += `
                     <article class="combatant-card ${isActive ? 'active-turn' : ''} ${isDead ? 'dead' : ''} ${isUnconscious ? 'unconscious' : ''}" aria-label="${escapeHtml(c.name)}, Initiative ${c.initiative}${isActive ? ', current turn' : ''}">
@@ -1310,7 +1427,7 @@
                                 <div class="combatant-ac" aria-label="Armor Class ${c.ac}">AC: <span>${c.ac}</span></div>
                                 ${c.concentration ? '<span class="concentration-badge" aria-label="Concentrating on a spell">Concentrating</span>' : ''}
                             </div>
-                            <button class="btn-remove" onclick="removeCombatant('${c.id}')" aria-label="Remove ${escapeHtml(c.name)} from combat">Remove</button>
+                            ${playerMode ? '' : `<button class="btn-remove" onclick="removeCombatant('${c.id}')" aria-label="Remove ${escapeHtml(c.name)} from combat">Remove</button>`}
                         </div>
 
                         <div class="combatant-body">
@@ -1324,6 +1441,7 @@
                                 <div class="hp-bar" role="progressbar" aria-valuenow="${c.hpCurrent}" aria-valuemin="0" aria-valuemax="${c.hpMax}" aria-label="HP bar">
                                     <div class="hp-bar-fill ${hpClass}" style="width: ${hpPercent}%"></div>
                                 </div>
+                                ${canEditHp ? `
                                 <div class="hp-controls" role="group" aria-label="HP adjustment controls">
                                     <button class="btn-damage" onclick="applyHpChange('${c.id}', 'damage')" aria-label="Apply damage">-</button>
                                     <label for="hp-change-${c.id}" class="visually-hidden">HP change amount</label>
@@ -1334,6 +1452,7 @@
                                     <label for="temp-hp-${c.id}">Temp HP:</label>
                                     <input type="number" id="temp-hp-${c.id}" value="${c.hpTemp}" min="0" onchange="setTempHp('${c.id}', this.value)" aria-label="Temporary hit points">
                                 </div>
+                                ` : ''}
                             </div>
 
                             <!-- Conditions Section -->
@@ -1343,10 +1462,11 @@
                                     ${c.conditions.map(cond => `
                                         <span class="condition-tag">
                                             ${cond}
-                                            <button onclick="removeCondition('${c.id}', '${cond}')" aria-label="Remove ${cond} condition">&times;</button>
+                                            ${canEditConditions ? `<button onclick="removeCondition('${c.id}', '${cond}')" aria-label="Remove ${cond} condition">&times;</button>` : ''}
                                         </span>
                                     `).join('')}
                                 </div>
+                                ${canEditConditions ? `
                                 <div class="condition-dropdown">
                                     <label for="add-condition-${c.id}" class="visually-hidden">Add condition</label>
                                     <select id="add-condition-${c.id}" onchange="addCondition('${c.id}', this.value); this.value='';" aria-label="Add condition to ${escapeHtml(c.name)}">
@@ -1358,6 +1478,7 @@
                                     <input type="checkbox" id="concentration-${c.id}" ${c.concentration ? 'checked' : ''} onchange="toggleConcentration('${c.id}')">
                                     <label for="concentration-${c.id}">Concentrating on a spell</label>
                                 </div>
+                                ` : ''}
                             </div>
 
                             <!-- Death Saves Section -->
@@ -1436,5 +1557,7 @@
         // Initialize
         loadState();
     </script>
+    <script src="multiplayer.js"></script>
+    <script src="multiplayer-ui.js"></script>
 </body>
 </html>

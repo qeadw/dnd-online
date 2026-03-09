@@ -723,13 +723,15 @@
             }
         }
     </style>
+    <script src="spa-bridge.js"></script>
 </head>
 <body>
+    <div id="multiplayer-overlay"></div>
     <a href="#main" class="skip-link">Skip to content</a>
     <header>
         <h1>Inventory Manager</h1>
         <nav class="main-nav">
-            <a href="index.html" class="nav-link">Game Tools</a>
+            <a href="game-tools.html" class="nav-link">Game Tools</a>
             <a href="character-creator.html" class="nav-link">Character Creator</a>
             <a href="characters.html" class="nav-link">My Characters</a>
             <a href="spells.html" class="nav-link">Spells</a>
@@ -738,6 +740,7 @@
             <a href="combat.html" class="nav-link">Combat</a>
             <a href="inventory.html" class="nav-link active">Inventory</a>
             <a href="maps.html" class="nav-link">Maps</a>
+            <a href="session.html" class="nav-link">Session</a>
         </nav>
     </header>
 
@@ -1547,5 +1550,7 @@
             }, 3000);
         }
     </script>
+    <script src="multiplayer.js"></script>
+    <script src="multiplayer-ui.js"></script>
 </body>
 </html>

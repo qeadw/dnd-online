@@ -4,6 +4,23 @@
    ============================================ */
 
 /* ============================================
+   Embedded Mode (SPA iframe)
+   Hide header/nav when page is loaded inside
+   the SPA shell as an iframe.
+   ============================================ */
+html.embedded header {
+    display: none !important;
+}
+
+html.embedded .skip-link {
+    display: none !important;
+}
+
+html.embedded #multiplayer-overlay {
+    display: none !important;
+}
+
+/* ============================================
    CSS Custom Properties (Design Tokens)
    ============================================ */
 :root {

@@ -10,7 +10,7 @@ Should this work only with tabs on the same computer/browser, or do you want pla
 - Option 2: Same network/LAN (simple WebSocket server)
 - Option 3: Full online (WebSocket server hosted somewhere)
 
-**Answer:**
+for now just the same browser on the same computer but eventually i will have Multiplayer, dont worry aobut it for now.
 
 ## B. DM vs Player Roles
 When someone opens a tab, how do they pick their role?
@@ -18,45 +18,45 @@ When someone opens a tab, how do they pick their role?
 - Option 2: Choose DM or Player from a menu when you open the page
 - Option 3: DM creates a session code, players enter it to join
 
-**Answer:**
+3
 
 ## C. What Can the DM Do That Players Can't?
 Check everything the DM should have exclusive control over:
-- [ ] See and control all monsters/NPCs
-- [ ] Roll dice secretly (hidden from players)
-- [ ] Push map changes to all players
-- [ ] Control initiative order
+- [X] See and control all monsters/NPCs (dm can select who can control what)
+- [x] Roll dice secretly (hidden from players)
+- [x] Push map changes to all players
+- [x] Control initiative order
 - [ ] Send narration/story text to all players
-- [ ] View all player character sheets
-- [ ] Apply damage/healing to player characters
-- [ ] Control what information players can see
+- [x] View all player character sheets
+- [x] Apply damage/healing to player characters
+- [x] Control what information players can see
 - [ ] Other: _______________
 
 **Answer:**
 
 ## D. What Can Players Do?
 Check everything players should be able to do:
-- [ ] See their own character sheet
-- [ ] Roll dice (visible to everyone)
+- [x] See their own character sheet
+- [x] Roll dice (visible to everyone)
 - [ ] Roll dice privately (only they see)
-- [ ] Move their token on a shared map
-- [ ] Send messages/chat to the group
-- [ ] Track their own HP/spell slots/inventory
+- [x] Move their token on a shared map
+- [x] Send messages/chat to the group
+- [x] Track their own HP/spell slots/inventory
 - [ ] See other players' character sheets
-- [ ] Request actions from the DM
+- [x] Request actions from the DM
 - [ ] Other: _______________
 
 **Answer:**
 
 ## E. Shared State — What Syncs Across Tabs?
 What should automatically update for everyone when it changes?
-- [ ] Dice rolls and results
-- [ ] Initiative tracker/turn order
-- [ ] Map and token positions
-- [ ] HP/damage changes
-- [ ] Chat/narration messages
-- [ ] Combat log
-- [ ] Conditions/status effects on characters
+- [x] Dice rolls and results
+- [x] Initiative tracker/turn order
+- [x] Map and token positions
+- [x] HP/damage changes
+- [x] Chat/narration messages
+- [x] Combat log
+- [x] Conditions/status effects on characters
 - [ ] Other: _______________
 
 **Answer:**
@@ -67,7 +67,7 @@ If all tabs close, what happens?
 - Option 2: DM's tab saves the session, can resume later
 - Option 3: All state auto-saves, anyone can reopen and continue
 
-**Answer:**
+2, the dm can resume the session
 
 ## G. Character Selection
 How do players pick their character when joining?
@@ -76,7 +76,7 @@ How do players pick their character when joining?
 - Option 3: DM assigns characters to player tabs
 - Option 4: Both — pick existing or create new
 
-**Answer:**
+4
 
 ## H. Map/Battle Grid
 How should the shared map work?
@@ -85,7 +85,7 @@ How should the shared map work?
 - Option 3: Full battle map with fog of war, token movement for everyone
 - Option 4: Start simple (option 2), add more later
 
-**Answer:**
+2, but when the dm loads a map it should load for everyone
 
 ## I. Chat System
 Do you want an in-app chat/message system?
@@ -94,7 +94,7 @@ Do you want an in-app chat/message system?
 - Option 3: Chat with channels (general, whisper to DM, whisper to player)
 - Option 4: Chat with character names and role-play formatting
 
-**Answer:**
+3
 
 ## J. How Many Players?
 What's the max number of player tabs you want to support?
@@ -103,7 +103,7 @@ What's the max number of player tabs you want to support?
 - Option 3: 1 DM + unlimited players
 - Option 4: Doesn't matter, just make it work
 
-**Answer:**
+Let the DM decide when making the session and let them change it later in session settings
 
 ## K. UI Layout
 Should the DM and player views be totally different pages, or the same page with different permissions?
@@ -111,7 +111,7 @@ Should the DM and player views be totally different pages, or the same page with
 - Option 2: Separate DM page and Player page
 - Option 3: DM gets a dashboard that embeds/controls the existing tools
 
-**Answer:**
+1
 
 ## L. Starting Point — What's the MVP?
 What's the bare minimum you want working first before adding more?
@@ -121,7 +121,7 @@ What's the bare minimum you want working first before adding more?
 - Option 4: Full DM/player split with dice, initiative, chat, and character view
 - Option 5: Other: _______________
 
-**Answer:**
+4
 
 ---
 
