@@ -328,6 +328,12 @@ const CLASSES = {
             cantripsKnown: [2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
             spellsKnown: [4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 15, 16, 18, 19, 19, 20, 22, 22, 22]
         },
+        startingEquipment: [
+            "A rapier OR a longsword OR any simple weapon",
+            "A diplomat's pack OR an entertainer's pack",
+            "A lute",
+            "Leather armor and a dagger"
+        ],
         features: {
             1: [
                 {
@@ -552,6 +558,13 @@ const CLASSES = {
             type: "prepared",
             cantripsKnown: [3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
         },
+        startingEquipment: [
+            "A mace OR a warhammer (if proficient)",
+            "Scale mail OR leather armor OR chain mail (if proficient)",
+            "A light crossbow and 20 bolts OR any simple weapon",
+            "A priest's pack OR an explorer's pack",
+            "A shield and a holy symbol"
+        ],
         features: {
             1: [
                 {
@@ -887,6 +900,11 @@ const CLASSES = {
             type: "prepared",
             cantripsKnown: [2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
         },
+        startingEquipment: [
+            "A wooden shield OR any simple weapon",
+            "A scimitar OR any simple melee weapon",
+            "Leather armor, an explorer's pack, and a druidic focus"
+        ],
         features: {
             1: [
                 {
@@ -1136,6 +1154,12 @@ const CLASSES = {
             count: 2,
             options: ["Acrobatics", "Animal Handling", "Athletics", "History", "Insight", "Intimidation", "Perception", "Survival"]
         },
+        startingEquipment: [
+            "Chain mail OR leather armor, a longbow, and 20 arrows",
+            "A martial weapon and a shield OR two martial weapons",
+            "A light crossbow and 20 bolts OR two handaxes",
+            "A dungeoneer's pack OR an explorer's pack"
+        ],
         features: {
             1: [
                 {
@@ -1512,6 +1536,11 @@ const CLASSES = {
             count: 2,
             options: ["Acrobatics", "Athletics", "History", "Insight", "Religion", "Stealth"]
         },
+        startingEquipment: [
+            "A shortsword OR any simple weapon",
+            "A dungeoneer's pack OR an explorer's pack",
+            "10 darts"
+        ],
         features: {
             1: [
                 {
@@ -1796,6 +1825,12 @@ const CLASSES = {
             type: "prepared",
             startLevel: 2
         },
+        startingEquipment: [
+            "A martial weapon and a shield OR two martial weapons",
+            "Five javelins OR any simple melee weapon",
+            "A priest's pack OR an explorer's pack",
+            "Chain mail and a holy symbol"
+        ],
         features: {
             1: [
                 {
@@ -2019,6 +2054,12 @@ const CLASSES = {
             startLevel: 2,
             spellsKnown: [0, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11]
         },
+        startingEquipment: [
+            "Scale mail OR leather armor",
+            "Two shortswords OR two simple melee weapons",
+            "A dungeoneer's pack OR an explorer's pack",
+            "A longbow and a quiver of 20 arrows"
+        ],
         features: {
             1: [
                 {
@@ -2248,6 +2289,12 @@ const CLASSES = {
             count: 4,
             options: ["Acrobatics", "Athletics", "Deception", "Insight", "Intimidation", "Investigation", "Perception", "Performance", "Persuasion", "Sleight of Hand", "Stealth"]
         },
+        startingEquipment: [
+            "A rapier OR a shortsword",
+            "A shortbow and quiver of 20 arrows OR a shortsword",
+            "A burglar's pack OR a dungeoneer's pack OR an explorer's pack",
+            "Leather armor, two daggers, and thieves' tools"
+        ],
         features: {
             1: [
                 {
@@ -2642,6 +2689,12 @@ const CLASSES = {
             cantripsKnown: [4, 4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
             spellsKnown: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12, 13, 13, 14, 14, 15, 15, 15, 15]
         },
+        startingEquipment: [
+            "A light crossbow and 20 bolts OR any simple weapon",
+            "A component pouch OR an arcane focus",
+            "A dungeoneer's pack OR an explorer's pack",
+            "Two daggers"
+        ],
         features: {
             1: [
                 {
@@ -2902,6 +2955,12 @@ const CLASSES = {
             cantripsKnown: [2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
             spellsKnown: [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15]
         },
+        startingEquipment: [
+            "A light crossbow and 20 bolts OR any simple weapon",
+            "A component pouch OR an arcane focus",
+            "A scholar's pack OR a dungeoneer's pack",
+            "Leather armor, any simple weapon, and two daggers"
+        ],
         features: {
             1: [
                 {
@@ -3085,6 +3144,12 @@ const CLASSES = {
             type: "prepared",
             cantripsKnown: [3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
         },
+        startingEquipment: [
+            "A quarterstaff OR a dagger",
+            "A component pouch OR an arcane focus",
+            "A scholar's pack OR an explorer's pack",
+            "A spellbook"
+        ],
         features: {
             1: [
                 {
