@@ -1140,57 +1140,142 @@ Popular expansion with subclasses, spells, and optional rules.
 
 ---
 
-## IMPLEMENTATION STATUS
+## IMPLEMENTATION STATUS (Audited 2026-03-09)
 
-### Completed
-- [ ] Base 12 Classes (PHB)
-- [ ] PHB Subclasses
-- [ ] XGtE Subclasses
-- [ ] PHB Cantrips
-- [ ] XGtE Cantrips
-- [ ] PHB 1st-Level Spells
-- [ ] XGtE 1st-Level Spells
-- [ ] PHB 2nd-Level Spells
-- [ ] XGtE 2nd-Level Spells
-- [ ] PHB 3rd-Level Spells
-- [ ] XGtE 3rd-Level Spells
-- [ ] PHB 4th-Level Spells
-- [ ] XGtE 4th-Level Spells
-- [ ] PHB 5th-Level Spells
-- [ ] XGtE 5th-Level Spells
-- [ ] PHB 6th-Level Spells
-- [ ] XGtE 6th-Level Spells
-- [ ] PHB 7th-Level Spells
-- [ ] XGtE 7th-Level Spells
-- [ ] PHB 8th-Level Spells
-- [ ] XGtE 8th-Level Spells
-- [ ] PHB 9th-Level Spells
-- [ ] XGtE 9th-Level Spells
-- [ ] Monster Manual - Aberrations
-- [ ] Monster Manual - Beasts
-- [ ] Monster Manual - Celestials
-- [ ] Monster Manual - Constructs
-- [ ] Monster Manual - Dragons (Chromatic)
-- [ ] Monster Manual - Dragons (Metallic)
-- [ ] Monster Manual - Elementals
-- [ ] Monster Manual - Fey
-- [ ] Monster Manual - Fiends (Demons)
-- [ ] Monster Manual - Fiends (Devils)
-- [ ] Monster Manual - Fiends (Other)
-- [ ] Monster Manual - Giants
-- [ ] Monster Manual - Humanoids
-- [ ] Monster Manual - Monstrosities
-- [ ] Monster Manual - Oozes
-- [ ] Monster Manual - Plants
-- [ ] Monster Manual - Undead
+### Overview
+- **328 of ~400+ monsters** implemented (82%)
+- **372 of ~420 spells** implemented (89%)
+- **52 of 59 subclasses** fully implemented (88%)
+- **55 feats** implemented (not in original reference — bonus content)
+- **12/12 base classes** fully implemented with level 1-20 progression
+- **23 races** implemented (exceeds the 9 PHB races planned)
+- **11/11 backgrounds** implemented
+- **15/15 conditions** implemented
+- **Equipment database** complete (weapons, armor, tools, ammunition, services)
+
+---
+
+## WHAT STILL NEEDS TO BE ADDED
+
+### 1. Missing Subclasses (6 total)
+
+#### Druid - Missing 2 XGtE Circles:
+- [ ] Circle of Dreams (XGtE) — features at levels 2, 6, 10, 14
+- [ ] Circle of the Shepherd (XGtE) — features at levels 2, 6, 10, 14
+
+#### Paladin - Missing 4 Oaths (only Oath of Devotion implemented):
+- [ ] Oath of the Ancients (PHB) — features at levels 3, 7, 15, 20
+- [ ] Oath of Vengeance (PHB) — features at levels 3, 7, 15, 20
+- [ ] Oath of Conquest (XGtE) — features at levels 3, 7, 15, 20
+- [ ] Oath of Redemption (XGtE) — features at levels 3, 7, 15, 20
+
+#### Bard - 1 Incomplete:
+- [ ] College of Creation (XGtE) — referenced but feature details are truncated/incomplete
+
+### 2. Missing Monsters (51 creatures)
+
+#### Aberrations (2 missing):
+- [ ] Death Slaad (CR 10)
+- [ ] Star Spawn (various CRs)
+
+#### Beasts (5 missing):
+- [ ] Axe Beak (CR 1/4)
+- [ ] Flying Snake (CR 1/8)
+- [ ] Giant Wolf Spider (CR 1/4)
+- [ ] Winter Wolf (CR 3)
+- [ ] Worg (CR 1/2)
+
+#### Humanoids (37 missing — largest gap):
+- [ ] Bugbear Chief (CR 3)
+- [ ] Drow (CR 1/4)
+- [ ] Drow Elite Warrior (CR 5)
+- [ ] Drow Mage (CR 7)
+- [ ] Drow Priestess of Lolth (CR 8)
+- [ ] Duergar (CR 1)
+- [ ] Gnoll (CR 1/2)
+- [ ] Gnoll Fang of Yeenoghu (CR 4)
+- [ ] Gnoll Pack Lord (CR 2)
+- [ ] Goblin Boss (CR 1)
+- [ ] Half-Ogre (CR 1)
+- [ ] Hobgoblin (CR 1/2)
+- [ ] Hobgoblin Captain (CR 3)
+- [ ] Hobgoblin Warlord (CR 6)
+- [ ] Jackalwere (CR 1/2)
+- [ ] Kobold (CR 1/8)
+- [ ] Kuo-Toa (CR 1/4)
+- [ ] Kuo-Toa Archpriest (CR 6)
+- [ ] Kuo-Toa Whip (CR 1)
+- [ ] Lizardfolk (CR 1/2)
+- [ ] Lizardfolk King/Queen (CR 4)
+- [ ] Lizardfolk Shaman (CR 2)
+- [ ] Merfolk (CR 1/8)
+- [ ] Orc Eye of Gruumsh (CR 2)
+- [ ] Orc War Chief (CR 4)
+- [ ] Sahuagin (CR 1/2)
+- [ ] Sahuagin Baron (CR 5)
+- [ ] Sahuagin Priestess (CR 2)
+- [ ] Troglodyte (CR 1/4)
+- [ ] Werebear (CR 5)
+- [ ] Wereboar (CR 4)
+- [ ] Wererat (CR 2)
+- [ ] Weretiger (CR 4)
+- [ ] Werewolf (CR 3)
+- [ ] Yuan-Ti Abomination (CR 7)
+- [ ] Yuan-Ti Malison (CR 3)
+- [ ] Yuan-Ti Pureblood (CR 1)
+
+#### Monstrosities (1 missing):
+- [ ] Yuan-Ti Anathema (CR 12)
+
+#### Plants (4 missing):
+- [ ] Blights (various CRs — Needle, Twig, Vine)
+- [ ] Myconid Adult (CR 1/2)
+- [ ] Myconid Sovereign (CR 2)
+- [ ] Myconid Sprout (CR 0)
+
+#### Fiends (1 missing):
+- [ ] Yugoloths (various — Mezzoloth, Nycaloth, Ultroloth, Arcanaloth)
+
+#### Plants (already in data but missing from reference):
+- [ ] Shrieker (CR 0)
+
+### 3. Missing Spells (~48 spells gap between 372 implemented and ~420 referenced)
+
+The spell database has 372 spells implemented. The reference lists ~420 total. A detailed spell-by-spell comparison is needed to identify the exact ~48 missing spells. The implemented spells cover all levels (cantrips through 9th) from both PHB and XGtE sources.
+
+### 4. Content NOT in Original Reference But Should Be Added
+
+#### Magic Items (not referenced, not implemented):
+- [ ] Common magic items
+- [ ] Uncommon magic items
+- [ ] Rare magic items
+- [ ] Very Rare magic items
+- [ ] Legendary magic items
+- [ ] Artifacts
+
+#### Game Mechanics (partially implemented):
+- [ ] Multiclassing rules and requirements
+- [ ] Spell scroll mechanics
+- [ ] Optional rules from Xanathar's Guide (tool proficiency expansions, simultaneous effects, etc.)
+
+#### Feats (55 implemented, but these PHB feats may still be missing):
+The current feats.js has 55 feat entries (including variants like Elemental Adept per element, Magic Initiate per class). The original CONTENT-REFERENCE.md did not include a feats checklist. A full PHB+XGtE feat audit against the implementation is recommended.
+
+### 5. Subclasses Implemented BEYOND the Reference (bonus content)
+These were added but are not listed in CONTENT-REFERENCE.md:
+- Druid: Circle of Spores, Circle of Stars, Circle of Wildfire
+- Sorcerer: Aberrant Mind, Clockwork Soul
+- Bard: College of Creation (partially)
 
 ---
 
 ## SUMMARY COUNTS
 
 ### Classes & Subclasses
-- **12 Base Classes** (PHB)
-- **47 Total Subclasses** (PHB + XGtE)
+- **12 Base Classes** (PHB) — ALL IMPLEMENTED
+- **52 of 59 Subclasses** fully implemented (88%)
+- **6 subclasses still needed** (2 Druid, 4 Paladin)
+- **5 bonus subclasses** implemented beyond reference scope
 
 ### Spells
 - **Cantrips:** 26 PHB + 12 XGtE = **38 total**
@@ -1203,49 +1288,47 @@ Popular expansion with subclasses, spells, and optional rules.
 - **7th Level:** 20 PHB + 4 XGtE = **24 total**
 - **8th Level:** 18 PHB + 4 XGtE = **22 total**
 - **9th Level:** 16 PHB + 3 XGtE = **19 total**
-- **TOTAL SPELLS: ~420**
+- **TOTAL REFERENCED: ~420 | IMPLEMENTED: 372 (~89%)**
 
 ### Monsters (Monster Manual)
-- **Aberrations:** ~15
-- **Beasts:** ~100
-- **Celestials:** ~7
-- **Constructs:** ~11
-- **Dragons:** ~40 (all ages of chromatic & metallic)
-- **Elementals:** ~22
-- **Fey:** ~8
-- **Fiends:** ~35 (demons, devils, other)
-- **Giants:** ~11
-- **Humanoids:** ~70
-- **Monstrosities:** ~50
-- **Oozes:** ~4
-- **Plants:** ~10
-- **Undead:** ~25
-- **TOTAL MONSTERS: ~400+**
+- **Aberrations:** ~13 of ~15 (2 missing)
+- **Beasts:** ~90 of ~100 (5 missing)
+- **Celestials:** 7 of 7 — COMPLETE
+- **Constructs:** 11 of 11 — COMPLETE
+- **Dragons:** 40 of 40 — COMPLETE (all ages chromatic & metallic)
+- **Elementals:** 22 of 22 — COMPLETE
+- **Fey:** 8 of 8 — COMPLETE
+- **Fiends (Demons):** 14 of 14 — COMPLETE
+- **Fiends (Devils):** 11 of 11 — COMPLETE
+- **Fiends (Other):** ~6 of ~7 (Yugoloths missing)
+- **Giants:** 11 of 11 — COMPLETE
+- **Humanoids:** ~33 of ~70 (37 missing — largest gap)
+- **Monstrosities:** ~42 of ~50 (1 from reference missing)
+- **Oozes:** 4 of 4 — COMPLETE
+- **Plants:** ~6 of ~10 (4 missing)
+- **Undead:** ~20 of ~25 — MOSTLY COMPLETE
+- **TOTAL: 328 implemented of ~400+ referenced (82%)**
 
 ---
 
 ## NOTES FOR IMPLEMENTATION
 
-1. **Spells** - Add full descriptions including:
-   - Casting time
-   - Range
-   - Components (V, S, M with material descriptions)
-   - Duration
-   - Full description text
-   - Higher level scaling
+1. **Priority 1 — Paladin Subclasses (4 missing):** This is the biggest class gap. Only 1 of 5 Paladin oaths is implemented. Add Oath of the Ancients, Vengeance, Conquest, and Redemption with full feature trees.
 
-2. **Monsters** - Include:
-   - Full stat blocks
-   - Actions, reactions, legendary actions
-   - Lair actions (where applicable)
-   - Challenge rating and XP
+2. **Priority 2 — Humanoid Monsters (37 missing):** The largest monster gap. Most are common enemies (Drow variants, Gnolls, Hobgoblins, Lycanthropes, Yuan-Ti). These are critical for encounter building.
 
-3. **Subclasses** - Add to character creator:
-   - Level requirements
-   - Feature descriptions
-   - Spell lists (for spellcasting subclasses)
+3. **Priority 3 — Druid Subclasses (2 missing):** Circle of Dreams and Circle of the Shepherd from XGtE.
 
-4. **Priority Order:**
-   - Part 1: Complete all PHB content first
-   - Part 2: Add XGtE content
-   - This allows for incremental testing
+4. **Priority 4 — Remaining Monsters (14 non-humanoid):** Beasts, Aberrations, Plants, and Fiend variants to reach full Monster Manual coverage.
+
+5. **Priority 5 — Missing Spells (~48):** Audit and add remaining spells to reach full PHB+XGtE coverage.
+
+6. **Priority 6 — Magic Items:** Not in original scope but important for a complete D&D tool. Add items by rarity tier.
+
+7. **Priority 7 — Advanced Rules:** Multiclassing, spell scrolls, optional XGtE rules.
+
+8. **Implementation Notes:**
+   - Spells need: casting time, range, components (V/S/M), duration, description, higher level scaling
+   - Monsters need: full stat blocks, actions, reactions, legendary actions, lair actions (where applicable), CR and XP
+   - Subclasses need: level requirements, feature descriptions, spell lists (for caster subclasses)
+   - Follow existing data patterns in classes.js, monsters.js, spells.js for consistency
