@@ -1069,6 +1069,58 @@ const CLASSES = {
                         description: "As an action, you can spend your wildfire spirit to release a wave of healing and destruction. Each creature of your choice in a 30-foot-radius sphere takes fire damage or regains hit points equal to 2d10 + your Wisdom modifier."
                     }]
                 }
+            },
+            dreams: {
+                name: "Circle of Dreams",
+                source: "XGtE",
+                description: "Druids who are members of the Circle of Dreams hail from regions that have strong ties to the Feywild and its dreamlike realms. The druids' guardianship of the natural world makes for a natural alliance between them and good-aligned fey.",
+                features: {
+                    2: [{
+                        name: "Balm of the Summer Court",
+                        description: "You become imbued with the blessings of the Summer Court. You have a pool of fey energy represented by a number of d6s equal to your druid level. As a bonus action, you can choose an ally you can see within 120 feet of you and spend a number of those dice equal to half your druid level or less. Roll the spent dice and add them together. The target regains a number of hit points equal to the total. The target also gains 1 temporary hit point per die spent. You regain the expended dice when you finish a long rest."
+                    }],
+                    6: [{
+                        name: "Hearth of Moonlight and Shadow",
+                        description: "Home can be wherever you are. During a short or long rest, you can invoke the shadowy power of the Gleaming Court to help guard your respite. At the start of the rest, you touch a point in space, and an invisible, 30-foot-radius sphere of magic appears, centered on that point. Total cover blocks the sphere. While within the sphere, you and your allies gain a +5 bonus to Dexterity (Stealth) and Wisdom (Perception) checks, and any light from open flames in the sphere (a campfire, torches, or the like) isn't visible outside it. The sphere vanishes at the end of the rest or when you leave the sphere."
+                    }],
+                    10: [{
+                        name: "Hidden Paths",
+                        description: "You can use the hidden, magical pathways that some fey use to traverse space in the blink of an eye. As a bonus action on your turn, you can teleport up to 60 feet to an unoccupied space you can see. Alternatively, you can use your action to teleport one willing creature you touch up to 30 feet to an unoccupied space you can see. You can use this feature a number of times equal to your Wisdom modifier (minimum of once), and you regain all expended uses when you finish a long rest."
+                    }],
+                    14: [{
+                        name: "Walker in Dreams",
+                        description: "The magic of the Feywild grants you the ability to travel mentally or physically through dreamlands. When you finish a short rest, you can cast one of the following spells, without expending a spell slot or requiring material components: dream (with you as the messenger), scrying, or teleportation circle. This use of teleportation circle is special. Rather than opening a portal to a permanent teleportation circle, it opens a portal to the last place where you finished a long rest on your current plane of existence. You can use this feature once per long rest."
+                    }]
+                }
+            },
+            shepherd: {
+                name: "Circle of the Shepherd",
+                source: "XGtE",
+                description: "Druids of the Circle of the Shepherd commune with the spirits of nature, especially the spirits of beasts and the fey, and call to those spirits for aid.",
+                features: {
+                    2: [
+                        {
+                            name: "Speech of the Woods",
+                            description: "You gain the ability to converse with beasts and many fey. You learn to speak, read, and write Sylvan. In addition, beasts can understand your speech, and you gain the ability to decipher their noises and motions. Most beasts lack the intelligence to convey or understand sophisticated concepts, but a friendly beast could relay what it has seen or heard in the recent past."
+                        },
+                        {
+                            name: "Spirit Totem",
+                            description: "You can call forth nature spirits to influence the world around you. As a bonus action, you can magically summon an incorporeal spirit to a point you can see within 60 feet of you. The spirit creates an aura in a 30-foot radius around that point. It counts as neither a creature nor an object, though it has the spectral appearance of the creature it represents. As a bonus action, you can move the spirit up to 60 feet to a point you can see. The spirit persists for 1 minute or until you're incapacitated. You can use this feature a number of times equal to your proficiency bonus, and you regain all expended uses when you finish a long rest. The effect of the spirit's aura depends on the type of spirit you summon. Bear Spirit: Each creature of your choice in the aura when the spirit appears gains temporary hit points equal to 5 + your druid level. In addition, you and your allies gain advantage on Strength checks and Strength saving throws while in the aura. Hawk Spirit: When a creature makes an attack roll against a target in the spirit's aura, you can use your reaction to grant advantage to that attack roll. In addition, you and your allies gain advantage on Wisdom (Perception) checks while in the aura. Unicorn Spirit: You and your allies gain advantage on all ability checks made to detect creatures in the spirit's aura. In addition, if you cast a spell using a spell slot that restores hit points to any creature inside or outside the aura, each creature of your choice in the aura also regains hit points equal to your druid level."
+                        }
+                    ],
+                    6: [{
+                        name: "Mighty Summoner",
+                        description: "Beasts and fey that you conjure are more resilient than normal. Any beast or fey summoned or created by a spell that you cast gains the following benefits: the creature appears with more hit points than normal — 2 extra hit points per Hit Die it has, and the damage from its natural weapons is considered magical for the purpose of overcoming immunity and resistance to nonmagical attacks and damage."
+                    }],
+                    10: [{
+                        name: "Guardian Spirit",
+                        description: "Your Spirit Totem safeguards the beasts and fey that you call forth with your magic. When a beast or fey that you summoned or created with a spell ends its turn in your Spirit Totem aura, that creature regains a number of hit points equal to half your druid level."
+                    }],
+                    14: [{
+                        name: "Faithful Summons",
+                        description: "The nature spirits you commune with protect you when you are the most defenseless. If you are reduced to 0 hit points or are incapacitated against your will, you can immediately gain the benefits of conjure animals as if it were cast using a 9th-level spell slot. It summons four beasts of your choice that are CR 2 or lower. The conjured beasts appear within 20 feet of you. If they receive no commands from you, they protect you from harm and attack your foes. The spell lasts for 1 hour, requiring no concentration, or until you dismiss it (no action required). Once you use this feature, you can't use it again until you finish a long rest."
+                    }]
+                }
             }
         }
     },
@@ -1830,6 +1882,120 @@ const CLASSES = {
                     20: [{
                         name: "Holy Nimbus",
                         description: "As an action, you can emanate an aura of sunlight."
+                    }]
+                }
+            },
+            ancients: {
+                name: "Oath of the Ancients",
+                description: "The Oath of the Ancients is as old as the race of elves and the rituals of the druids. Sometimes called fey knights, green knights, or horned knights, paladins who swear this oath cast their lot with the side of the light in the cosmic struggle against darkness because they love the beautiful and life-giving things of the world.",
+                features: {
+                    3: [
+                        {
+                            name: "Oath Spells",
+                            description: "You gain oath spells at the paladin levels listed: 3rd - ensnaring strike, speak with animals; 5th - moonbeam, misty step; 9th - plant growth, protection from energy; 13th - ice storm, stoneskin; 17th - commune with nature, tree stride."
+                        },
+                        {
+                            name: "Channel Divinity",
+                            description: "You gain the following two Channel Divinity options. Nature's Wrath: You can use your Channel Divinity to invoke primeval forces to ensnare a foe. As an action, you can cause spectral vines to spring up and reach for a creature within 10 feet of you that you can see. The creature must succeed on a Strength or Dexterity saving throw (its choice) or be restrained. While restrained by the vines, the creature repeats the saving throw at the end of each of its turns. On a success, it frees itself and the vines vanish. Turn the Faithless: You can use your Channel Divinity to utter ancient words that are painful for fey and fiends to hear. As an action, you present your holy symbol, and each fey or fiend within 30 feet of you that can hear you must make a Wisdom saving throw. On a failed save, the creature is turned for 1 minute or until it takes damage."
+                        }
+                    ],
+                    7: [{
+                        name: "Aura of Warding",
+                        description: "Ancient magic lies so heavily upon you that it forms an eldritch ward. You and friendly creatures within 10 feet of you have resistance to damage from spells. At 18th level, the range of this aura increases to 30 feet."
+                    }],
+                    15: [{
+                        name: "Undying Sentinel",
+                        description: "When you are reduced to 0 hit points and are not killed outright, you can choose to drop to 1 hit point instead. Once you use this ability, you can't use it again until you finish a long rest. Additionally, you suffer none of the drawbacks of old age, and you can't be aged magically."
+                    }],
+                    20: [{
+                        name: "Elder Champion",
+                        description: "You can assume the form of an ancient force of nature, using your action to gain the following benefits for 1 minute: at the start of each of your turns, you regain 10 hit points; whenever you cast a paladin spell that has a casting time of 1 action, you can cast it as a bonus action instead; enemy creatures within 10 feet of you have disadvantage on saving throws against your paladin spells and Channel Divinity options. Once you use this feature, you can't use it again until you finish a long rest."
+                    }]
+                }
+            },
+            vengeance: {
+                name: "Oath of Vengeance",
+                description: "The Oath of Vengeance is a solemn commitment to punish those who have committed a grievous sin. When evil forces slaughter helpless villagers, when an entire people turns against the will of the gods, when a thieves' guild grows too violent and powerful, when a dragon rampages through the countryside — at times like these, paladins arise and swear an Oath of Vengeance to set right that which has gone wrong.",
+                features: {
+                    3: [
+                        {
+                            name: "Oath Spells",
+                            description: "You gain oath spells at the paladin levels listed: 3rd - bane, hunter's mark; 5th - hold person, misty step; 9th - haste, protection from energy; 13th - banishment, dimension door; 17th - hold monster, scrying."
+                        },
+                        {
+                            name: "Channel Divinity",
+                            description: "You gain the following two Channel Divinity options. Abjure Enemy: As an action, you present your holy symbol and speak a prayer of denunciation, using your Channel Divinity. Choose one creature within 60 feet of you that you can see. That creature must make a Wisdom saving throw, unless it is immune to being frightened. Fiends and undead have disadvantage on this saving throw. On a failed save, the creature is frightened for 1 minute or until it takes any damage. While frightened, the creature's speed is 0, and it can't benefit from any bonus to its speed. On a successful save, the creature's speed is halved for 1 minute or until it takes any damage. Vow of Enmity: As a bonus action, you can utter a vow of enmity against a creature you can see within 10 feet of you, using your Channel Divinity. You gain advantage on attack rolls against the creature for 1 minute or until it drops to 0 hit points or falls unconscious."
+                        }
+                    ],
+                    7: [{
+                        name: "Relentless Avenger",
+                        description: "Your supernatural focus helps you close off a foe's retreat. When you hit a creature with an opportunity attack, you can move up to half your speed immediately after the attack and as part of the same reaction. This movement doesn't provoke opportunity attacks."
+                    }],
+                    15: [{
+                        name: "Soul of Vengeance",
+                        description: "The authority with which you speak your Vow of Enmity gives you greater power over your foe. When a creature under the effect of your Vow of Enmity makes an attack, you can use your reaction to make a melee weapon attack against that creature if it is within range."
+                    }],
+                    20: [{
+                        name: "Avenging Angel",
+                        description: "You can assume the form of an angelic avenger. Using your action, you undergo a transformation. For 1 hour, you gain the following benefits: wings sprout from your back and grant you a flying speed of 60 feet; you emanate an aura of menace in a 30-foot radius. The first time any enemy creature enters the aura or starts its turn there during a battle, the creature must succeed on a Wisdom saving throw or become frightened of you for 1 minute or until it takes any damage. Attack rolls against the frightened creature have advantage. Once you use this feature, you can't use it again until you finish a long rest."
+                    }]
+                }
+            },
+            conquest: {
+                name: "Oath of Conquest",
+                source: "XGtE",
+                description: "The Oath of Conquest calls to paladins who seek glory in battle and the subjugation of their enemies. It isn't enough for these paladins to establish order. They must crush the forces of chaos.",
+                features: {
+                    3: [
+                        {
+                            name: "Oath Spells",
+                            description: "You gain oath spells at the paladin levels listed: 3rd - armor of agathys, command; 5th - hold person, spiritual weapon; 9th - bestow curse, fear; 13th - dominate beast, stoneskin; 17th - cloudkill, dominate person."
+                        },
+                        {
+                            name: "Channel Divinity",
+                            description: "You gain the following two Channel Divinity options. Conquering Presence: You can use your Channel Divinity to exude a terrifying presence. As an action, you force each creature of your choice that you can see within 30 feet of you to make a Wisdom saving throw. On a failed save, a creature becomes frightened of you for 1 minute. The frightened creature can repeat this saving throw at the end of each of its turns, ending the effect on itself on a success. Guided Strike: You can use your Channel Divinity to strike with supernatural accuracy. When you make an attack roll, you can use your Channel Divinity to gain a +10 bonus to the roll. You make this choice after you see the roll, but before the DM says whether the attack hits or misses."
+                        }
+                    ],
+                    7: [{
+                        name: "Aura of Conquest",
+                        description: "You constantly emanate a menacing aura while you're not incapacitated. The aura extends 10 feet from you in every direction, but not through total cover. If a creature is frightened of you, its speed is reduced to 0 while in the aura, and that creature takes psychic damage equal to half your paladin level if it starts its turn there. At 18th level, the range of this aura increases to 30 feet."
+                    }],
+                    15: [{
+                        name: "Scornful Rebuke",
+                        description: "Those who dare to strike you are psychically punished for their audacity. Whenever a creature hits you with an attack, that creature takes psychic damage equal to your Charisma modifier (minimum of 1) if you're not incapacitated."
+                    }],
+                    20: [{
+                        name: "Invincible Conqueror",
+                        description: "You gain the ability to harness extraordinary martial prowess. As an action, you can magically become an avatar of conquest, gaining the following benefits for 1 minute: you have resistance to all damage; when you take the Attack action on your turn, you can make one additional attack as part of that action; your melee weapon attacks score a critical hit on a roll of 19 or 20 on the d20. Once you use this feature, you can't use it again until you finish a long rest."
+                    }]
+                }
+            },
+            redemption: {
+                name: "Oath of Redemption",
+                source: "XGtE",
+                description: "The Oath of Redemption sets a paladin on a difficult path, one that requires a holy warrior to use violence only as a last resort. Paladins who dedicate themselves to this oath believe that any person can be redeemed and that the path of benevolence and justice is one that anyone can walk.",
+                features: {
+                    3: [
+                        {
+                            name: "Oath Spells",
+                            description: "You gain oath spells at the paladin levels listed: 3rd - sanctuary, sleep; 5th - calm emotions, hold person; 9th - counterspell, hypnotic pattern; 13th - Otiluke's resilient sphere, stoneskin; 17th - hold monster, wall of force."
+                        },
+                        {
+                            name: "Channel Divinity",
+                            description: "You gain the following two Channel Divinity options. Emissary of Peace: You can use your Channel Divinity to augment your presence with divine power. As a bonus action, you grant yourself a +5 bonus to Charisma (Persuasion) checks for the next 10 minutes. Rebuke the Violent: You can use your Channel Divinity to rebuke those who use violence. Immediately after an attacker within 30 feet of you deals damage with an attack against a creature other than you, you can use your reaction to force the attacker to make a Wisdom saving throw. On a failed save, the attacker takes radiant damage equal to the damage it just dealt. On a successful save, it takes half as much damage."
+                        }
+                    ],
+                    7: [{
+                        name: "Aura of the Guardian",
+                        description: "You can shield others from harm at the cost of your own health. When a creature within 10 feet of you takes damage, you can use your reaction to magically take that damage, instead of that creature taking it. This feature doesn't transfer any other effects that might accompany the damage, and this damage can't be reduced in any way. At 18th level, the range of this aura increases to 30 feet."
+                    }],
+                    15: [{
+                        name: "Protective Spirit",
+                        description: "A holy presence mends your wounds in battle. You regain hit points equal to 1d6 + half your paladin level if you end your turn in combat with fewer than half of your hit points remaining and you aren't incapacitated."
+                    }],
+                    20: [{
+                        name: "Emissary of Redemption",
+                        description: "You become an avatar of peace, which gives you two benefits. You have resistance to all damage dealt by other creatures (their attacks, spells, and other effects). Whenever a creature hits you with an attack, it takes radiant damage equal to half the damage you take from the attack. If you attack a creature, cast a spell on it, or deal damage to it by any means but this feature, neither benefit works against that creature until you finish a long rest."
                     }]
                 }
             }
