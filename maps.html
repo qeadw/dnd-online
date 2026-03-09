@@ -801,6 +801,9 @@
 
             // Load saved state if exists
             loadFromLocalStorage();
+
+            // Set up multiplayer listeners and role-based UI
+            setupMultiplayer();
         }
 
         function resizeCanvases() {
@@ -861,6 +864,17 @@
             if (state.currentTool === 'select') {
                 const token = getTokenAtPosition(pos);
                 if (token) {
+                    // Multiplayer: players can only drag tokens they own
+                    const canDrag = !window.Multiplayer || !window.Multiplayer.getSessionCode() ||
+                        window.Multiplayer.isDM() ||
+                        (token.ownerId && token.ownerId === window.Multiplayer.getMyTabId()) ||
+                        (window.Multiplayer.canControl && window.Multiplayer.canControl(token.id));
+                    if (!canDrag) {
+                        selectToken(token);
+                        state.isDragging = false;
+                        render();
+                        return;
+                    }
                     selectToken(token);
                     state.tokenDragOffset = {
                         x: pos.x - token.x,
@@ -931,6 +945,17 @@
         }
 
         function handleMouseUp(e) {
+            // Multiplayer: broadcast token move when drag ends
+            if (state.selectedToken && state.currentTool === 'select') {
+                if (window.Multiplayer && window.Multiplayer.getSessionCode()) {
+                    window.Multiplayer.broadcast('token-move', {
+                        tokenId: state.selectedToken.id,
+                        x: state.selectedToken.x,
+                        y: state.selectedToken.y
+                    });
+                }
+            }
+
             state.isDragging = false;
             state.tokenCanvas.classList.remove('grabbing');
 
@@ -1015,6 +1040,15 @@
                         centerMap();
                         render();
                         saveToLocalStorage();
+                        // Multiplayer: broadcast map to all players
+                        if (window.Multiplayer && window.Multiplayer.isDM()) {
+                            window.Multiplayer.broadcast('map-push', {
+                                mapImageDataUrl: state.mapCanvas.toDataURL(),
+                                tokens: state.tokens,
+                                gridSize: state.gridSize,
+                                showGrid: state.showGrid
+                            });
+                        }
                     };
                     img.src = event.target.result;
                 };
@@ -1535,6 +1569,7 @@
                 initFog();
             }
             render();
+            broadcastFogUpdate();
         }
 
         function setFogMode(mode) {
@@ -1544,6 +1579,16 @@
         function resetFog() {
             initFog();
             render();
+            broadcastFogUpdate();
+        }
+
+        function broadcastFogUpdate() {
+            if (window.Multiplayer && window.Multiplayer.isDM()) {
+                window.Multiplayer.broadcast('fog-update', {
+                    fogRevealed: state.fogData,
+                    fogEnabled: state.fogEnabled
+                });
+            }
         }
 
         // ==========================================
@@ -1556,6 +1601,15 @@
 
             if (mapType === 'blank') {
                 state.mapImage = null;
+                // Multiplayer: broadcast blank map to all players
+                if (window.Multiplayer && window.Multiplayer.isDM()) {
+                    window.Multiplayer.broadcast('map-push', {
+                        mapImageDataUrl: null,
+                        tokens: state.tokens,
+                        gridSize: state.gridSize,
+                        showGrid: state.showGrid
+                    });
+                }
             } else {
                 // For now, create colored placeholder backgrounds
                 const canvas = document.createElement('canvas');
@@ -1586,6 +1640,15 @@
                     state.mapImage = img;
                     centerMap();
                     render();
+                    // Multiplayer: broadcast preset map to all players
+                    if (window.Multiplayer && window.Multiplayer.isDM()) {
+                        window.Multiplayer.broadcast('map-push', {
+                            mapImageDataUrl: state.mapCanvas.toDataURL(),
+                            tokens: state.tokens,
+                            gridSize: state.gridSize,
+                            showGrid: state.showGrid
+                        });
+                    }
                 };
             }
 
@@ -1708,6 +1771,103 @@
                 }
             };
             input.click();
+        }
+
+        // ==========================================
+        // MULTIPLAYER INTEGRATION
+        // ==========================================
+
+        function setupMultiplayer() {
+            if (!window.Multiplayer) return;
+
+            // --- Role-based UI: hide DM-only controls for players ---
+            if (window.Multiplayer.getSessionCode() && !window.Multiplayer.isDM()) {
+                // Hide map upload and preset library
+                const mapLibrarySection = document.querySelector('#mapLibrary')?.closest('.sidebar-section');
+                if (mapLibrarySection) mapLibrarySection.style.display = 'none';
+
+                // Hide add-token form (players cannot add/delete tokens)
+                const addTokenForm = document.querySelector('.add-token-form');
+                if (addTokenForm) addTokenForm.style.display = 'none';
+
+                // Hide fog of war section
+                const fogSection = document.getElementById('enableFog')?.closest('.sidebar-section');
+                if (fogSection) fogSection.style.display = 'none';
+
+                // Hide DM-only toolbar buttons (Clear Tokens, Save, Load)
+                document.querySelectorAll('.map-toolbar .tool-btn.secondary').forEach(btn => {
+                    const text = btn.textContent.trim().toLowerCase();
+                    if (['clear tokens', 'save', 'load'].includes(text)) {
+                        btn.style.display = 'none';
+                    }
+                });
+
+                // Hide context menu DM actions (Edit, Duplicate, Delete)
+                document.querySelectorAll('.context-menu-item').forEach(item => {
+                    const text = item.textContent.trim().toLowerCase();
+                    if (['edit token', 'duplicate', 'delete'].includes(text)) {
+                        item.style.display = 'none';
+                    }
+                });
+                // Also hide dividers that are now orphaned
+                document.querySelectorAll('.context-menu-divider').forEach(div => {
+                    div.style.display = 'none';
+                });
+            }
+
+            // --- Receive map push from DM ---
+            window.Multiplayer.on('map-push', (msg) => {
+                if (msg.senderId === window.Multiplayer.getMyTabId()) return;
+                const payload = msg.payload;
+
+                state.tokens = payload.tokens || [];
+                state.gridSize = payload.gridSize || state.gridSize;
+                state.showGrid = payload.showGrid !== undefined ? payload.showGrid : state.showGrid;
+
+                // Update UI to reflect new grid settings
+                document.getElementById('gridSize').value = state.gridSize;
+                document.getElementById('showGrid').checked = state.showGrid;
+
+                if (payload.mapImageDataUrl) {
+                    // Load the map image from data URL
+                    const img = new Image();
+                    img.onload = () => {
+                        state.mapImage = img;
+                        updateTokenList();
+                        centerMap();
+                        render();
+                    };
+                    img.src = payload.mapImageDataUrl;
+                } else {
+                    // Blank map
+                    state.mapImage = null;
+                    updateTokenList();
+                    centerMap();
+                    render();
+                }
+            });
+
+            // --- Receive token move ---
+            window.Multiplayer.on('token-move', (msg) => {
+                if (msg.senderId === window.Multiplayer.getMyTabId()) return;
+                const payload = msg.payload;
+                const token = state.tokens.find(t => t.id === payload.tokenId);
+                if (token) {
+                    token.x = payload.x;
+                    token.y = payload.y;
+                    renderTokens();
+                }
+            });
+
+            // --- Receive fog of war updates ---
+            window.Multiplayer.on('fog-update', (msg) => {
+                if (msg.senderId === window.Multiplayer.getMyTabId()) return;
+                const payload = msg.payload;
+                state.fogData = payload.fogRevealed;
+                state.fogEnabled = payload.fogEnabled;
+                document.getElementById('enableFog').checked = state.fogEnabled;
+                render();
+            });
         }
 
         // Initialize on page load
