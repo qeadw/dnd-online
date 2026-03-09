@@ -925,7 +925,7 @@ function getEquipmentSubOptions(optionText) {
     if (lower.includes('druidic focus')) {
         return (typeof EQUIPMENT !== 'undefined' && EQUIPMENT.adventuringGear)
             ? Object.values(EQUIPMENT.adventuringGear)
-                .filter(g => g.name && g.name.includes('Druidic Focus') || (g.name && g.name.startsWith('Druidic Focus')))
+                .filter(g => g.name && g.name.includes('Druidic Focus'))
                 .map(g => g.name) : null;
     }
     if (lower.includes('holy symbol')) {
@@ -1367,6 +1367,14 @@ document.addEventListener('DOMContentLoaded', () => {
             character.level = parseInt(e.target.value) || 1;
             updateSummary();
             updateSubclassVisibility();
+        });
+    }
+
+    const alignmentSelect = document.getElementById('char-alignment');
+    if (alignmentSelect) {
+        alignmentSelect.addEventListener('change', (e) => {
+            character.alignment = e.target.value;
+            updateSummary();
         });
     }
 });

@@ -63,7 +63,7 @@ function customRoll() {
         const isCritical = numDice === 1 && diceType === 20 && rolls[0] === 20;
         const isFumble = numDice === 1 && diceType === 20 && rolls[0] === 1;
 
-        const notation = `${numDice}d${diceType}${modifier >= 0 ? '+' : ''}${modifier}`;
+        const notation = `${numDice}d${diceType}${modifier !== 0 ? (modifier >= 0 ? '+' : '') + modifier : ''}`;
         displayResult(total, notation, rolls, modifier, { isCritical, isFumble });
         addToHistory(`${notation}: ${total} (${rolls.join(', ')})`, { isCritical, isFumble });
         broadcastDiceRoll(notation, total, rolls, modifier, 'Custom Roll');

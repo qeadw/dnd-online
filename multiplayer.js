@@ -284,8 +284,10 @@
       console.warn("[Multiplayer] Cannot broadcast — no active channel.");
       return;
     }
+    var msgId = TAB_ID + '-' + now() + '-' + Math.random().toString(36).substr(2, 4);
     const msg = {
       type: type,
+      msgId: msgId,
       senderId: TAB_ID,
       senderName: _playerName || "Unknown",
       senderRole: _role || "unknown",
@@ -335,12 +337,27 @@
    * Internal dispatcher — route incoming messages to registered handlers and
    * to the local event emitter so UI code receives them.
    */
+  // Deduplication set for messages received via both BC and WS transports.
+  var _seenMsgIds = new Set();
+  var _seenMsgCleanupTimer = 0;
+
   function handleIncomingMessage(msg) {
     if (!msg || !msg.type) return;
 
     // Ignore our own messages (BroadcastChannel shouldn't deliver them, but
     // guard anyway).
     if (msg.senderId === TAB_ID) return;
+
+    // Deduplicate messages that arrive via both transports.
+    if (msg.msgId) {
+      if (_seenMsgIds.has(msg.msgId)) return;
+      _seenMsgIds.add(msg.msgId);
+      // Periodically prune old IDs to prevent unbounded growth.
+      if (_seenMsgIds.size > 500) {
+        var arr = Array.from(_seenMsgIds);
+        _seenMsgIds = new Set(arr.slice(arr.length - 200));
+      }
+    }
 
     // Route to channel-level handlers.
     const handlers = _messageHandlers[msg.type];

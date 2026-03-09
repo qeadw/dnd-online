@@ -1528,7 +1528,7 @@ const CLASSES = {
         description: "A master of martial arts, harnessing the power of the body in pursuit of physical and spiritual perfection.",
         hitDie: 8,
         primaryAbility: "Dexterity & Wisdom",
-        savingThrows: ["str", "dex"],
+        savingThrows: ["str", "wis"],
         armorProficiencies: [],
         weaponProficiencies: ["Simple weapons", "Shortswords"],
         toolProficiencies: ["One type of artisan's tools or one musical instrument"],
