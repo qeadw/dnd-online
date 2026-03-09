@@ -454,6 +454,79 @@
     line-height: 1.55;
 }
 
+/* Skill Selection Checkboxes */
+.skill-choices-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.skill-choice-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(201, 162, 39, 0.2);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.skill-choice-label:hover {
+    background: rgba(201, 162, 39, 0.1);
+    border-color: rgba(201, 162, 39, 0.4);
+}
+
+.skill-choice-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(201, 162, 39, 0.5);
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.skill-choice-checkbox:checked {
+    background: #c9a227;
+    border-color: #c9a227;
+}
+
+.skill-choice-checkbox:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #1a1a2e;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.skill-choice-checkbox:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.skill-choice-name {
+    font-size: 0.88rem;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.skill-count-badge {
+    font-size: 0.8rem;
+    font-weight: normal;
+    color: #d4a843;
+    margin-left: 6px;
+}
+
 /* Subrace/Subclass Selection */
 .subrace-container,
 .subclass-container,

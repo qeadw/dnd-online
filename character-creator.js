@@ -377,6 +377,8 @@ function selectClass(classKey) {
     const cls = CLASSES[classKey];
     character.class = classKey;
     character.subclass = null;
+    // Clear class skill selections when switching classes
+    character.proficiencies.skills = [];
 
     // Update details panel
     document.getElementById('class-name').textContent = cls.name;
@@ -410,12 +412,25 @@ function selectClass(classKey) {
         `;
     }
 
-    // Skills
+    // Skills - interactive checkboxes
     if (cls.skillChoices) {
+        const skillCheckboxes = cls.skillChoices.options.map(skill => {
+            const checked = character.proficiencies.skills.includes(skill) ? 'checked' : '';
+            return `<label class="skill-choice-label">
+                <input type="checkbox" class="skill-choice-checkbox" value="${skill}" ${checked}
+                    onchange="handleSkillSelection(this, ${cls.skillChoices.count})">
+                <span class="skill-choice-name">${skill}</span>
+            </label>`;
+        }).join('');
+
+        const selectedCount = character.proficiencies.skills.filter(s => cls.skillChoices.options.includes(s)).length;
+
         infoContainer.innerHTML += `
-            <div class="trait-item">
-                <h5>Skills</h5>
-                <p>Choose ${cls.skillChoices.count} from: ${cls.skillChoices.options.join(', ')}</p>
+            <div class="trait-item skill-choices-container">
+                <h5>Skills <span class="skill-count-badge">(${selectedCount}/${cls.skillChoices.count} selected)</span></h5>
+                <div class="skill-choices-grid">
+                    ${skillCheckboxes}
+                </div>
             </div>
         `;
     }
@@ -431,6 +446,48 @@ function selectClass(classKey) {
             `;
         });
     }
+
+    updateSummary();
+}
+
+function handleSkillSelection(checkbox, maxCount) {
+    const skill = checkbox.value;
+    const cls = CLASSES[character.class];
+    if (!cls || !cls.skillChoices) return;
+
+    // Get only class-related skill selections (not from race/background)
+    const classSkillOptions = cls.skillChoices.options;
+    const currentClassSkills = character.proficiencies.skills.filter(s => classSkillOptions.includes(s));
+
+    if (checkbox.checked) {
+        // Enforce max selection
+        if (currentClassSkills.length >= maxCount) {
+            checkbox.checked = false;
+            return;
+        }
+        if (!character.proficiencies.skills.includes(skill)) {
+            character.proficiencies.skills.push(skill);
+        }
+    } else {
+        character.proficiencies.skills = character.proficiencies.skills.filter(s => s !== skill);
+    }
+
+    // Update the count badge
+    const newCount = character.proficiencies.skills.filter(s => classSkillOptions.includes(s)).length;
+    const badge = document.querySelector('.skill-count-badge');
+    if (badge) {
+        badge.textContent = `(${newCount}/${maxCount} selected)`;
+        badge.style.color = newCount === maxCount ? '#4ade80' : '#d4a843';
+    }
+
+    // Disable unchecked boxes if max reached
+    const allBoxes = document.querySelectorAll('.skill-choice-checkbox');
+    allBoxes.forEach(cb => {
+        if (!cb.checked) {
+            cb.disabled = newCount >= maxCount;
+            cb.closest('.skill-choice-label').style.opacity = newCount >= maxCount ? '0.5' : '1';
+        }
+    });
 
     updateSummary();
 }
@@ -1915,7 +1972,12 @@ function updateSidebarProficiencies() {
             weapons.push(...cls.weaponProficiencies);
         }
         if (cls.skillChoices) {
-            skills.push(`Choose ${cls.skillChoices.count}: ${cls.skillChoices.options.slice(0, 3).join(', ')}...`);
+            const classSkills = character.proficiencies.skills.filter(s => cls.skillChoices.options.includes(s));
+            if (classSkills.length > 0) {
+                skills.push(...classSkills);
+            } else {
+                skills.push(`Choose ${cls.skillChoices.count} skills`);
+            }
         }
     }
 
