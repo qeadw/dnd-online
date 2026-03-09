@@ -1239,9 +1239,107 @@ Popular expansion with subclasses, spells, and optional rules.
 #### Plants (already in data but missing from reference):
 - [ ] Shrieker (CR 0)
 
-### 3. Missing Spells (~48 spells gap between 372 implemented and ~420 referenced)
+### 3. Missing Spells (83 missing of 454 referenced — 372 implemented)
 
-The spell database has 372 spells implemented. The reference lists ~420 total. A detailed spell-by-spell comparison is needed to identify the exact ~48 missing spells. The implemented spells cover all levels (cantrips through 9th) from both PHB and XGtE sources.
+#### 1st-Level (3 missing):
+- [ ] Find Familiar (PHB)
+- [ ] Hail of Thorns (PHB)
+- [ ] Hex (PHB)
+- [ ] Illusory Script (PHB)
+
+#### 2nd-Level (1 missing):
+- [ ] Pass without Trace (PHB)
+
+#### 3rd-Level (3 missing):
+- [ ] Speak with Dead (PHB)
+- [ ] Speak with Plants (PHB)
+- [ ] Wind Wall (PHB)
+
+#### 4th-Level (8 missing):
+- [ ] Charm Monster (XGtE)
+- [ ] Elemental Bane (XGtE)
+- [ ] Find Greater Steed (XGtE)
+- [ ] Guardian of Nature (XGtE)
+- [ ] Shadow of Moil (XGtE)
+- [ ] Sickening Radiance (XGtE)
+- [ ] Storm Sphere (XGtE)
+- [ ] Summon Greater Demon (XGtE)
+- [ ] Vitriolic Sphere (XGtE)
+- [ ] Watery Sphere (XGtE)
+
+#### 5th-Level (34 missing — largest gap):
+- [ ] Antilife Shell (PHB)
+- [ ] Awaken (PHB)
+- [ ] Banishing Smite (PHB)
+- [ ] Bigby's Hand (PHB)
+- [ ] Circle of Power (PHB)
+- [ ] Commune (PHB)
+- [ ] Commune with Nature (PHB)
+- [ ] Conjure Volley (PHB)
+- [ ] Contact Other Plane (PHB)
+- [ ] Contagion (PHB)
+- [ ] Creation (PHB)
+- [ ] Destructive Wave (PHB)
+- [ ] Dispel Evil and Good (PHB)
+- [ ] Hallow (PHB)
+- [ ] Legend Lore (PHB)
+- [ ] Mislead (PHB)
+- [ ] Modify Memory (PHB)
+- [ ] Planar Binding (PHB)
+- [ ] Rary's Telepathic Bond (PHB)
+- [ ] Reincarnate (PHB)
+- [ ] Seeming (PHB)
+- [ ] Swift Quiver (PHB)
+- [ ] Tree Stride (PHB)
+- [ ] Control Winds (XGtE)
+- [ ] Danse Macabre (XGtE)
+- [ ] Dawn (XGtE)
+- [ ] Enervation (XGtE)
+- [ ] Far Step (XGtE)
+- [ ] Holy Weapon (XGtE)
+- [ ] Immolation (XGtE)
+- [ ] Infernal Calling (XGtE)
+- [ ] Maelstrom (XGtE)
+- [ ] Negative Energy Flood (XGtE)
+- [ ] Skill Empowerment (XGtE)
+- [ ] Steel Wind Strike (XGtE)
+- [ ] Synaptic Static (XGtE)
+- [ ] Transmute Rock (XGtE)
+- [ ] Wall of Light (XGtE)
+- [ ] Wrath of Nature (XGtE)
+
+#### 6th-Level (11 missing):
+- [ ] Bones of the Earth (XGtE)
+- [ ] Create Homunculus (XGtE)
+- [ ] Investiture of Flame (XGtE)
+- [ ] Investiture of Ice (XGtE)
+- [ ] Investiture of Stone (XGtE)
+- [ ] Investiture of Wind (XGtE)
+- [ ] Mental Prison (XGtE)
+- [ ] Primordial Ward (XGtE)
+- [ ] Scatter (XGtE)
+- [ ] Soul Cage (XGtE)
+- [ ] Tenser's Transformation (XGtE)
+
+#### 7th-Level (4 missing):
+- [ ] Crown of Stars (XGtE)
+- [ ] Power Word Pain (XGtE)
+- [ ] Temple of the Gods (XGtE)
+- [ ] Whirlwind (XGtE)
+
+#### 8th-Level (5 missing):
+- [ ] Trap the Soul (PHB)
+- [ ] Tsunami (PHB)
+- [ ] Abi-Dalzim's Horrid Wilting (XGtE)
+- [ ] Illusory Dragon (XGtE)
+- [ ] Maddening Darkness (XGtE)
+- [ ] Mighty Fortress (XGtE)
+
+#### 9th-Level (3 missing):
+- [ ] Power Word Heal (PHB)
+- [ ] Invulnerability (XGtE)
+- [ ] Mass Polymorph (XGtE)
+- [ ] Psychic Scream (XGtE)
 
 ### 4. Content NOT in Original Reference But Should Be Added
 
@@ -1288,7 +1386,7 @@ These were added but are not listed in CONTENT-REFERENCE.md:
 - **7th Level:** 20 PHB + 4 XGtE = **24 total**
 - **8th Level:** 18 PHB + 4 XGtE = **22 total**
 - **9th Level:** 16 PHB + 3 XGtE = **19 total**
-- **TOTAL REFERENCED: ~420 | IMPLEMENTED: 372 (~89%)**
+- **TOTAL REFERENCED: 454 | IMPLEMENTED: 372 (82%) | MISSING: 83**
 
 ### Monsters (Monster Manual)
 - **Aberrations:** ~13 of ~15 (2 missing)
