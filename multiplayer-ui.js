@@ -12,7 +12,7 @@
     // ------------------------------------------
     function getSession() {
         try {
-            const raw = sessionStorage.getItem('mp_session');
+            const raw = localStorage.getItem('mp_session');
             return raw ? JSON.parse(raw) : null;
         } catch { return null; }
     }
@@ -913,8 +913,17 @@ body.mp-active { padding-top: 46px !important; }
             if (isDM && mp.endSession) mp.endSession();
             else if (mp.leaveSession) mp.leaveSession();
         }
-        sessionStorage.removeItem('mp_session');
-        location.reload();
+        localStorage.removeItem('mp_session');
+        // Remove the multiplayer UI overlay instead of reloading the page
+        const bar = document.getElementById('mp-status-bar');
+        if (bar) bar.remove();
+        const chatPanel = document.querySelector('.mp-chat-panel');
+        if (chatPanel) chatPanel.remove();
+        const playersPanel = document.querySelector('.mp-players-panel');
+        if (playersPanel) playersPanel.remove();
+        const dmPanel = document.querySelector('.mp-dm-panel');
+        if (dmPanel) dmPanel.remove();
+        document.body.style.paddingTop = '';
     }
 
     // ------------------------------------------

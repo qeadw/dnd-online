@@ -1046,6 +1046,31 @@
     margin-top: 2px;
 }
 
+.equipment-choice-title {
+    color: #f0d050;
+    margin: 0 0 12px 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.equipment-fixed {
+    padding: 10px 14px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.equipment-fixed .option-text {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.no-equipment {
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+    padding: 20px;
+    text-align: center;
+}
+
 /* Gold Option */
 .gold-option {
     padding: 20px;

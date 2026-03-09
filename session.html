@@ -955,6 +955,11 @@
             // Save full session state via BroadcastChannel / localStorage
             localStorage.setItem('dndSession_' + code, JSON.stringify(session));
 
+            // Activate the multiplayer engine
+            if (window.Multiplayer) {
+                window.Multiplayer.createSession(name, maxPlayers);
+            }
+
             showLobby();
             startLobbyPolling();
         }
@@ -1045,6 +1050,13 @@
             // Save updated session
             localStorage.setItem('dndSession_' + code, JSON.stringify(session));
 
+            // Activate the multiplayer engine
+            if (window.Multiplayer) {
+                window.Multiplayer.joinSession(code, playerName, charInfo).catch(function(err) {
+                    console.warn('Multiplayer engine join failed:', err.message);
+                });
+            }
+
             currentSession = session;
             currentSession._myId = playerId;
             currentSession._myRole = 'player';
@@ -1056,6 +1068,13 @@
                 name: session.name,
                 role: 'player',
                 myId: playerId
+            }));
+
+            // Set mp_session so multiplayer-ui.js activates
+            localStorage.setItem('mp_session', JSON.stringify({
+                code: code,
+                name: session.name,
+                role: 'player'
             }));
 
             showLobby();
@@ -1354,6 +1373,13 @@
             localStorage.setItem('dndSession_' + currentSession.code, JSON.stringify(currentSession));
             saveSessionToList(currentSession);
 
+            // Set mp_session so multiplayer-ui.js activates on game pages
+            localStorage.setItem('mp_session', JSON.stringify({
+                code: currentSession.code,
+                name: currentSession.name,
+                role: 'dm'
+            }));
+
             // Navigate DM to game tools via SPA shell
             if (window.spaNavigate) {
                 window.spaNavigate('game-tools.html');
@@ -1372,6 +1398,7 @@
             localStorage.setItem('dndSession_' + currentSession.code, JSON.stringify(currentSession));
 
             localStorage.removeItem(SESSION_STORAGE_KEY);
+            localStorage.removeItem('mp_session');
             currentSession = null;
             showNoSession();
         }
@@ -1388,6 +1415,7 @@
             localStorage.setItem('dndSession_' + currentSession.code, JSON.stringify(currentSession));
 
             localStorage.removeItem(SESSION_STORAGE_KEY);
+            localStorage.removeItem('mp_session');
             currentSession = null;
             showNoSession();
         }

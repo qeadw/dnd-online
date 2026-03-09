@@ -864,6 +864,13 @@
             state.dragStart = pos;
             state.isDragging = true;
 
+            // Right-click fog painting
+            if (state.fogEnabled && e.button === 2) {
+                state.fogBrushSize = parseInt(document.getElementById('fogBrushSize').value) || 2;
+                paintFog(pos);
+                return;
+            }
+
             if (state.currentTool === 'select') {
                 const token = getTokenAtPosition(pos);
                 if (token) {
@@ -942,12 +949,18 @@
             }
 
             // Fog of war painting
-            if (state.fogEnabled && state.isDragging && (state.currentTool === 'select' || state.currentTool === 'pan')) {
-                // Could add fog painting here
+            if (state.fogEnabled && state.isDragging && e.buttons === 2) {
+                paintFog(pos);
             }
         }
 
         function handleMouseUp(e) {
+            // Save fog state after painting
+            if (state.fogEnabled && e.button === 2) {
+                saveToLocalStorage();
+                broadcastFogUpdate();
+            }
+
             // Multiplayer: broadcast token move when drag ends
             if (state.selectedToken && state.currentTool === 'select') {
                 if (window.Multiplayer && window.Multiplayer.getSessionCode()) {
@@ -995,6 +1008,10 @@
 
         function handleContextMenu(e) {
             e.preventDefault();
+
+            // When fog is enabled, right-click is used for fog painting
+            if (state.fogEnabled) return;
+
             const pos = getMousePos(e);
             const token = getTokenAtPosition(pos);
 
@@ -1566,12 +1583,35 @@
             state.fogData = Array(rows).fill(null).map(() => Array(cols).fill(true));
         }
 
+        function paintFog(pos) {
+            if (!state.fogData) initFog();
+            const gridSize = state.gridSize;
+            const brushRadius = state.fogBrushSize;
+            const centerX = Math.floor(pos.x / gridSize);
+            const centerY = Math.floor(pos.y / gridSize);
+            const value = state.fogMode === 'hide';
+
+            for (let dy = -brushRadius; dy <= brushRadius; dy++) {
+                for (let dx = -brushRadius; dx <= brushRadius; dx++) {
+                    if (dx * dx + dy * dy <= brushRadius * brushRadius) {
+                        const gy = centerY + dy;
+                        const gx = centerX + dx;
+                        if (gy >= 0 && gy < state.fogData.length && gx >= 0 && gx < state.fogData[0].length) {
+                            state.fogData[gy][gx] = value;
+                        }
+                    }
+                }
+            }
+            render();
+        }
+
         function toggleFog() {
             state.fogEnabled = document.getElementById('enableFog').checked;
             if (state.fogEnabled && !state.fogData) {
                 initFog();
             }
             render();
+            saveToLocalStorage();
             broadcastFogUpdate();
         }
 
@@ -1582,6 +1622,7 @@
         function resetFog() {
             initFog();
             render();
+            saveToLocalStorage();
             broadcastFogUpdate();
         }
 
@@ -1672,7 +1713,9 @@
                 snapToGrid: state.snapToGrid,
                 mapImage: state.mapImage ? state.mapImage.src : null,
                 mapOffset: state.mapOffset,
-                zoom: state.zoom
+                zoom: state.zoom,
+                fogEnabled: state.fogEnabled,
+                fogData: state.fogData
             };
             localStorage.setItem('dnd-map-state', JSON.stringify(data));
         }
@@ -1691,12 +1734,19 @@
                     state.mapOffset = data.mapOffset || { x: 0, y: 0 };
                     state.zoom = data.zoom || 1;
 
+                    // Restore fog of war
+                    if (data.fogEnabled !== undefined) {
+                        state.fogEnabled = data.fogEnabled;
+                        state.fogData = data.fogData || null;
+                    }
+
                     // Update UI
                     document.getElementById('showGrid').checked = state.showGrid;
                     document.getElementById('gridSize').value = state.gridSize;
                     document.getElementById('gridType').value = state.gridType;
                     document.getElementById('gridColor').value = state.gridColor;
                     document.getElementById('snapToGrid').checked = state.snapToGrid;
+                    document.getElementById('enableFog').checked = state.fogEnabled;
                     document.getElementById('zoomDisplay').textContent = `Zoom: ${Math.round(state.zoom * 100)}%`;
 
                     if (data.mapImage) {
