@@ -1109,6 +1109,22 @@
             });
 
             clearFiltersBtn.addEventListener('click', clearFilters);
+
+            // Re-check for new custom monsters when tab becomes visible (SPA iframe switching)
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) {
+                    loadCustomMonsters();
+                    initTypeFilters();
+                    renderMonsters();
+                }
+            });
+
+            // Also listen for focus (covers iframe activation in SPA shell)
+            window.addEventListener('focus', () => {
+                loadCustomMonsters();
+                initTypeFilters();
+                renderMonsters();
+            });
         });
     </script>
     <script src="multiplayer.js"></script>

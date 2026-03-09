@@ -1917,6 +1917,11 @@
             savedMonsters[key] = data;
             localStorage.setItem('customMonsters', JSON.stringify(savedMonsters));
 
+            // Also save to the monsters page DB so it shows up there
+            const customMonstersDB = JSON.parse(localStorage.getItem('customMonstersDB') || '{}');
+            customMonstersDB[key] = data;
+            localStorage.setItem('customMonstersDB', JSON.stringify(customMonstersDB));
+
             localStorage.removeItem('monsterBuilderWIP');
             alert(`"${data.name}" has been saved to your browser!`);
             loadSavedMonsters();
@@ -2075,6 +2080,12 @@
             const savedMonsters = JSON.parse(localStorage.getItem('customMonsters') || '{}');
             delete savedMonsters[key];
             localStorage.setItem('customMonsters', JSON.stringify(savedMonsters));
+
+            // Also remove from monsters page DB
+            const customMonstersDB = JSON.parse(localStorage.getItem('customMonstersDB') || '{}');
+            delete customMonstersDB[key];
+            localStorage.setItem('customMonstersDB', JSON.stringify(customMonstersDB));
+
             loadSavedMonsters();
         }
 
