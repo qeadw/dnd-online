@@ -1272,15 +1272,21 @@
 
             saveState();
             render();
-            broadcastHpChange(id, combatant.hpCurrent, combatant.hpTemp);
-            broadcastCombatState();
-            // Players broadcast HP changes on their own character too
-            if (window.Multiplayer && !window.Multiplayer.isDM()) {
-                window.Multiplayer.broadcast('hp-change', {
-                    combatantId: id,
-                    hpCurrent: combatant.hpCurrent,
-                    hpTemp: combatant.hpTemp
-                });
+            // DM broadcasts full combat state; players broadcast only their own HP change
+            if (window.Multiplayer && window.Multiplayer.getSessionCode()) {
+                if (window.Multiplayer.isDM()) {
+                    broadcastCombatState();
+                } else {
+                    // Players can only broadcast changes for their own combatant
+                    var myName = window.Multiplayer.getMyName ? window.Multiplayer.getMyName() : null;
+                    if (myName && combatant.name === myName) {
+                        window.Multiplayer.broadcast('hp-change', {
+                            combatantId: id,
+                            hpCurrent: combatant.hpCurrent,
+                            hpTemp: combatant.hpTemp
+                        });
+                    }
+                }
             }
         }
 

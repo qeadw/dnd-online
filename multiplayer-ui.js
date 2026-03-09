@@ -770,6 +770,7 @@ body.mp-active { padding-top: 46px !important; }
         activeChannel = channelId;
         renderChannelTabs();
         renderMessages();
+        scrollChatToBottom();
     }
 
     function addWhisperChannel(playerId, playerName) {
@@ -918,13 +919,21 @@ body.mp-active { padding-top: 46px !important; }
         ['mp-status-bar', 'mp-chat-panel', 'mp-players-panel', 'mp-dm-panel',
          'mp-chat-toggle', 'mp-players-toggle', 'mp-dm-fab', 'mp-toast-container'
         ].forEach(function (id) {
-            var el = document.getElementById(id);
-            if (el) el.remove();
+            var e = document.getElementById(id);
+            if (e) e.remove();
         });
         document.body.classList.remove('mp-active');
         document.body.style.paddingTop = '';
         // Remove injected style element
         if (styleEl && styleEl.parentNode) styleEl.remove();
+        // Remove keyboard listener
+        document.removeEventListener('keydown', _keydownHandler);
+        // Remove multiplayer event listeners
+        if (mp && mp.off) {
+            _mpHandlers.forEach(function (h) { mp.off(h.type, h.fn); });
+        }
+        _mpHandlers.length = 0;
+        messageStore.length = 0;
     }
 
     // ------------------------------------------
@@ -1099,50 +1108,53 @@ body.mp-active { padding-top: 46px !important; }
     // ------------------------------------------
     //  Listen for Multiplayer Events (if available)
     // ------------------------------------------
-    if (mp) {
-        if (mp.on) {
-            mp.on('chat-message', msg => {
+    // Store references for cleanup on leave
+    var _mpHandlers = [];
+    if (mp && mp.on) {
+        var handlers = {
+            'chat-message': function (msg) {
                 window.MultiplayerUI.addChatMessage(msg);
-            });
-
-            mp.on('player-joined', data => {
-                showNotification(`${data.name || 'A player'} joined the session`, 'success');
-            });
-
-            mp.on('player-left', data => {
-                showNotification(`${data.name || 'A player'} left the session`, 'warning');
-            });
-
-            mp.on('player-list-updated', players => {
+            },
+            'player-joined': function (data) {
+                showNotification((data.name || 'A player') + ' joined the session', 'success');
+            },
+            'player-left': function (data) {
+                showNotification((data.name || 'A player') + ' left the session', 'warning');
+            },
+            'player-list-updated': function (players) {
                 window.MultiplayerUI.updatePlayerList(players);
-            });
-
-            mp.on('whisper-received', msg => {
-                showNotification(`Whisper from ${msg.senderName || 'someone'}`, 'whisper');
+            },
+            'whisper-received': function (msg) {
+                showNotification('Whisper from ' + (msg.senderName || 'someone'), 'whisper');
                 window.MultiplayerUI.addChatMessage({
-                    ...msg,
+                    sender: msg.sender,
+                    senderName: msg.senderName,
+                    text: msg.text,
+                    channel: msg.channel,
                     type: 'whisper',
                     own: false
                 });
-            });
-
-            mp.on('action-requested', data => {
+            },
+            'action-requested': function (data) {
                 showNotification(data.text || 'The DM has requested an action', 'info');
-            });
-
-            mp.on('connection-changed', status => {
+            },
+            'connection-changed': function (status) {
                 setConnectionStatus(status.connected);
                 if (!status.connected) {
                     showNotification('Connection lost. Attempting to reconnect...', 'error');
                 }
-            });
-        }
+            }
+        };
+        Object.keys(handlers).forEach(function (type) {
+            mp.on(type, handlers[type]);
+            _mpHandlers.push({ type: type, fn: handlers[type] });
+        });
     }
 
     // ------------------------------------------
     //  Keyboard Shortcuts
     // ------------------------------------------
-    document.addEventListener('keydown', function (e) {
+    function _keydownHandler(e) {
         // Escape closes any open panel
         if (e.key === 'Escape') {
             if (chatOpen) toggleChat();
@@ -1159,7 +1171,8 @@ body.mp-active { padding-top: 46px !important; }
             e.preventDefault();
             togglePlayers();
         }
-    });
+    }
+    document.addEventListener('keydown', _keydownHandler);
 
     // ------------------------------------------
     //  Initial Render

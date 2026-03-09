@@ -1054,6 +1054,12 @@
             if (window.Multiplayer) {
                 window.Multiplayer.joinSession(code, playerName, charInfo).catch(function(err) {
                     console.warn('Multiplayer engine join failed:', err.message);
+                    // Clean up session state on failure
+                    localStorage.removeItem(SESSION_STORAGE_KEY);
+                    localStorage.removeItem('mp_session');
+                    currentSession = null;
+                    showView('joinView');
+                    alert('Failed to join session: ' + err.message);
                 });
             }
 
@@ -1076,6 +1082,16 @@
                 name: session.name,
                 role: 'player'
             }));
+
+            // If session is already active (mid-session join), go directly to game
+            if (session.status === 'active') {
+                if (window.spaNavigate) {
+                    window.spaNavigate('game-tools.html');
+                } else {
+                    window.location.href = 'game-tools.html';
+                }
+                return;
+            }
 
             showLobby();
             startLobbyPolling();

@@ -582,10 +582,7 @@
     stopHeartbeatCheck();
     stopStateSync();
     stopAutosave();
-    if (_dmPresenceTimer) {
-      clearInterval(_dmPresenceTimer);
-      _dmPresenceTimer = null;
-    }
+    stopDMPresenceMonitor();
   }
 
   // ---------------------------------------------------------------------------
@@ -627,34 +624,41 @@
    * is likely gone. The oldest connected player can be promoted.
    */
   let _lastDMSync = 0;
+  let _dmSyncListener = null;
 
   function monitorDMPresence() {
-    // Clear any existing monitor to prevent duplicates.
-    if (_dmPresenceTimer) {
-      clearInterval(_dmPresenceTimer);
-      _dmPresenceTimer = null;
-    }
+    stopDMPresenceMonitor();
 
     // Players listen for state-sync to know DM is alive.
-    _events.on("state-sync", function () {
+    _dmSyncListener = function () {
       _lastDMSync = now();
-    });
+    };
+    _events.on("state-sync", _dmSyncListener);
 
     // Check periodically.
     _dmPresenceTimer = setInterval(function () {
       if (_role !== "player" || !_sessionCode) {
-        clearInterval(_dmPresenceTimer);
-        _dmPresenceTimer = null;
+        stopDMPresenceMonitor();
         return;
       }
       // If we've been connected for a while and DM hasn't synced...
       if (_lastDMSync > 0 && now() - _lastDMSync > HEARTBEAT_TIMEOUT_MS * 3) {
         _events.emit("dm-disconnected", {});
-        // Attempt auto-promotion: the player with the lowest joinedAt takes over.
         attemptDMPromotion();
         _lastDMSync = now(); // reset so we don't spam
       }
     }, HEARTBEAT_INTERVAL_MS * 2);
+  }
+
+  function stopDMPresenceMonitor() {
+    if (_dmPresenceTimer) {
+      clearInterval(_dmPresenceTimer);
+      _dmPresenceTimer = null;
+    }
+    if (_dmSyncListener) {
+      _events.off("state-sync", _dmSyncListener);
+      _dmSyncListener = null;
+    }
   }
 
   function attemptDMPromotion() {
@@ -672,6 +676,7 @@
       sessionStorage.setItem("dnd-role", "dm");
       broadcast("dm-promotion", { newDMTabId: TAB_ID, newDMName: _playerName });
       _events.emit("promoted-to-dm", {});
+      stopDMPresenceMonitor();
       startDMTimers();
     }
   }
