@@ -941,7 +941,7 @@
             currentSession._myRole = 'dm';
 
             // Save to sessionStorage for cross-tab awareness
-            sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({
+            localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({
                 sessionId: session.id,
                 code: session.code,
                 name: session.name,
@@ -1050,7 +1050,7 @@
             currentSession._myRole = 'player';
 
             // Save to sessionStorage
-            sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({
+            localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({
                 sessionId: session.id,
                 code: session.code,
                 name: session.name,
@@ -1110,7 +1110,7 @@
             currentSession._myId = session.dmId;
             currentSession._myRole = 'dm';
 
-            sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({
+            localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({
                 sessionId: session.id,
                 code: session.code,
                 name: session.name,
@@ -1153,7 +1153,7 @@
         function checkForActiveSession() {
             let info;
             try {
-                info = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY));
+                info = JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY));
             } catch (e) { return; }
 
             if (!info || !info.code) return;
@@ -1164,7 +1164,7 @@
             } catch (e) { return; }
 
             if (!session || session.status === 'ended') {
-                sessionStorage.removeItem(SESSION_STORAGE_KEY);
+                localStorage.removeItem(SESSION_STORAGE_KEY);
                 showNoSession();
                 return;
             }
@@ -1278,15 +1278,19 @@
                     if (!fresh) return;
 
                     if (fresh.status === 'ended') {
-                        sessionStorage.removeItem(SESSION_STORAGE_KEY);
+                        localStorage.removeItem(SESSION_STORAGE_KEY);
                         currentSession = null;
                         showNoSession();
                         return;
                     }
 
                     if (fresh.status === 'active') {
-                        // DM started the game - navigate
-                        window.location.href = 'index.html';
+                        // DM started the game - navigate to game tools
+                        if (window.spaNavigate) {
+                            window.spaNavigate('game-tools.html');
+                        } else {
+                            window.location.href = 'game-tools.html';
+                        }
                         return;
                     }
 
@@ -1296,7 +1300,7 @@
                     if (myRole === 'player') {
                         const stillIn = fresh.players.find(p => p.id === myId);
                         if (!stillIn) {
-                            sessionStorage.removeItem(SESSION_STORAGE_KEY);
+                            localStorage.removeItem(SESSION_STORAGE_KEY);
                             currentSession = null;
                             showNoSession();
                             alert('You have been removed from the session.');
@@ -1350,8 +1354,12 @@
             localStorage.setItem('dndSession_' + currentSession.code, JSON.stringify(currentSession));
             saveSessionToList(currentSession);
 
-            // Navigate DM to game tools
-            window.location.href = 'index.html';
+            // Navigate DM to game tools via SPA shell
+            if (window.spaNavigate) {
+                window.spaNavigate('game-tools.html');
+            } else {
+                window.location.href = 'game-tools.html';
+            }
         }
 
         function endSession() {
@@ -1363,7 +1371,7 @@
             currentSession.lastActive = getTimestamp();
             localStorage.setItem('dndSession_' + currentSession.code, JSON.stringify(currentSession));
 
-            sessionStorage.removeItem(SESSION_STORAGE_KEY);
+            localStorage.removeItem(SESSION_STORAGE_KEY);
             currentSession = null;
             showNoSession();
         }
@@ -1379,7 +1387,7 @@
             currentSession.lastActive = getTimestamp();
             localStorage.setItem('dndSession_' + currentSession.code, JSON.stringify(currentSession));
 
-            sessionStorage.removeItem(SESSION_STORAGE_KEY);
+            localStorage.removeItem(SESSION_STORAGE_KEY);
             currentSession = null;
             showNoSession();
         }
