@@ -2260,3 +2260,94 @@
 .skip-link:focus {
     top: 0;
 }
+
+/* =====================================================
+   Language Picker Styles
+   ===================================================== */
+.language-selection {
+    margin-top: 12px;
+}
+
+.language-selection .selection-hint {
+    font-size: 0.85rem;
+    color: #999;
+    margin-bottom: 10px;
+}
+
+.language-picker {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.language-options {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.language-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.language-group-label {
+    font-size: 0.8rem;
+    color: #c9a227;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+}
+
+.language-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(30, 30, 50, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.language-option:hover {
+    background: rgba(201, 162, 39, 0.15);
+    border-color: rgba(201, 162, 39, 0.3);
+}
+
+.language-option.selected {
+    background: rgba(201, 162, 39, 0.2);
+    border-color: rgba(201, 162, 39, 0.5);
+}
+
+.language-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #c9a227;
+    cursor: pointer;
+}
+
+.language-option input[type="checkbox"]:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.language-option input[type="checkbox"]:disabled + span {
+    opacity: 0.4;
+}
+
+.language-option span {
+    font-size: 0.9rem;
+    color: #e8e8e8;
+}
+
+.language-selection-count {
+    margin-top: 10px;
+    text-align: right;
+    font-size: 0.85rem;
+    color: #c9a227;
+    font-weight: 600;
+}

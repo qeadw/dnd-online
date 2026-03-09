@@ -61,6 +61,22 @@ const pointBuyCosts = {
     8: 0, 9: 1, 10: 2, 11: 3, 12: 4, 13: 5, 14: 7, 15: 9
 };
 
+// Available Languages in D&D 5e
+const ALL_LANGUAGES = {
+    standard: [
+        'Common', 'Dwarvish', 'Elvish', 'Giant', 'Gnomish',
+        'Goblin', 'Halfling', 'Orc'
+    ],
+    exotic: [
+        'Abyssal', 'Celestial', 'Draconic', 'Deep Speech',
+        'Infernal', 'Primordial', 'Sylvan', 'Undercommon'
+    ]
+};
+
+// Track selected extra languages
+let selectedRaceLanguages = [];
+let selectedBackgroundLanguages = [];
+
 // Race Image Mappings
 const RACE_IMAGES = {
     // SRD Races
@@ -190,6 +206,10 @@ function selectRace(raceKey) {
     const race = RACES[raceKey];
     character.race = raceKey;
     character.subrace = null;
+
+    // Reset race language selections when race changes
+    selectedRaceLanguages = [];
+    updateCharacterLanguages();
     character.draconicAncestry = null;
 
     // Update details panel
@@ -240,6 +260,19 @@ function selectRace(raceKey) {
             <p>${race.languages.join(', ')}${race.extraLanguages ? ` + ${race.extraLanguages} of your choice` : ''}</p>
         </div>
     `;
+
+    // Extra Language Selection
+    if (race.extraLanguages && race.extraLanguages > 0) {
+        traitsContainer.innerHTML += `
+            <div class="trait-item language-selection" id="race-language-selection">
+                <h5>Choose Extra Language${race.extraLanguages > 1 ? 's' : ''}</h5>
+                <p class="selection-hint">Select ${race.extraLanguages} language${race.extraLanguages > 1 ? 's' : ''}</p>
+                <div class="language-picker" id="race-language-picker"></div>
+            </div>
+        `;
+        // Render language picker after DOM update
+        setTimeout(() => renderRaceLanguagePicker(race), 0);
+    }
 
     // Handle subraces
     const subraceContainer = document.getElementById('subrace-selection');
@@ -331,6 +364,161 @@ function selectSubrace(subraceKey) {
     character.subrace = subraceKey;
     updateRacialBonuses();
     updateSummary();
+}
+
+// Language Picker Functions
+function getAvailableLanguages(excludeLanguages = []) {
+    const allLangs = [...ALL_LANGUAGES.standard, ...ALL_LANGUAGES.exotic];
+    return allLangs.filter(lang => !excludeLanguages.includes(lang));
+}
+
+function renderRaceLanguagePicker(race) {
+    const container = document.getElementById('race-language-picker');
+    if (!container) return;
+
+    const maxSelections = race.extraLanguages || 0;
+    const knownLanguages = [...(race.languages || [])];
+    const availableLanguages = getAvailableLanguages(knownLanguages);
+
+    container.innerHTML = `
+        <div class="language-options">
+            <div class="language-group">
+                <label class="language-group-label">Standard Languages</label>
+                ${ALL_LANGUAGES.standard
+                    .filter(lang => !knownLanguages.includes(lang))
+                    .map(lang => `
+                        <label class="language-option ${selectedRaceLanguages.includes(lang) ? 'selected' : ''}">
+                            <input type="checkbox" value="${lang}"
+                                ${selectedRaceLanguages.includes(lang) ? 'checked' : ''}
+                                ${selectedRaceLanguages.length >= maxSelections && !selectedRaceLanguages.includes(lang) ? 'disabled' : ''}>
+                            <span>${lang}</span>
+                        </label>
+                    `).join('')}
+            </div>
+            <div class="language-group">
+                <label class="language-group-label">Exotic Languages</label>
+                ${ALL_LANGUAGES.exotic
+                    .filter(lang => !knownLanguages.includes(lang))
+                    .map(lang => `
+                        <label class="language-option ${selectedRaceLanguages.includes(lang) ? 'selected' : ''}">
+                            <input type="checkbox" value="${lang}"
+                                ${selectedRaceLanguages.includes(lang) ? 'checked' : ''}
+                                ${selectedRaceLanguages.length >= maxSelections && !selectedRaceLanguages.includes(lang) ? 'disabled' : ''}>
+                            <span>${lang}</span>
+                        </label>
+                    `).join('')}
+            </div>
+        </div>
+        <div class="language-selection-count">
+            Selected: ${selectedRaceLanguages.length}/${maxSelections}
+        </div>
+    `;
+
+    // Add event listeners
+    container.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+            const lang = e.target.value;
+            if (e.target.checked) {
+                if (selectedRaceLanguages.length < maxSelections) {
+                    selectedRaceLanguages.push(lang);
+                } else {
+                    e.target.checked = false;
+                    return;
+                }
+            } else {
+                selectedRaceLanguages = selectedRaceLanguages.filter(l => l !== lang);
+            }
+            renderRaceLanguagePicker(race);
+            updateCharacterLanguages();
+            updateSidebarProficiencies();
+        });
+    });
+}
+
+function renderBackgroundLanguagePicker(background) {
+    const container = document.getElementById('background-language-picker');
+    if (!container) return;
+
+    const maxSelections = background.languages || 0;
+    const race = character.race ? RACES[character.race] : null;
+    const knownLanguages = [
+        ...(race ? race.languages : []),
+        ...selectedRaceLanguages
+    ];
+    const availableLanguages = getAvailableLanguages(knownLanguages);
+
+    container.innerHTML = `
+        <div class="language-options">
+            <div class="language-group">
+                <label class="language-group-label">Standard Languages</label>
+                ${ALL_LANGUAGES.standard
+                    .filter(lang => !knownLanguages.includes(lang))
+                    .map(lang => `
+                        <label class="language-option ${selectedBackgroundLanguages.includes(lang) ? 'selected' : ''}">
+                            <input type="checkbox" value="${lang}"
+                                ${selectedBackgroundLanguages.includes(lang) ? 'checked' : ''}
+                                ${selectedBackgroundLanguages.length >= maxSelections && !selectedBackgroundLanguages.includes(lang) ? 'disabled' : ''}>
+                            <span>${lang}</span>
+                        </label>
+                    `).join('')}
+            </div>
+            <div class="language-group">
+                <label class="language-group-label">Exotic Languages</label>
+                ${ALL_LANGUAGES.exotic
+                    .filter(lang => !knownLanguages.includes(lang))
+                    .map(lang => `
+                        <label class="language-option ${selectedBackgroundLanguages.includes(lang) ? 'selected' : ''}">
+                            <input type="checkbox" value="${lang}"
+                                ${selectedBackgroundLanguages.includes(lang) ? 'checked' : ''}
+                                ${selectedBackgroundLanguages.length >= maxSelections && !selectedBackgroundLanguages.includes(lang) ? 'disabled' : ''}>
+                            <span>${lang}</span>
+                        </label>
+                    `).join('')}
+            </div>
+        </div>
+        <div class="language-selection-count">
+            Selected: ${selectedBackgroundLanguages.length}/${maxSelections}
+        </div>
+    `;
+
+    // Add event listeners
+    container.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+            const lang = e.target.value;
+            if (e.target.checked) {
+                if (selectedBackgroundLanguages.length < maxSelections) {
+                    selectedBackgroundLanguages.push(lang);
+                } else {
+                    e.target.checked = false;
+                    return;
+                }
+            } else {
+                selectedBackgroundLanguages = selectedBackgroundLanguages.filter(l => l !== lang);
+            }
+            renderBackgroundLanguagePicker(background);
+            updateCharacterLanguages();
+            updateSidebarProficiencies();
+        });
+    });
+}
+
+function updateCharacterLanguages() {
+    const race = character.race ? RACES[character.race] : null;
+    const languages = [];
+
+    // Add race languages
+    if (race && race.languages) {
+        languages.push(...race.languages);
+    }
+
+    // Add selected extra race languages
+    languages.push(...selectedRaceLanguages);
+
+    // Add selected background languages
+    languages.push(...selectedBackgroundLanguages);
+
+    // Store unique languages
+    character.proficiencies.languages = [...new Set(languages)];
 }
 
 function updateRacialBonuses() {
@@ -802,6 +990,10 @@ function selectBackground(bgKey) {
     const bg = BACKGROUNDS[bgKey];
     character.background = bgKey;
 
+    // Reset background language selections when background changes
+    selectedBackgroundLanguages = [];
+    updateCharacterLanguages();
+
     // Update details panel
     document.getElementById('background-name').textContent = bg.name;
     document.getElementById('background-description').textContent = bg.description;
@@ -835,7 +1027,14 @@ function selectBackground(bgKey) {
                 <h5>Languages</h5>
                 <p>${bg.languages} of your choice</p>
             </div>
+            <div class="background-info-item language-selection" id="background-language-selection">
+                <h5>Choose Language${bg.languages > 1 ? 's' : ''}</h5>
+                <p class="selection-hint">Select ${bg.languages} language${bg.languages > 1 ? 's' : ''}</p>
+                <div class="language-picker" id="background-language-picker"></div>
+            </div>
         `;
+        // Render language picker after DOM update
+        setTimeout(() => renderBackgroundLanguagePicker(bg), 0);
     }
 
     // Equipment
@@ -2305,9 +2504,13 @@ function updateSidebarProficiencies() {
             languages.push(...race.languages);
         }
 
-        // Extra languages
+        // Extra languages - show selected or prompt
         if (race.extraLanguages) {
-            languages.push(`+${race.extraLanguages} choice`);
+            if (selectedRaceLanguages.length > 0) {
+                languages.push(...selectedRaceLanguages);
+            } else {
+                languages.push(`+${race.extraLanguages} choice`);
+            }
         }
 
         // Tool proficiency choices
@@ -2328,7 +2531,8 @@ function updateSidebarProficiencies() {
                 tools.push(...subrace.toolProficiencies);
             }
             if (subrace.extraLanguages) {
-                languages.push(`+${subrace.extraLanguages} choice`);
+                // Subrace extra languages are included in race selection
+                // Only show prompt if not already selected via race picker
             }
         }
     }
@@ -2364,7 +2568,11 @@ function updateSidebarProficiencies() {
             tools.push(...bg.toolProficiencies);
         }
         if (bg.languages) {
-            languages.push(`+${bg.languages} choice`);
+            if (selectedBackgroundLanguages.length > 0) {
+                languages.push(...selectedBackgroundLanguages);
+            } else {
+                languages.push(`+${bg.languages} choice`);
+            }
         }
     }
 
