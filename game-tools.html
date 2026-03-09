@@ -92,7 +92,8 @@
         }
 
         .advantage-btn,
-        .disadvantage-btn {
+        .disadvantage-btn,
+        .secret-roll-btn {
             flex: 1 1 auto;
             min-width: 120px;
             padding: 12px 20px;
@@ -125,6 +126,21 @@
         .disadvantage-btn:hover {
             transform: scale(1.05);
             box-shadow: 0 0 15px rgba(139, 0, 0, 0.6);
+        }
+
+        .secret-roll-btn {
+            background: linear-gradient(145deg, #4a4a4a, #2a2a2a);
+            color: #fff;
+        }
+
+        .secret-roll-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(100, 100, 100, 0.6);
+        }
+
+        .secret-roll-btn.active {
+            background: linear-gradient(145deg, #6b3fa0, #4a2875);
+            box-shadow: 0 0 10px rgba(107, 63, 160, 0.8);
         }
 
         /* Dice Expression */
@@ -1107,6 +1123,7 @@
             <div class="advantage-buttons" role="group" aria-label="Advantage and disadvantage rolls">
                 <button onclick="rollWithAdvantage()" class="advantage-btn" aria-label="Roll with advantage - roll 2d20, take highest">Advantage</button>
                 <button onclick="rollWithDisadvantage()" class="disadvantage-btn" aria-label="Roll with disadvantage - roll 2d20, take lowest">Disadvantage</button>
+                <button id="secretRollToggle" onclick="toggleSecretRoll()" class="secret-roll-btn" aria-label="Toggle secret roll mode">Secret Roll: OFF</button>
             </div>
 
             <div class="dice-expression">
@@ -1200,8 +1217,8 @@
             </div>
             <ul id="initiativeList" aria-live="polite" aria-label="Initiative order"></ul>
             <div class="initiative-controls" role="group" aria-label="Initiative controls">
-                <button onclick="clearInitiative()" class="clear-btn">Clear All</button>
-                <button onclick="nextTurn()" class="next-btn">Next Turn</button>
+                <button id="clearInitBtn" onclick="clearInitiative()" class="clear-btn">Clear All</button>
+                <button id="nextTurnBtn" onclick="nextTurn()" class="next-btn">Next Turn</button>
             </div>
         </section>
 

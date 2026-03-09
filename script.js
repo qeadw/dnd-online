@@ -3,6 +3,20 @@ let rollHistory = [];
 let customMacros = [];
 let secretRollMode = false; // DM secret roll toggle
 
+// Unique ID generator to avoid Date.now() collisions
+let _idCounter = 0;
+function generateUniqueId() {
+    return Date.now().toString(36) + '-' + (++_idCounter).toString(36) + '-' + Math.random().toString(36).substr(2, 5);
+}
+
+// HTML escape helper to prevent XSS
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // Multiplayer broadcast helper — sends dice roll data if a session is active
 function broadcastDiceRoll(notation, result, rolls, modifier, description) {
     if (window.Multiplayer && window.Multiplayer.getSessionCode()) {
@@ -110,7 +124,9 @@ function rollWithDisadvantage() {
 
 // Dice Expression Parser (e.g., "2d6+3+1d4")
 function parseDiceExpression() {
-    const expression = document.getElementById('diceExpression').value.trim().toLowerCase();
+    const exprInput = document.getElementById('diceExpression');
+    if (!exprInput) return;
+    const expression = exprInput.value.trim().toLowerCase();
 
     if (!expression) {
         alert('Please enter a dice expression (e.g., 2d6+3+1d4)');
@@ -149,10 +165,11 @@ function evaluateDiceExpression(expression) {
             let negative = part.startsWith('-');
             let cleanPart = negative ? part.substring(1) : part;
             const [numStr, sidesStr] = cleanPart.split('d');
-            const num = parseInt(numStr) || 1;
-            const sides = parseInt(sidesStr);
+            const num = parseInt(numStr, 10) || 1;
+            const sides = parseInt(sidesStr, 10);
 
             if (isNaN(sides) || sides < 1) throw new Error('Invalid dice');
+            if (num > 100 || sides > 1000) throw new Error('Dice values too large');
 
             const rolls = [];
             for (let i = 0; i < num; i++) {
@@ -171,7 +188,7 @@ function evaluateDiceExpression(expression) {
             }
         } else {
             // It's a static modifier
-            const mod = parseInt(part);
+            const mod = parseInt(part, 10);
             if (!isNaN(mod)) {
                 total += mod;
                 staticModifier += mod;
@@ -239,8 +256,11 @@ function rollDamage(numDice, sides) {
 
 // Custom Macros
 function saveCustomMacro() {
-    const name = document.getElementById('macroName').value.trim();
-    const expression = document.getElementById('macroExpression').value.trim();
+    const nameInput = document.getElementById('macroName');
+    const exprInput = document.getElementById('macroExpression');
+    if (!nameInput || !exprInput) return;
+    const name = nameInput.value.trim();
+    const expression = exprInput.value.trim();
 
     if (!name || !expression) {
         alert('Please enter both a name and an expression');
@@ -255,11 +275,11 @@ function saveCustomMacro() {
         return;
     }
 
-    customMacros.push({ name, expression, id: Date.now() });
+    customMacros.push({ name, expression, id: generateUniqueId() });
     renderCustomMacros();
 
-    document.getElementById('macroName').value = '';
-    document.getElementById('macroExpression').value = '';
+    if (nameInput) nameInput.value = '';
+    if (exprInput) exprInput.value = '';
 
     saveData();
 }
@@ -292,9 +312,9 @@ function renderCustomMacros() {
 
     container.innerHTML = customMacros.map(macro => `
         <div class="custom-macro-item">
-            <button onclick="rollCustomMacro(${macro.id})" class="macro-btn custom">${macro.name}</button>
-            <span class="macro-expr">${macro.expression}</span>
-            <button onclick="deleteCustomMacro(${macro.id})" class="delete-macro-btn">X</button>
+            <button onclick="rollCustomMacro('${macro.id}')" class="macro-btn custom">${escapeHtml(macro.name)}</button>
+            <span class="macro-expr">${escapeHtml(macro.expression)}</span>
+            <button onclick="deleteCustomMacro('${macro.id}')" class="delete-macro-btn">X</button>
         </div>
     `).join('');
 }
@@ -330,6 +350,7 @@ function animateDiceRoll(sides, callback) {
 // Display result for advantage/disadvantage rolls
 function displayAdvantageResult(roll1, roll2, chosen, total, modifier, type, flags = {}) {
     const resultDiv = document.getElementById('rollResult');
+    if (!resultDiv) return;
     const isAdvantage = type === 'advantage';
 
     let criticalHtml = '';
@@ -367,6 +388,7 @@ function displayAdvantageResult(roll1, roll2, chosen, total, modifier, type, fla
 // Display result with critical hit/fumble detection
 function displayResult(total, notation, rolls, modifier = 0, flags = {}) {
     const resultDiv = document.getElementById('rollResult');
+    if (!resultDiv) return;
     let modifierText = '';
     if (modifier !== 0) {
         modifierText = ` ${modifier >= 0 ? '+' : ''}${modifier}`;
@@ -417,6 +439,7 @@ function addToHistory(text, flags = {}) {
 
 function renderRollHistory() {
     const historyDiv = document.getElementById('rollHistory');
+    if (!historyDiv) return;
     historyDiv.innerHTML = rollHistory.map(r => `
         <p class="${r.flagClass || ''}">
             <span class="history-time">${r.timestamp}</span>
@@ -456,7 +479,7 @@ function addToInitiative() {
         return;
     }
 
-    initiative.push({ name, init, id: Date.now() });
+    initiative.push({ name, init, id: generateUniqueId() });
     initiative.sort((a, b) => b.init - a.init);
     currentTurn = 0;
     renderInitiative();
@@ -479,11 +502,12 @@ function removeFromInitiative(id) {
 
 function renderInitiative() {
     const list = document.getElementById('initiativeList');
+    if (!list) return;
     const isMultiplayerPlayer = window.Multiplayer && window.Multiplayer.getSessionCode() && !window.Multiplayer.isDM();
 
     list.innerHTML = initiative.map((char, index) => `
         <li class="${index === currentTurn ? 'active' : ''}">
-            <span><strong>${char.init}</strong> - ${char.name}</span>
+            <span><strong>${char.init}</strong> - ${escapeHtml(char.name)}</span>
             ${isMultiplayerPlayer ? '' : `<button onclick="removeFromInitiative(${char.id})">X</button>`}
         </li>
     `).join('');
@@ -570,7 +594,13 @@ function loadData() {
     const saved = localStorage.getItem('dndOnlineData');
     if (!saved) return;
 
-    const data = JSON.parse(saved);
+    let data;
+    try {
+        data = JSON.parse(saved);
+    } catch (e) {
+        console.error('Failed to parse saved data:', e);
+        return;
+    }
 
     if (data.stats) {
         stats.forEach(stat => {
@@ -587,8 +617,8 @@ function loadData() {
     if (data.hp) {
         const currentHp = document.getElementById('currentHp');
         const maxHp = document.getElementById('maxHp');
-        if (currentHp) currentHp.value = data.hp.current || 10;
-        if (maxHp) maxHp.value = data.hp.max || 10;
+        if (currentHp) currentHp.value = data.hp.current !== undefined ? data.hp.current : 10;
+        if (maxHp) maxHp.value = data.hp.max !== undefined ? data.hp.max : 10;
     }
 
     if (data.notes) {

@@ -462,7 +462,7 @@
     // --- Player-side handlers -----------------------------------------------
 
     on("join-accepted", function (msg) {
-      if (msg.payload.targetTabId !== TAB_ID) return;
+      if (!msg.payload || msg.payload.targetTabId !== TAB_ID) return;
       _role = "player";
       sessionStorage.setItem("dnd-role", "player");
 
@@ -478,19 +478,20 @@
     });
 
     on("join-rejected", function (msg) {
-      if (msg.payload.targetTabId !== TAB_ID) return;
+      if (!msg.payload || msg.payload.targetTabId !== TAB_ID) return;
       _events.emit("join-rejected", { reason: msg.payload.reason });
       cleanup();
     });
 
     on("state-sync", function (msg) {
       if (_role === "dm") return; // DM is the authority.
+      if (!msg.payload) return;
       _sessionState = msg.payload.sessionState || _sessionState;
       rebuildPlayersFromArray(msg.payload.players);
     });
 
     on("kick-player", function (msg) {
-      if (msg.payload.targetTabId !== TAB_ID) return;
+      if (!msg.payload || msg.payload.targetTabId !== TAB_ID) return;
       _events.emit("kicked", { reason: msg.payload.reason || "No reason." });
       cleanup();
     });
@@ -501,7 +502,7 @@
     });
 
     on("dm-delegate", function (msg) {
-      if (msg.payload.targetTabId !== TAB_ID) return;
+      if (!msg.payload || msg.payload.targetTabId !== TAB_ID) return;
       // DM has delegated a token to us.
       _events.emit("delegation-received", {
         tokenId: msg.payload.tokenId,
@@ -510,6 +511,7 @@
 
     on("dm-promotion", function (msg) {
       // Only the promoted player becomes DM; others just acknowledge.
+      if (!msg.payload) return;
       if (msg.payload.newDMTabId === TAB_ID) {
         _role = "dm";
         sessionStorage.setItem("dnd-role", "dm");
@@ -1107,6 +1109,98 @@
   };
 
   // ---------------------------------------------------------------------------
+  // DM Control Methods
+  // ---------------------------------------------------------------------------
+
+  /** DM forces an immediate state sync to all players */
+  function syncState() {
+    if (_role !== "dm") {
+      console.warn("[Multiplayer] Only the DM can sync state.");
+      return;
+    }
+    broadcast("state-sync", {
+      sessionState: _sessionState,
+      players: serializePlayers(),
+    });
+  }
+
+  /** DM pushes the current map to all players */
+  function pushMap() {
+    if (_role !== "dm") {
+      console.warn("[Multiplayer] Only the DM can push maps.");
+      return;
+    }
+    broadcast("map-push", {
+      map: _sessionState.map,
+      fog: _sessionState.fog,
+      tokens: _sessionState.tokens,
+    });
+  }
+
+  /** DM requests rolls from all players */
+  function requestRolls(rollType, reason) {
+    if (_role !== "dm") {
+      console.warn("[Multiplayer] Only the DM can request rolls.");
+      return;
+    }
+    broadcast("request-action", {
+      action: "roll",
+      rollType: rollType || "any",
+      reason: reason || "The DM has requested a roll",
+      text: reason || "The DM has requested a roll",
+    });
+  }
+
+  /** DM pauses or unpauses the game */
+  let _gamePaused = false;
+  function pauseGame(pause) {
+    if (_role !== "dm") {
+      console.warn("[Multiplayer] Only the DM can pause the game.");
+      return;
+    }
+    _gamePaused = pause !== undefined ? pause : !_gamePaused;
+    _sessionState.custom.paused = _gamePaused;
+    broadcast("state-sync", {
+      sessionState: _sessionState,
+      players: serializePlayers(),
+    });
+    _events.emit("game-paused", { paused: _gamePaused });
+    return _gamePaused;
+  }
+
+  /** Check if game is paused */
+  function isGamePaused() {
+    return _gamePaused;
+  }
+
+  /** DM enables/disables secret roll mode (rolls visible only to DM) */
+  let _secretRollMode = false;
+  function setSecretRoll(enabled) {
+    if (_role !== "dm") {
+      console.warn("[Multiplayer] Only the DM can toggle secret rolls.");
+      return;
+    }
+    _secretRollMode = enabled === true;
+    _events.emit("secret-roll-changed", { enabled: _secretRollMode });
+    return _secretRollMode;
+  }
+
+  /** Check if secret roll mode is active */
+  function isSecretRollMode() {
+    return _secretRollMode;
+  }
+
+  /** Send a chat message through the multiplayer system */
+  function sendChatMessage(msg) {
+    if (!msg || !msg.text) return;
+    broadcast("chat", {
+      channel: msg.channel || "general",
+      text: msg.text,
+      type: msg.type || "normal",
+    });
+  }
+
+  // ---------------------------------------------------------------------------
   // Permission Helpers
   // ---------------------------------------------------------------------------
 
@@ -1281,6 +1375,16 @@
     // Saved sessions
     getSavedSessions: getSavedSessions,
     deleteSavedSession: deleteSavedSession,
+
+    // DM control methods
+    syncState: syncState,
+    pushMap: pushMap,
+    requestRolls: requestRolls,
+    pauseGame: pauseGame,
+    isGamePaused: isGamePaused,
+    setSecretRoll: setSecretRoll,
+    isSecretRollMode: isSecretRollMode,
+    sendChatMessage: sendChatMessage,
 
     // Local event emitter for UI subscriptions
     events: _events,

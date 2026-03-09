@@ -1,5 +1,5 @@
 // D&D 5e SRD Spells Database
-// Source: https://www.5esrd.com/spellcasting/spell-lists-and-டspells/
+// Source: https://www.5esrd.com/spellcasting/spell-lists-and-spells/
 
 const SPELLS = {
     // Cantrips (Level 0)
@@ -1785,7 +1785,7 @@ const SPELLS = {
         duration: "Concentration, up to 1 hour",
         concentration: true,
         classes: ["Druid", "Ranger"],
-        description: "A veil of shadows and silence radiates from you, masking you and your companions from detection. For the duration, each creature you choose within 30 feet of you (including you) has a +10 bonus to Dexterity (Stealth) checks and can't be tracked except by magical means."
+        description: "A veil of shadows and silence radiates from you, masking you and your companions from detection. For the duration, each creature you choose within 30 feet of you (including you) has a +10 bonus to Dexterity (Stealth) checks and can't be tracked except by magical means. A creature that receives this bonus leaves behind no tracks or other traces of its passage."
     },
     "phantasmal-force": {
         name: "Phantasmal Force",
@@ -4496,20 +4496,6 @@ const SPELLS = {
         ritual: true,
         classes: ["Bard", "Warlock", "Wizard"],
         description: "You write on parchment, paper, or some other suitable writing material and imbue it with a potent illusion that lasts for the duration. To you and any creatures you designate when you cast the spell, the writing appears normal, written in your hand, and conveys whatever meaning you intended when you wrote the text. To all others, the writing appears as if it were written in an unknown or magical script that is unintelligible. Alternatively, you can cause the writing to appear to be an entirely different message, written in a different hand and language, though the language must be one you know."
-    },
-
-    // 2nd-Level Spells
-    "pass-without-trace": {
-        name: "Pass without Trace",
-        level: 2,
-        school: "Abjuration",
-        castingTime: "1 action",
-        range: "Self",
-        components: "V, S, M (ashes from a burned leaf of mistletoe and a sprig of spruce)",
-        duration: "Concentration, up to 1 hour",
-        concentration: true,
-        classes: ["Druid", "Ranger"],
-        description: "A veil of shadows and silence radiates from you, masking you and your companions from detection. For the duration, each creature you choose within 30 feet of you (including you) has a +10 bonus to Dexterity (Stealth) checks and can't be tracked except by magical means. A creature that receives this bonus leaves behind no tracks or other traces of its passage."
     },
 
     // 3rd-Level Spells

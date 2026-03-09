@@ -930,6 +930,14 @@
 
     <script src="data/equipment.js"></script>
     <script>
+        // HTML escape helper to prevent XSS
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         // Inventory State
         let inventory = [];
         let currency = { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 };
@@ -1130,10 +1138,10 @@
 
             div.innerHTML = `
                 <div class="equipment-item-info">
-                    <div class="equipment-item-name">${item.name}</div>
-                    <div class="equipment-item-details">${costText} | ${weightText}</div>
+                    <div class="equipment-item-name">${escapeHtml(item.name)}</div>
+                    <div class="equipment-item-details">${escapeHtml(costText)} | ${escapeHtml(weightText)}</div>
                 </div>
-                <button class="equipment-item-add" onclick="addItemToInventory('${item.id}')" aria-label="Add ${item.name} to inventory">Add</button>
+                <button class="equipment-item-add" onclick="addItemToInventory('${escapeHtml(item.id)}')" aria-label="Add ${escapeHtml(item.name)} to inventory">Add</button>
             `;
 
             return div;

@@ -785,7 +785,17 @@ body.mp-active { padding-top: 46px !important; }
     // ------------------------------------------
     //  Messages Store & Rendering
     // ------------------------------------------
+    const MAX_MESSAGES = 500; // Limit to prevent memory issues
     const messageStore = []; // { channel, sender, senderName, text, timestamp, type: 'normal'|'whisper'|'system', own }
+
+    // Helper to add message with limit enforcement
+    function addMessage(msg) {
+        messageStore.push(msg);
+        // Remove oldest messages if limit exceeded
+        while (messageStore.length > MAX_MESSAGES) {
+            messageStore.shift();
+        }
+    }
 
     function renderMessages() {
         messagesContainer.innerHTML = '';
@@ -835,7 +845,7 @@ body.mp-active { padding-top: 46px !important; }
             own: true
         };
 
-        messageStore.push(msg);
+        addMessage(msg);
         renderMessages();
         chatInput.value = '';
 
@@ -974,15 +984,17 @@ body.mp-active { padding-top: 46px !important; }
 
         players.forEach(p => {
             const actions = [];
+            // Use tabId (from multiplayer.js) or fallback to id (for compatibility)
+            const playerId = p.tabId || p.id;
 
             if (isDM) {
                 actions.push(el('button', {
                     className: 'mp-whisper-btn',
-                    onClick: () => addWhisperChannel(p.id, p.characterName || p.name)
+                    onClick: () => addWhisperChannel(playerId, p.characterName || p.name)
                 }, 'Whisper'));
                 actions.push(el('button', {
                     className: 'mp-kick-btn',
-                    onClick: () => handleKick(p.id, p.name)
+                    onClick: () => handleKick(playerId, p.name)
                 }, 'Kick'));
             }
 
@@ -1041,7 +1053,7 @@ body.mp-active { padding-top: 46px !important; }
                 type: msg.type || 'normal', // 'normal', 'whisper', 'system'
                 own: msg.own === true
             };
-            messageStore.push(message);
+            addMessage(message);
 
             // If whisper from a new player, create a channel for DM
             if (isDM && message.type === 'whisper' && message.sender && !message.own) {

@@ -1131,7 +1131,14 @@
         function loadState() {
             const saved = localStorage.getItem('dnd-combat-tracker');
             if (saved) {
-                const state = JSON.parse(saved);
+                let state;
+                try {
+                    state = JSON.parse(saved);
+                } catch (e) {
+                    console.error('Failed to parse combat tracker data:', e);
+                    render();
+                    return;
+                }
                 combatants = state.combatants || [];
                 currentTurnIndex = state.currentTurnIndex || 0;
                 roundNumber = state.roundNumber || 1;
@@ -1468,8 +1475,8 @@
                                 <div class="active-conditions" aria-live="polite" aria-label="Active conditions">
                                     ${c.conditions.map(cond => `
                                         <span class="condition-tag">
-                                            ${cond}
-                                            ${canEditConditions ? `<button onclick="removeCondition('${c.id}', '${cond}')" aria-label="Remove ${cond} condition">&times;</button>` : ''}
+                                            ${escapeHtml(cond)}
+                                            ${canEditConditions ? `<button onclick="removeCondition('${escapeHtml(c.id)}', '${escapeHtml(cond)}')" aria-label="Remove ${escapeHtml(cond)} condition">&times;</button>` : ''}
                                         </span>
                                     `).join('')}
                                 </div>

@@ -1402,7 +1402,7 @@ const RACES = {
     shifter: {
         name: "Shifter",
         description: "Shifters are sometimes called the weretouched, as many believe they are the descendants of humans and lycanthropes. They are humanoids with a bestial aspect; while they cannot fully change shape, they can temporarily enhance their animalistic features - a state they call shifting.",
-        abilityScoreIncrease: {},
+        abilityScoreIncrease: { dex: 1 },
         age: "Shifters are quick to mature both physically and emotionally, reaching young adulthood at age 10. They rarely live to be more than 70 years old.",
         alignment: "Shifters tend toward neutrality, being more focused on survival than concepts of good and evil. A love of personal freedom can drive shifters toward chaotic alignments.",
         size: "Medium",

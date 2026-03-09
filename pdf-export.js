@@ -1,11 +1,88 @@
 // D&D 5e Character Sheet PDF Export
 // Uses pdf-lib to generate a standard-layout character sheet PDF
 
-async function exportCharacterPDF(index) {
-    const char = characters[index];
-    if (!char) return;
+// Helper functions for PDF export (duplicated from characters.js for standalone use)
+function calculateAbilities(char) {
+    const abilities = {};
+    const abilityNames = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
+    abilityNames.forEach(ab => {
+        const base = char.abilities ? (char.abilities[ab] || 10) : 10;
+        const racial = char.racialBonuses ? (char.racialBonuses[ab] || 0) : 0;
+        const total = base + racial;
+        abilities[ab] = {
+            base: base,
+            racial: racial,
+            total: total,
+            mod: Math.floor((total - 10) / 2)
+        };
+    });
+    return abilities;
+}
 
-    const { PDFDocument, rgb, StandardFonts } = PDFLib;
+function calculateHP(char, abilities) {
+    const cls = char.class ? CLASSES[char.class] : null;
+    const hitDie = cls ? cls.hitDie : 8;
+    const conMod = abilities.con ? abilities.con.mod : 0;
+    const level = char.level || 1;
+    // Level 1: max hit die + CON mod, subsequent levels: average + CON mod
+    return hitDie + conMod + (level - 1) * (Math.floor(hitDie / 2) + 1 + conMod);
+}
+
+function calculateAC(char, abilities) {
+    const dexMod = abilities.dex ? abilities.dex.mod : 0;
+    // Base AC is 10 + DEX mod (unarmored)
+    return 10 + dexMod;
+}
+
+function calculateSpeed(char) {
+    const race = char.race ? RACES[char.race] : null;
+    return race ? (race.speed || 30) : 30;
+}
+
+function getProficiencyBonus(level) {
+    // Proficiency bonus: +2 at 1-4, +3 at 5-8, +4 at 9-12, +5 at 13-16, +6 at 17-20
+    return Math.floor((level - 1) / 4) + 2;
+}
+
+function getDisplayRaceName(char) {
+    if (!char.race) return 'Unknown';
+    const race = RACES[char.race];
+    if (!race) return char.race;
+    let name = race.name;
+    if (char.subrace && race.subraces && race.subraces[char.subrace]) {
+        name = race.subraces[char.subrace].name;
+    }
+    return name;
+}
+
+function getDisplayClassName(char) {
+    if (!char.class) return 'Unknown';
+    const cls = CLASSES[char.class];
+    return cls ? cls.name : char.class;
+}
+
+function formatAlignment(alignment) {
+    if (!alignment) return 'Unknown';
+    const alignments = {
+        'lg': 'Lawful Good', 'ng': 'Neutral Good', 'cg': 'Chaotic Good',
+        'ln': 'Lawful Neutral', 'tn': 'True Neutral', 'cn': 'Chaotic Neutral',
+        'le': 'Lawful Evil', 'ne': 'Neutral Evil', 'ce': 'Chaotic Evil'
+    };
+    return alignments[alignment.toLowerCase()] || alignment;
+}
+
+async function exportCharacterPDF(index) {
+    try {
+        const char = characters[index];
+        if (!char) return;
+
+        // Check if PDFLib is loaded
+        if (typeof PDFLib === 'undefined') {
+            alert('PDF library failed to load. Please refresh the page and try again.');
+            return;
+        }
+
+        const { PDFDocument, rgb, StandardFonts } = PDFLib;
 
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage([612, 792]); // US Letter
@@ -211,7 +288,8 @@ async function exportCharacterPDF(index) {
     allSkills.forEach((skill, i) => {
         const sy = skillStartY - 4 - i * 14.5;
         const isProf = skillProfs.has(skill.name);
-        const mod = abilities[skill.ability].mod + (isProf ? profBonus : 0);
+        const abilityData = abilities[skill.ability] || { mod: 0 };
+        const mod = abilityData.mod + (isProf ? profBonus : 0);
 
         // Proficiency dot
         if (isProf) {
@@ -427,6 +505,10 @@ async function exportCharacterPDF(index) {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Failed to export PDF:', error);
+        alert('Failed to export character sheet. Please try again.');
+    }
 }
 
 // Helper: wrap text to fit width

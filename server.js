@@ -68,7 +68,7 @@ const server = http.createServer(function (req, res) {
   }
 
   fs.stat(filePath, function (err, stats) {
-    if (err || !stats.isFile()) {
+    if (err || !stats || !stats.isFile()) {
       res.writeHead(404);
       res.end("Not Found");
       return;
@@ -78,7 +78,15 @@ const server = http.createServer(function (req, res) {
     const contentType = MIME_TYPES[ext] || "application/octet-stream";
 
     res.writeHead(200, { "Content-Type": contentType });
-    fs.createReadStream(filePath).pipe(res);
+    const stream = fs.createReadStream(filePath);
+    stream.on('error', function(err) {
+      console.error('Stream error:', err);
+      if (!res.headersSent) {
+        res.writeHead(500);
+      }
+      res.end('Internal Server Error');
+    });
+    stream.pipe(res);
   });
 });
 

@@ -2254,7 +2254,8 @@ const EquipmentUtils = {
             const maxDex = armor.maxDexBonus !== null ? armor.maxDexBonus : dexMod;
             ac += Math.min(dexMod, maxDex);
         } else if (armor.acBonus === "shield") {
-            ac = dexMod; // Shield bonus is added to existing AC
+            // Shield provides a flat AC bonus (typically +2) to be added to existing AC
+            ac = armor.ac;
         }
         return ac;
     },

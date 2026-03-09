@@ -1289,3 +1289,255 @@
         transition-duration: 0.01ms !important;
     }
 }
+
+/* ==========================================================================
+   HP Tracker & Edit Mode Styles
+   ========================================================================== */
+
+/* HP Box */
+.hp-box {
+    min-width: 180px;
+}
+
+.hp-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 8px;
+}
+
+.hp-input {
+    width: 60px;
+    padding: 8px;
+    border: 2px solid rgba(201, 162, 39, 0.5);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.hp-input:focus {
+    outline: none;
+    border-color: #c9a227;
+    box-shadow: 0 0 10px rgba(201, 162, 39, 0.3);
+}
+
+.hp-input.small {
+    width: 50px;
+    font-size: 1rem;
+}
+
+.hp-separator {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1.2rem;
+}
+
+.hp-max {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.hp-actions {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.hp-btn {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.hp-btn.damage {
+    background: rgba(220, 53, 69, 0.8);
+    color: #fff;
+}
+
+.hp-btn.damage:hover {
+    background: rgba(220, 53, 69, 1);
+}
+
+.hp-btn.heal {
+    background: rgba(40, 167, 69, 0.8);
+    color: #fff;
+}
+
+.hp-btn.heal:hover {
+    background: rgba(40, 167, 69, 1);
+}
+
+.hp-btn.reset {
+    background: rgba(108, 117, 125, 0.8);
+    color: #fff;
+}
+
+.hp-btn.reset:hover {
+    background: rgba(108, 117, 125, 1);
+}
+
+/* Temp HP Box */
+.temp-hp-box {
+    min-width: 80px;
+}
+
+/* Rest Button */
+.rest-box {
+    min-width: 100px;
+}
+
+.rest-btn {
+    padding: 10px 15px;
+    background: linear-gradient(135deg, #8e44ad, #9b59b6);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.rest-btn:hover {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(142, 68, 173, 0.4);
+}
+
+/* Ability Score Edit Mode */
+.ability-input {
+    width: 50px;
+    padding: 8px;
+    border: 2px solid rgba(201, 162, 39, 0.5);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.ability-input:focus {
+    outline: none;
+    border-color: #c9a227;
+    box-shadow: 0 0 10px rgba(201, 162, 39, 0.3);
+}
+
+/* Edit Mode Button States */
+.btn-success {
+    background: linear-gradient(135deg, #28a745, #218838);
+    color: #fff;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #218838, #1e7e34);
+}
+
+/* Spell Slot Tracker */
+.spell-slot-tracker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.slot-btn {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.slot-btn.use {
+    background: rgba(220, 53, 69, 0.8);
+    color: #fff;
+}
+
+.slot-btn.use:hover {
+    background: rgba(220, 53, 69, 1);
+}
+
+.slot-btn.recover {
+    background: rgba(40, 167, 69, 0.8);
+    color: #fff;
+}
+
+.slot-btn.recover:hover {
+    background: rgba(40, 167, 69, 1);
+}
+
+.slots-display {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.slots-available {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.slots-used {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Character Notes in Edit Mode */
+.char-notes-section {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.char-notes-section h3 {
+    margin-bottom: 10px;
+    color: #c9a227;
+}
+
+.char-notes-textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: 12px;
+    border: 2px solid rgba(201, 162, 39, 0.3);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+}
+
+.char-notes-textarea:focus {
+    outline: none;
+    border-color: #c9a227;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hp-actions {
+        flex-wrap: wrap;
+    }
+
+    .hp-btn {
+        padding: 6px 10px;
+    }
+
+    .sheet-combat-box {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+}

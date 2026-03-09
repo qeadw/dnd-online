@@ -1,6 +1,14 @@
 // D&D 5e Character Creator
 // Main JavaScript Logic
 
+// HTML escape helper to prevent XSS
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // Character State
 const character = {
     name: '',
@@ -176,7 +184,8 @@ function selectRace(raceKey) {
     document.querySelectorAll('#race-grid .selection-card').forEach(card => {
         card.classList.remove('selected');
     });
-    document.querySelector(`#race-grid [data-race="${raceKey}"]`).classList.add('selected');
+    const selectedRaceCard = document.querySelector(`#race-grid [data-race="${raceKey}"]`);
+    if (selectedRaceCard) selectedRaceCard.classList.add('selected');
 
     const race = RACES[raceKey];
     character.race = raceKey;
@@ -316,7 +325,8 @@ function selectSubrace(subraceKey) {
     document.querySelectorAll('.subrace-option').forEach(opt => {
         opt.classList.remove('selected');
     });
-    document.querySelector(`[data-subrace="${subraceKey}"]`).classList.add('selected');
+    const selectedSubrace = document.querySelector(`[data-subrace="${subraceKey}"]`);
+    if (selectedSubrace) selectedSubrace.classList.add('selected');
 
     character.subrace = subraceKey;
     updateRacialBonuses();
@@ -397,7 +407,8 @@ function selectClass(classKey) {
     document.querySelectorAll('#class-grid .selection-card').forEach(card => {
         card.classList.remove('selected');
     });
-    document.querySelector(`#class-grid [data-class="${classKey}"]`).classList.add('selected');
+    const selectedClassCard = document.querySelector(`#class-grid [data-class="${classKey}"]`);
+    if (selectedClassCard) selectedClassCard.classList.add('selected');
 
     const cls = CLASSES[classKey];
     character.class = classKey;
@@ -560,10 +571,10 @@ function updateAbilityMethod() {
     const rollBtn = document.getElementById('roll-abilities-btn');
     const inputs = document.querySelectorAll('.ability-score-card input');
 
-    // Reset
-    pointBuyInfo.style.display = 'none';
-    arrayPool.style.display = 'none';
-    rollBtn.style.display = 'none';
+    // Reset - with null checks
+    if (pointBuyInfo) pointBuyInfo.style.display = 'none';
+    if (arrayPool) arrayPool.style.display = 'none';
+    if (rollBtn) rollBtn.style.display = 'none';
 
     inputs.forEach(input => {
         input.readOnly = true;
@@ -571,15 +582,15 @@ function updateAbilityMethod() {
 
     switch (abilityMethod) {
         case 'standard':
-            arrayPool.style.display = 'block';
+            if (arrayPool) arrayPool.style.display = 'block';
             initStandardArray();
             break;
         case 'pointbuy':
-            pointBuyInfo.style.display = 'block';
+            if (pointBuyInfo) pointBuyInfo.style.display = 'block';
             initPointBuy();
             break;
         case 'roll':
-            rollBtn.style.display = 'block';
+            if (rollBtn) rollBtn.style.display = 'block';
             break;
         case 'manual':
             inputs.forEach(input => {
@@ -595,6 +606,7 @@ function initStandardArray() {
     character.abilities = { str: 8, dex: 8, con: 8, int: 8, wis: 8, cha: 8 };
 
     const container = document.getElementById('available-scores');
+    if (!container) return;
     container.innerHTML = '';
 
     availableScores.forEach((score, index) => {
@@ -728,8 +740,10 @@ function updateAbilityTotals() {
         const total = base + racial;
         const modifier = Math.floor((total - 10) / 2);
 
-        document.getElementById(`total-${ability}`).textContent = total;
-        document.getElementById(`mod-${ability}`).textContent = modifier >= 0 ? `+${modifier}` : modifier;
+        const totalEl = document.getElementById(`total-${ability}`);
+        const modEl = document.getElementById(`mod-${ability}`);
+        if (totalEl) totalEl.textContent = total;
+        if (modEl) modEl.textContent = modifier >= 0 ? `+${modifier}` : modifier;
     });
 
     updateSummary();
@@ -782,7 +796,8 @@ function selectBackground(bgKey) {
     document.querySelectorAll('#background-grid .selection-card').forEach(card => {
         card.classList.remove('selected');
     });
-    document.querySelector(`#background-grid [data-background="${bgKey}"]`).classList.add('selected');
+    const selectedBgCard = document.querySelector(`#background-grid [data-background="${bgKey}"]`);
+    if (selectedBgCard) selectedBgCard.classList.add('selected');
 
     const bg = BACKGROUNDS[bgKey];
     character.background = bgKey;
@@ -1199,7 +1214,8 @@ function validateStep(step) {
                 alert('Please select a race.');
                 return false;
             }
-            if (RACES[character.race].subraces && !character.subrace) {
+            const selectedRace = RACES[character.race];
+            if (selectedRace && selectedRace.subraces && !character.subrace) {
                 alert('Please select a subrace.');
                 return false;
             }
@@ -1259,12 +1275,14 @@ function updateCharacterPortrait() {
         portraitContainer.classList.add('has-image');
 
         // Update label with race/class info
-        let labelText = RACES[character.race].name;
-        if (character.subrace && RACES[character.race].subraces) {
-            labelText = RACES[character.race].subraces[character.subrace].name;
+        const raceData = RACES[character.race];
+        let labelText = raceData ? raceData.name : character.race;
+        if (character.subrace && raceData && raceData.subraces && raceData.subraces[character.subrace]) {
+            labelText = raceData.subraces[character.subrace].name;
         }
-        if (character.class) {
-            labelText += ' ' + CLASSES[character.class].name;
+        const classData = character.class ? CLASSES[character.class] : null;
+        if (classData) {
+            labelText += ' ' + classData.name;
         }
         portraitLabel.textContent = labelText;
     } else {
@@ -1288,9 +1306,10 @@ function updateSummary() {
     // Race
     let raceText = '-';
     if (character.race) {
-        raceText = RACES[character.race].name;
-        if (character.subrace && RACES[character.race].subraces) {
-            raceText = RACES[character.race].subraces[character.subrace].name;
+        const raceData = RACES[character.race];
+        raceText = raceData ? raceData.name : character.race;
+        if (character.subrace && raceData && raceData.subraces && raceData.subraces[character.subrace]) {
+            raceText = raceData.subraces[character.subrace].name;
         }
     }
     document.getElementById('sum-race').textContent = raceText;
@@ -1298,9 +1317,10 @@ function updateSummary() {
     // Class
     let classText = '-';
     if (character.class) {
-        classText = CLASSES[character.class].name;
-        if (character.subclass && CLASSES[character.class].subclasses) {
-            classText += ` (${CLASSES[character.class].subclasses[character.subclass].name})`;
+        const classData = CLASSES[character.class];
+        classText = classData ? classData.name : character.class;
+        if (character.subclass && classData && classData.subclasses && classData.subclasses[character.subclass]) {
+            classText += ` (${classData.subclasses[character.subclass].name})`;
         }
     }
     document.getElementById('sum-class').textContent = classText;
@@ -1333,10 +1353,13 @@ function updateSummary() {
     // Speed
     let speed = 30;
     if (character.race) {
-        speed = RACES[character.race].speed;
-        if (character.subrace && RACES[character.race].subraces &&
-            RACES[character.race].subraces[character.subrace].speedBonus) {
-            speed += RACES[character.race].subraces[character.subrace].speedBonus;
+        const raceSpeedData = RACES[character.race];
+        if (raceSpeedData) {
+            speed = raceSpeedData.speed || 30;
+            if (character.subrace && raceSpeedData.subraces && raceSpeedData.subraces[character.subrace] &&
+                raceSpeedData.subraces[character.subrace].speedBonus) {
+                speed += raceSpeedData.subraces[character.subrace].speedBonus;
+            }
         }
     }
     document.getElementById('sum-speed').textContent = speed + ' ft';
@@ -1358,13 +1381,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const levelInput = document.getElementById('char-level');
     if (levelInput) {
         levelInput.addEventListener('change', (e) => {
-            character.level = parseInt(e.target.value) || 1;
+            character.level = parseInt(e.target.value, 10) || 1;
             updateSummary();
             updateSubclassVisibility();
         });
         // Also listen for input event for immediate feedback
         levelInput.addEventListener('input', (e) => {
-            character.level = parseInt(e.target.value) || 1;
+            character.level = parseInt(e.target.value, 10) || 1;
             updateSummary();
             updateSubclassVisibility();
         });
@@ -1461,19 +1484,34 @@ function generateCharacterPreview() {
         };
     });
 
-    const hp = cls ? cls.hitDie + abilities.con.mod : 0;
+    // Calculate HP with proper level scaling
+    // Level 1: max hit die + CON mod
+    // Levels 2+: average hit die (rounded up) + CON mod per level
+    const level = character.level || 1;
+    let hp = 0;
+    if (cls) {
+        const hitDie = cls.hitDie;
+        const avgHitDie = Math.ceil(hitDie / 2) + 1; // Average rounded up (d6=4, d8=5, d10=6, d12=7)
+        hp = hitDie + abilities.con.mod; // Level 1
+        if (level > 1) {
+            hp += (avgHitDie + abilities.con.mod) * (level - 1); // Additional levels
+        }
+        hp = Math.max(hp, 1); // Minimum 1 HP
+    }
     const ac = 10 + abilities.dex.mod;
     const speed = race ? race.speed : 30;
+    // Proficiency bonus scales with level: +2 at 1-4, +3 at 5-8, +4 at 9-12, +5 at 13-16, +6 at 17-20
+    const proficiencyBonus = Math.floor((level - 1) / 4) + 2;
 
     preview.innerHTML = `
         <div class="preview-header">
             <div>
-                <h2 class="preview-name">${character.name || 'Unnamed Character'}</h2>
-                <p class="preview-subtitle">${raceDisplay} ${classDisplay} ${character.level}</p>
+                <h2 class="preview-name">${escapeHtml(character.name) || 'Unnamed Character'}</h2>
+                <p class="preview-subtitle">${escapeHtml(raceDisplay)} ${escapeHtml(classDisplay)} ${character.level}</p>
             </div>
             <div>
-                <p><strong>Background:</strong> ${bg ? bg.name : 'Unknown'}</p>
-                <p><strong>Alignment:</strong> ${formatAlignment(character.alignment)}</p>
+                <p><strong>Background:</strong> ${bg ? escapeHtml(bg.name) : 'Unknown'}</p>
+                <p><strong>Alignment:</strong> ${escapeHtml(formatAlignment(character.alignment))}</p>
             </div>
         </div>
 
@@ -1502,7 +1540,7 @@ function generateCharacterPreview() {
             </div>
             <div class="preview-stat" style="flex: 1;">
                 <label>Proficiency</label>
-                <div class="value">+2</div>
+                <div class="value">+${proficiencyBonus}</div>
             </div>
         </div>
 
@@ -1512,8 +1550,18 @@ function generateCharacterPreview() {
         </div>
 
         <div class="preview-section">
-            <h4>Class Features (Level 1)</h4>
-            ${cls && cls.features && cls.features[1] ? cls.features[1].map(f => `<p><strong>${f.name}:</strong> ${f.description}</p>`).join('') : '<p>None</p>'}
+            <h4>Class Features (Level ${level})</h4>
+            ${cls && cls.features ? (() => {
+                const allFeatures = [];
+                for (let lvl = 1; lvl <= level; lvl++) {
+                    if (cls.features[lvl]) {
+                        allFeatures.push(...cls.features[lvl]);
+                    }
+                }
+                return allFeatures.length > 0
+                    ? allFeatures.map(f => `<p><strong>${f.name}:</strong> ${f.description}</p>`).join('')
+                    : '<p>None</p>';
+            })() : '<p>None</p>'}
         </div>
 
         <div class="preview-section">
@@ -1562,7 +1610,7 @@ function saveCharacter() {
         raceName: character.race ? RACES[character.race].name : '',
         className: character.class ? CLASSES[character.class].name : '',
         alignment: document.getElementById('char-alignment').value,
-        level: parseInt(document.getElementById('char-level').value) || 1,
+        level: parseInt(document.getElementById('char-level').value, 10) || 1,
         age: document.getElementById('char-age').value,
         height: document.getElementById('char-height').value,
         weight: document.getElementById('char-weight').value,
@@ -1576,7 +1624,13 @@ function saveCharacter() {
     };
 
     // Get existing characters
-    const savedCharacters = JSON.parse(localStorage.getItem('dndCharacters') || '[]');
+    let savedCharacters;
+    try {
+        savedCharacters = JSON.parse(localStorage.getItem('dndCharacters') || '[]');
+    } catch (e) {
+        console.error('Failed to parse characters data:', e);
+        savedCharacters = [];
+    }
 
     // Add new character
     savedCharacters.push(charData);

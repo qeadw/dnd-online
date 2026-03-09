@@ -1,10 +1,19 @@
 // D&D Character Management
 // Handles listing, viewing, importing, exporting, and deleting characters
 
+// HTML escape helper to prevent XSS
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // State
 let characters = [];
 let currentCharacterIndex = null;
 let deleteCharacterIndex = null;
+let editMode = false;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -21,7 +30,16 @@ document.addEventListener('DOMContentLoaded', () => {
 // Load characters from localStorage
 function loadCharacters() {
     const saved = localStorage.getItem('dndCharacters');
-    characters = saved ? JSON.parse(saved) : [];
+    if (!saved) {
+        characters = [];
+        return;
+    }
+    try {
+        characters = JSON.parse(saved);
+    } catch (e) {
+        console.error('Failed to parse characters data:', e);
+        characters = [];
+    }
 }
 
 // Save characters to localStorage
@@ -70,12 +88,12 @@ function createCharacterCard(char, index) {
 
     card.innerHTML = `
         <div class="card-header">
-            <h3 class="char-name">${char.name || 'Unnamed Character'}</h3>
+            <h3 class="char-name">${escapeHtml(char.name) || 'Unnamed Character'}</h3>
             <span class="char-level">Lvl ${char.level || 1}</span>
         </div>
         <div class="char-info">
-            <div class="char-race-class">${raceName} ${className}</div>
-            <div class="char-background">${backgroundName}</div>
+            <div class="char-race-class">${escapeHtml(raceName)} ${escapeHtml(className)}</div>
+            <div class="char-background">${escapeHtml(backgroundName)}</div>
         </div>
         <div class="char-stats">
             <div class="stat-mini">
@@ -293,20 +311,35 @@ function renderCharacterSheet(char) {
     let html = `
         <div class="sheet-top">
             <div class="sheet-identity">
-                <h2>${char.name || 'Unnamed Character'}</h2>
-                <div class="subtitle">${raceName} ${className} ${char.level || 1}</div>
+                <h2>${escapeHtml(char.name) || 'Unnamed Character'}</h2>
+                <div class="subtitle">${escapeHtml(raceName)} ${escapeHtml(className)} ${char.level || 1}</div>
                 <div class="details">
-                    <span><strong>Background:</strong> ${backgroundName}</span>
-                    <span><strong>Alignment:</strong> ${formatAlignment(char.alignment)}</span>
-                    ${char.age ? `<span><strong>Age:</strong> ${char.age}</span>` : ''}
-                    ${char.height ? `<span><strong>Height:</strong> ${char.height}</span>` : ''}
-                    ${char.weight ? `<span><strong>Weight:</strong> ${char.weight}</span>` : ''}
+                    <span><strong>Background:</strong> ${escapeHtml(backgroundName)}</span>
+                    <span><strong>Alignment:</strong> ${escapeHtml(formatAlignment(char.alignment))}</span>
+                    ${char.age ? `<span><strong>Age:</strong> ${escapeHtml(char.age)}</span>` : ''}
+                    ${char.height ? `<span><strong>Height:</strong> ${escapeHtml(char.height)}</span>` : ''}
+                    ${char.weight ? `<span><strong>Weight:</strong> ${escapeHtml(char.weight)}</span>` : ''}
                 </div>
             </div>
             <div class="sheet-combat-box">
-                <div class="combat-box">
-                    <div class="label">HP</div>
-                    <div class="value">${hp}</div>
+                <div class="combat-box hp-box">
+                    <div class="label">Current HP</div>
+                    <div class="hp-display">
+                        <input type="number" id="edit-current-hp" class="hp-input" value="${char.currentHP !== undefined ? char.currentHP : hp}" min="0" onchange="saveCharacterEdits()">
+                        <span class="hp-separator">/</span>
+                        <span class="hp-max">${hp}</span>
+                    </div>
+                    <div class="hp-actions">
+                        <button class="hp-btn damage" onclick="updateCurrentHP(-1)" title="Take 1 damage">-1</button>
+                        <button class="hp-btn damage" onclick="updateCurrentHP(-5)" title="Take 5 damage">-5</button>
+                        <button class="hp-btn heal" onclick="updateCurrentHP(1)" title="Heal 1">+1</button>
+                        <button class="hp-btn heal" onclick="updateCurrentHP(5)" title="Heal 5">+5</button>
+                        <button class="hp-btn reset" onclick="resetHP()" title="Reset to max HP">Max</button>
+                    </div>
+                </div>
+                <div class="combat-box temp-hp-box">
+                    <div class="label">Temp HP</div>
+                    <input type="number" id="edit-temp-hp" class="hp-input small" value="${char.tempHP || 0}" min="0" onchange="saveCharacterEdits()">
                 </div>
                 <div class="combat-box">
                     <div class="label">AC</div>
@@ -320,6 +353,9 @@ function renderCharacterSheet(char) {
                     <div class="label">Prof</div>
                     <div class="value">+${profBonus}</div>
                 </div>
+                <div class="combat-box rest-box">
+                    <button class="rest-btn" onclick="longRest()" title="Restore HP and spell slots">Long Rest</button>
+                </div>
             </div>
         </div>
 
@@ -327,7 +363,11 @@ function renderCharacterSheet(char) {
             ${['str', 'dex', 'con', 'int', 'wis', 'cha'].map(ability => `
                 <div class="ability-box">
                     <div class="ability-name">${ability.toUpperCase()}</div>
-                    <div class="ability-score">${abilities[ability].total}</div>
+                    ${editMode ? `
+                        <input type="number" id="edit-ability-${ability}" class="ability-input" value="${char.abilities ? char.abilities[ability] : 10}" min="1" max="30" onchange="saveCharacterEdits()">
+                    ` : `
+                        <div class="ability-score">${abilities[ability].total}</div>
+                    `}
                     <div class="ability-mod">${abilities[ability].modStr}</div>
                 </div>
             `).join('')}
@@ -603,7 +643,8 @@ function renderSpellcasting(char, abilities) {
         'int': 'Intelligence'
     }[spellcasting.ability] || spellcasting.ability;
 
-    const abilityMod = abilities[spellcasting.ability].mod;
+    const abilityData = abilities[spellcasting.ability] || { mod: 0 };
+    const abilityMod = abilityData.mod;
     const profBonus = getProficiencyBonus(level);
     const spellSaveDC = 8 + profBonus + abilityMod;
     const spellAttack = profBonus + abilityMod;
@@ -647,12 +688,26 @@ function renderSpellcasting(char, abilities) {
             </div>
             <h4 style="color:#c9a227; margin-bottom: 10px;">Spell Slots</h4>
             <div class="spell-slots-grid">
-                ${slots.map((count, idx) => count > 0 ? `
-                    <div class="spell-slot">
-                        <div class="slot-level">${idx === 0 ? '1st' : idx === 1 ? '2nd' : idx === 2 ? '3rd' : (idx + 1) + 'th'}</div>
-                        <div class="slot-count">${count}</div>
-                    </div>
-                ` : '').join('')}
+                ${slots.map((count, idx) => {
+                    if (count <= 0) return '';
+                    const level = idx + 1;
+                    const used = (char.spellSlotsUsed && char.spellSlotsUsed[level]) || 0;
+                    const available = Math.max(0, count - used);
+                    const levelLabel = idx === 0 ? '1st' : idx === 1 ? '2nd' : idx === 2 ? '3rd' : level + 'th';
+                    return `
+                        <div class="spell-slot">
+                            <div class="slot-level">${levelLabel}</div>
+                            <div class="slot-count">
+                                <span class="slots-available">${available}</span>
+                                <span class="slots-used">/ ${count}</span>
+                            </div>
+                            <div class="spell-slot-tracker">
+                                <button class="slot-btn use" onclick="useSpellSlot(${level})" title="Use slot" ${available <= 0 ? 'disabled' : ''}>-</button>
+                                <button class="slot-btn recover" onclick="recoverSpellSlot(${level})" title="Recover slot" ${used <= 0 ? 'disabled' : ''}>+</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
             </div>
         </div>
     `;
@@ -687,8 +742,8 @@ function renderCharacterDetails(char) {
                 <div class="details-grid">
                     ${details.map(d => `
                         <div class="detail-item">
-                            <label>${d.label}</label>
-                            <p>${d.value}</p>
+                            <label>${escapeHtml(d.label)}</label>
+                            <p>${escapeHtml(d.value)}</p>
                         </div>
                     `).join('')}
                 </div>
@@ -700,7 +755,7 @@ function renderCharacterDetails(char) {
         html += `
             <div class="sheet-section full-width">
                 <h3>Backstory</h3>
-                <p class="backstory-text">${char.backstory}</p>
+                <p class="backstory-text">${escapeHtml(char.backstory)}</p>
             </div>
         `;
     }
@@ -713,6 +768,139 @@ function showCharacterList() {
     document.getElementById('character-sheet-view').style.display = 'none';
     document.getElementById('character-list-view').style.display = 'block';
     currentCharacterIndex = null;
+    editMode = false;
+    updateEditButton();
+}
+
+// Toggle edit mode for character sheet
+function toggleEditMode() {
+    editMode = !editMode;
+    updateEditButton();
+    if (currentCharacterIndex !== null) {
+        renderCharacterSheet(characters[currentCharacterIndex]);
+    }
+}
+
+// Update the edit button text based on mode
+function updateEditButton() {
+    const btn = document.getElementById('edit-mode-btn');
+    if (btn) {
+        if (editMode) {
+            btn.innerHTML = '<span class="btn-icon" aria-hidden="true">&#10003;</span> Save';
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-success');
+        } else {
+            btn.innerHTML = '<span class="btn-icon" aria-hidden="true">&#9998;</span> Edit';
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-primary');
+        }
+    }
+}
+
+// Save character edits from edit mode
+function saveCharacterEdits() {
+    if (currentCharacterIndex === null) return;
+
+    const char = characters[currentCharacterIndex];
+
+    // Get runtime values from edit fields
+    const currentHpEl = document.getElementById('edit-current-hp');
+    const tempHpEl = document.getElementById('edit-temp-hp');
+    const notesEl = document.getElementById('edit-char-notes');
+
+    if (currentHpEl) char.currentHP = parseInt(currentHpEl.value, 10) || 0;
+    if (tempHpEl) char.tempHP = parseInt(tempHpEl.value, 10) || 0;
+    if (notesEl) char.notes = notesEl.value;
+
+    // Get edited ability scores
+    ['str', 'dex', 'con', 'int', 'wis', 'cha'].forEach(ability => {
+        const el = document.getElementById(`edit-ability-${ability}`);
+        if (el && char.abilities) {
+            char.abilities[ability] = parseInt(el.value, 10) || 10;
+        }
+    });
+
+    // Get spell slot usage
+    for (let level = 1; level <= 9; level++) {
+        const el = document.getElementById(`edit-slots-used-${level}`);
+        if (el) {
+            if (!char.spellSlotsUsed) char.spellSlotsUsed = {};
+            char.spellSlotsUsed[level] = parseInt(el.value, 10) || 0;
+        }
+    }
+
+    // Update save timestamp
+    char.lastEditedAt = new Date().toISOString();
+
+    saveCharacters();
+}
+
+// Update HP (quick actions)
+function updateCurrentHP(delta) {
+    if (currentCharacterIndex === null) return;
+    const char = characters[currentCharacterIndex];
+
+    if (char.currentHP === undefined) {
+        const abilities = calculateAbilities(char);
+        char.currentHP = calculateHP(char, abilities);
+    }
+
+    char.currentHP = Math.max(0, char.currentHP + delta);
+    saveCharacters();
+    renderCharacterSheet(char);
+}
+
+// Reset HP to max
+function resetHP() {
+    if (currentCharacterIndex === null) return;
+    const char = characters[currentCharacterIndex];
+    const abilities = calculateAbilities(char);
+    char.currentHP = calculateHP(char, abilities);
+    char.tempHP = 0;
+    saveCharacters();
+    renderCharacterSheet(char);
+}
+
+// Use a spell slot
+function useSpellSlot(level) {
+    if (currentCharacterIndex === null) return;
+    const char = characters[currentCharacterIndex];
+
+    if (!char.spellSlotsUsed) char.spellSlotsUsed = {};
+    char.spellSlotsUsed[level] = (char.spellSlotsUsed[level] || 0) + 1;
+
+    saveCharacters();
+    renderCharacterSheet(char);
+}
+
+// Recover a spell slot
+function recoverSpellSlot(level) {
+    if (currentCharacterIndex === null) return;
+    const char = characters[currentCharacterIndex];
+
+    if (!char.spellSlotsUsed) char.spellSlotsUsed = {};
+    char.spellSlotsUsed[level] = Math.max(0, (char.spellSlotsUsed[level] || 0) - 1);
+
+    saveCharacters();
+    renderCharacterSheet(char);
+}
+
+// Long rest - recover all spell slots and HP
+function longRest() {
+    if (currentCharacterIndex === null) return;
+    const char = characters[currentCharacterIndex];
+
+    // Reset HP
+    const abilities = calculateAbilities(char);
+    char.currentHP = calculateHP(char, abilities);
+    char.tempHP = 0;
+
+    // Reset spell slots
+    char.spellSlotsUsed = {};
+
+    saveCharacters();
+    renderCharacterSheet(char);
+    alert('Long rest complete! HP and spell slots restored.');
 }
 
 // Export a character

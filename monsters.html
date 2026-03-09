@@ -724,7 +724,13 @@
 
         // Merge custom monsters from localStorage into MONSTERS
         function loadCustomMonsters() {
-            const customMonstersDB = JSON.parse(localStorage.getItem('customMonstersDB') || '{}');
+            let customMonstersDB;
+            try {
+                customMonstersDB = JSON.parse(localStorage.getItem('customMonstersDB') || '{}');
+            } catch (e) {
+                console.error('Failed to parse custom monsters:', e);
+                return;
+            }
             Object.entries(customMonstersDB).forEach(([key, monster]) => {
                 MONSTERS[key] = monster;
             });
