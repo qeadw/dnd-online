@@ -83,7 +83,10 @@
                 </button>
                 <div class="sheet-actions" role="group" aria-label="Character actions">
                     <button class="btn-secondary" onclick="exportCurrentCharacter()" aria-label="Export character as JSON">
-                        <span class="btn-icon" aria-hidden="true">&#8595;</span> Export
+                        <span class="btn-icon" aria-hidden="true">&#8595;</span> JSON
+                    </button>
+                    <button class="btn-secondary" onclick="exportCharacterPDF(currentCharacterIndex)" aria-label="Export as D&D PDF sheet">
+                        <span class="btn-icon" aria-hidden="true">&#128220;</span> PDF Sheet
                     </button>
                     <button class="btn-secondary" onclick="printCharacterSheet()" aria-label="Print character sheet">
                         <span class="btn-icon" aria-hidden="true">&#9113;</span> Print
@@ -121,7 +124,9 @@
     <script src="data/backgrounds.js"></script>
     <script src="data/feats.js"></script>
     <script src="data/spells.js"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <script src="characters.js"></script>
+    <script src="pdf-export.js"></script>
     <script src="multiplayer.js"></script>
     <script src="multiplayer-ui.js"></script>
 </body>

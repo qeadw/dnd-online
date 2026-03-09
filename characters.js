@@ -119,7 +119,8 @@ function createCharacterCard(char, index) {
         </div>
         <div class="card-actions">
             <button class="btn-load" onclick="viewCharacter(${index})">View</button>
-            <button class="btn-export" onclick="exportCharacter(${index})">Export</button>
+            <button class="btn-export" onclick="exportCharacter(${index})">JSON</button>
+            <button class="btn-pdf" onclick="exportCharacterPDF(${index})">PDF</button>
             <button class="btn-delete" onclick="showDeleteModal(${index})">Delete</button>
         </div>
     `;
