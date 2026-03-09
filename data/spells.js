@@ -4443,6 +4443,128 @@ const SPELLS = {
         duration: "Instantaneous",
         classes: ["Sorcerer", "Wizard"],
         description: "Wish is the mightiest spell a mortal creature can cast. By simply speaking aloud, you can alter the very foundations of reality in accord with your desires. The basic use of this spell is to duplicate any other spell of 8th level or lower. You don't need to meet any requirements in that spell, including costly components. The spell simply takes effect. Alternatively, you can create one of the following effects of your choice: create an object worth up to 25,000 gp, grant up to ten creatures resistance to a damage type, grant up to ten creatures immunity to a spell or effect, undo a recent event, or any other effect of comparable power."
+    },
+    // 4th Level Spells (XGE)
+    "charm-monster": {
+        name: "Charm Monster",
+        level: 4,
+        school: "Enchantment",
+        castingTime: "1 action",
+        range: "30 feet",
+        components: "V, S",
+        duration: "1 hour",
+        classes: ["Bard", "Druid", "Sorcerer", "Warlock", "Wizard"],
+        description: "You attempt to charm a creature you can see within range. It must make a Wisdom saving throw, and it does so with advantage if you or your companions are fighting it. If it fails the saving throw, it is charmed by you until the spell ends or until you or your companions do anything harmful to it. The charmed creature is friendly to you. When the spell ends, the creature knows it was charmed by you.",
+        higherLevels: "When you cast this spell using a spell slot of 5th level or higher, you can target one additional creature for each slot level above 4th. The creatures must be within 30 feet of each other when you target them."
+    },
+    "elemental-bane": {
+        name: "Elemental Bane",
+        level: 4,
+        school: "Transmutation",
+        castingTime: "1 action",
+        range: "90 feet",
+        components: "V, S",
+        duration: "Concentration, up to 1 minute",
+        concentration: true,
+        classes: ["Druid", "Warlock", "Wizard"],
+        description: "Choose one creature you can see within range, and choose one of the following damage types: acid, cold, fire, lightning, or thunder. The target must succeed on a Constitution saving throw or be affected by the spell for its duration. The first time each turn the affected target takes damage of the chosen type, the target takes an extra 2d6 damage of that type. Moreover, the target loses any resistance to that damage type until the spell ends.",
+        higherLevels: "When you cast this spell using a spell slot of 5th level or higher, you can target one additional creature for each slot level above 4th. The creatures must be within 30 feet of each other when you target them."
+    },
+    "find-greater-steed": {
+        name: "Find Greater Steed",
+        level: 4,
+        school: "Conjuration",
+        castingTime: "10 minutes",
+        range: "30 feet",
+        components: "V, S",
+        duration: "Instantaneous",
+        classes: ["Paladin"],
+        description: "You summon a spirit that assumes the form of a loyal, majestic mount. Appearing in an unoccupied space within range, the spirit takes on a form you choose: a griffon, a pegasus, a peryton, a dire wolf, a rhinoceros, or a saber-toothed tiger. The creature has the statistics of the chosen form, though it is a celestial, a fey, or a fiend (your choice) instead of its normal creature type. Additionally, if it has an Intelligence score of 5 or less, its Intelligence becomes 6, and it gains the ability to understand one language of your choice that you speak. You control the mount in combat. While the mount is within 1 mile of you, you can communicate with it telepathically. While mounted on it, you can make any spell you cast that targets only you also target the mount. The mount disappears temporarily when it drops to 0 hit points or when you dismiss it as an action. Casting this spell again re-summons the bonded mount, with all its hit points restored and any conditions removed."
+    },
+    "guardian-of-nature": {
+        name: "Guardian of Nature",
+        level: 4,
+        school: "Transmutation",
+        castingTime: "1 bonus action",
+        range: "Self",
+        components: "V",
+        duration: "Concentration, up to 1 minute",
+        concentration: true,
+        classes: ["Druid", "Ranger"],
+        description: "A nature spirit answers your call and transforms you into a powerful guardian. The transformation lasts until the spell ends. You choose one of the following forms to assume: Primal Beast or Great Tree. Primal Beast. Bestial fur covers your body, your facial features become feral, and you gain the following benefits: Your walking speed increases by 10 feet. You gain darkvision with a range of 120 feet. You make Strength-based attack rolls with advantage. Your melee weapon attacks deal an extra 1d6 force damage on a hit. Great Tree. Your skin appears barky, leaves sprout from your hair, and you gain the following benefits: You gain 10 temporary hit points. You make Constitution saving throws with advantage. You make Dexterity- and Wisdom-based attack rolls with advantage. While you are on the ground, the ground within 15 feet of you is difficult terrain for your enemies."
+    },
+    "shadow-of-moil": {
+        name: "Shadow of Moil",
+        level: 4,
+        school: "Necromancy",
+        castingTime: "1 action",
+        range: "Self",
+        components: "V, S, M (an undead eyeball encased in a gem worth at least 150 gp)",
+        duration: "Concentration, up to 1 minute",
+        concentration: true,
+        classes: ["Warlock"],
+        description: "Flame-like shadows wreathe your body until the spell ends, causing you to become heavily obscured to others. The shadows turn dim light within 10 feet of you into darkness, and bright light in the same area to dim light. Until the spell ends, you have resistance to radiant damage. In addition, whenever a creature within 10 feet of you hits you with an attack, the shadows lash out at that creature, dealing it 2d8 necrotic damage. You gain darkvision with a range of 60 feet for the duration. If you already have darkvision, its range increases by 60 feet for the duration."
+    },
+    "sickening-radiance": {
+        name: "Sickening Radiance",
+        level: 4,
+        school: "Evocation",
+        castingTime: "1 action",
+        range: "120 feet",
+        components: "V, S",
+        duration: "Concentration, up to 10 minutes",
+        concentration: true,
+        classes: ["Sorcerer", "Warlock", "Wizard"],
+        description: "Dim, greenish light spreads within a 30-foot-radius sphere centered on a point you choose within range. The light spreads around corners, and it lasts until the spell ends. When a creature moves into the spell's area for the first time on a turn or starts its turn there, that creature must succeed on a Constitution saving throw or take 4d10 radiant damage, and it suffers one level of exhaustion and emits a dim, greenish light in a 5-foot radius. This light makes it impossible for the creature to benefit from being invisible. The light and any levels of exhaustion caused by this spell go away when the spell ends."
+    },
+    "storm-sphere": {
+        name: "Storm Sphere",
+        level: 4,
+        school: "Evocation",
+        castingTime: "1 action",
+        range: "150 feet",
+        components: "V, S",
+        duration: "Concentration, up to 1 minute",
+        concentration: true,
+        classes: ["Sorcerer", "Wizard"],
+        description: "A 20-foot-radius sphere of whirling air springs into existence, centered on a point you choose within range. The sphere remains for the spell's duration. Each creature in the sphere when it appears or that ends its turn there must succeed on a Strength saving throw or take 2d6 bludgeoning damage. As a bonus action on each of your turns, you can cause a bolt of lightning to leap from the center of the sphere toward one creature you choose within 60 feet of the center. Make a ranged spell attack. You have advantage on the attack roll if the target is in the sphere. On a hit, the target takes 4d6 lightning damage. Creatures within 30 feet of the sphere have disadvantage on Wisdom (Perception) checks made to listen.",
+        higherLevels: "When you cast this spell using a spell slot of 5th level or higher, the damage for each of its effects increases by 1d6 for each slot level above 4th."
+    },
+    "summon-greater-demon": {
+        name: "Summon Greater Demon",
+        level: 4,
+        school: "Conjuration",
+        castingTime: "1 action",
+        range: "60 feet",
+        components: "V, S, M (a vial of blood from a humanoid killed within the past 24 hours)",
+        duration: "Concentration, up to 1 hour",
+        concentration: true,
+        classes: ["Warlock", "Wizard"],
+        description: "You utter foul words, summoning one demon from the chaos of the Abyss. You choose the demon's type, which must be one of challenge rating 5 or lower. The demon appears in an unoccupied space you can see within range, and the demon disappears when it drops to 0 hit points or when the spell ends. Roll initiative for the demon, which has its own turns. When you summon it and on each of your turns thereafter, you can issue a verbal command to it (requiring no action on your part), telling it what it must do on its next turn. If you issue no command, it spends its turn attacking any creature within reach that has attacked it. At the end of each of the demon's turns, it makes a Charisma saving throw. The demon has disadvantage on this saving throw if you say its true name. On a success, your control of the demon ends for the rest of the duration, and the demon spends its turns pursuing and attacking the nearest non-demons to the best of its ability. As part of casting the spell, you can form a circle on the ground with the blood used as a material component. The circle is large enough to encompass your space. While the spell lasts, the summoned demon can't cross the circle or harm anyone in it.",
+        higherLevels: "When you cast this spell using a spell slot of 5th level or higher, the challenge rating increases by 1 for each slot level above 4th."
+    },
+    "vitriolic-sphere": {
+        name: "Vitriolic Sphere",
+        level: 4,
+        school: "Evocation",
+        castingTime: "1 action",
+        range: "150 feet",
+        components: "V, S, M (a drop of giant slug bile)",
+        duration: "Instantaneous",
+        classes: ["Sorcerer", "Wizard"],
+        description: "You point at a location within range, and a glowing 1-foot-diameter ball of emerald acid streaks there and explodes in a 20-foot-radius sphere. Each creature in that area must make a Dexterity saving throw. On a failed save, a creature takes 10d4 acid damage and 5d4 acid damage at the end of its next turn. On a successful save, a creature takes half the initial damage and no damage at the end of its next turn."
+    },
+    "watery-sphere": {
+        name: "Watery Sphere",
+        level: 4,
+        school: "Conjuration",
+        castingTime: "1 action",
+        range: "90 feet",
+        components: "V, S, M (a droplet of water)",
+        duration: "Concentration, up to 1 minute",
+        concentration: true,
+        classes: ["Druid", "Sorcerer", "Wizard"],
+        description: "You conjure up a sphere of water with a 5-foot radius at a point you can see within range. The sphere can hover but no more than 10 feet off the ground. The sphere remains for the spell's duration. Any creature in the sphere's space must make a Strength saving throw. On a successful save, a creature is ejected from that space to the nearest unoccupied space of the creature's choice outside the sphere. On a failed save, a creature is restrained by the sphere and is engulfed by the water. At the end of each of its turns, a restrained target can repeat the saving throw, ending the effect on itself on a success. The sphere can restrain as many as four Medium or smaller creatures or one Large creature. If the sphere restrains a creature that causes it to exceed this capacity, a random creature that was already restrained by the sphere falls out of it and lands prone in a space within 5 feet of it. As an action, you can move the sphere up to 30 feet in a straight line. If it moves over a pit, a cliff, or other drop-off, it safely descends until it is hovering 10 feet above the ground. Any creature restrained by the sphere moves with it."
     }
 };
 
