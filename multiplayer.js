@@ -151,6 +151,8 @@
   // ---------------------------------------------------------------------------
 
   let _channel = null; // BroadcastChannel instance
+  let _ws = null; // WebSocket instance (for LAN play)
+  let _wsReady = false; // true when WebSocket is open and usable
   let _sessionCode = null;
   let _sessionName = null;
   let _role = null; // "dm" | "player" | null
@@ -194,6 +196,7 @@
 
   /**
    * Open (or reopen) a BroadcastChannel for the given session code.
+   * Also attempts a WebSocket connection if served over HTTP (LAN mode).
    */
   function openChannel(code) {
     if (_channel) {
@@ -203,13 +206,81 @@
     _channel.onmessage = function (event) {
       handleIncomingMessage(event.data);
     };
+
+    // --- WebSocket (LAN) transport ---
+    // Only attempt if the page was served over HTTP (not file://).
+    closeWebSocket();
+    if (
+      typeof window !== "undefined" &&
+      window.location &&
+      window.location.protocol.startsWith("http")
+    ) {
+      try {
+        var wsProtocol =
+          window.location.protocol === "https:" ? "wss://" : "ws://";
+        var wsUrl = wsProtocol + window.location.host;
+        _ws = new WebSocket(wsUrl);
+
+        _ws.onopen = function () {
+          _wsReady = true;
+          console.log("[Multiplayer] WebSocket connected — LAN mode active.");
+        };
+
+        _ws.onmessage = function (event) {
+          try {
+            var msg = JSON.parse(event.data);
+            // Strip the sessionCode wrapper before passing to handler.
+            // The server relays the full JSON, which includes sessionCode.
+            handleIncomingMessage(msg);
+          } catch (e) {
+            // Ignore non-JSON messages.
+          }
+        };
+
+        _ws.onclose = function () {
+          _wsReady = false;
+          console.log("[Multiplayer] WebSocket closed.");
+        };
+
+        _ws.onerror = function () {
+          // Silently fall back to BroadcastChannel-only mode.
+          _wsReady = false;
+          console.warn(
+            "[Multiplayer] WebSocket failed to connect — using BroadcastChannel only."
+          );
+          closeWebSocket();
+        };
+      } catch (e) {
+        console.warn("[Multiplayer] Could not create WebSocket:", e);
+        _ws = null;
+        _wsReady = false;
+      }
+    }
+  }
+
+  /**
+   * Close the WebSocket connection if one exists.
+   */
+  function closeWebSocket() {
+    if (_ws) {
+      try {
+        _ws.onclose = null; // prevent log noise on intentional close
+        _ws.onerror = null;
+        _ws.close();
+      } catch (e) {
+        // ignore
+      }
+      _ws = null;
+      _wsReady = false;
+    }
   }
 
   /**
    * Build and broadcast a message to the channel.
+   * Sends via BOTH BroadcastChannel (same-browser tabs) and WebSocket (LAN).
    */
   function broadcast(type, payload) {
-    if (!_channel) {
+    if (!_channel && !_wsReady) {
       console.warn("[Multiplayer] Cannot broadcast — no active channel.");
       return;
     }
@@ -221,7 +292,22 @@
       timestamp: now(),
       payload: payload || {},
     };
-    _channel.postMessage(msg);
+
+    // BroadcastChannel (same-browser tabs).
+    if (_channel) {
+      _channel.postMessage(msg);
+    }
+
+    // WebSocket (LAN) — include sessionCode so the server can route.
+    if (_ws && _wsReady) {
+      try {
+        var wsMsg = Object.assign({}, msg, { sessionCode: _sessionCode });
+        _ws.send(JSON.stringify(wsMsg));
+      } catch (e) {
+        console.warn("[Multiplayer] WebSocket send failed:", e);
+      }
+    }
+
     // Also emit locally so the sending tab sees its own messages in the event
     // bus (BroadcastChannel does NOT deliver to the sender).
     _events.emit(type, msg.payload, msg);
@@ -595,6 +681,7 @@
       _channel.close();
       _channel = null;
     }
+    closeWebSocket();
     _sessionCode = null;
     _sessionName = null;
     _role = null;

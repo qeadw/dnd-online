@@ -890,6 +890,101 @@ const STARTING_GOLD = {
     wizard: '4d4 x 10'
 };
 
+// Detect equipment options that need a sub-picker (weapon lists, arcane focus, etc.)
+function getEquipmentSubOptions(optionText) {
+    const lower = optionText.toLowerCase().trim();
+    if (lower.includes('any simple weapon') && !lower.includes('melee')) {
+        return (typeof EQUIPMENT !== 'undefined' && EQUIPMENT.getSimpleWeapons)
+            ? EQUIPMENT.getSimpleWeapons().map(w => w.name) : null;
+    }
+    if (lower.includes('any simple melee weapon')) {
+        return (typeof EQUIPMENT !== 'undefined' && EQUIPMENT.weapons)
+            ? Object.values(EQUIPMENT.weapons).filter(w => w.category === 'Simple Melee').map(w => w.name) : null;
+    }
+    if (lower.includes('any martial melee weapon')) {
+        return (typeof EQUIPMENT !== 'undefined' && EQUIPMENT.weapons)
+            ? Object.values(EQUIPMENT.weapons).filter(w => w.category === 'Martial Melee').map(w => w.name) : null;
+    }
+    if (lower.includes('any martial weapon') && !lower.includes('melee')) {
+        return (typeof EQUIPMENT !== 'undefined' && EQUIPMENT.getMartialWeapons)
+            ? EQUIPMENT.getMartialWeapons().map(w => w.name) : null;
+    }
+    if (lower === 'an arcane focus' || lower === 'arcane focus') {
+        return (typeof EQUIPMENT !== 'undefined' && EQUIPMENT.adventuringGear)
+            ? Object.values(EQUIPMENT.adventuringGear)
+                .filter(g => g.name && g.name.startsWith('Arcane Focus'))
+                .map(g => g.name) : null;
+    }
+    if (lower.includes('druidic focus')) {
+        return (typeof EQUIPMENT !== 'undefined' && EQUIPMENT.adventuringGear)
+            ? Object.values(EQUIPMENT.adventuringGear)
+                .filter(g => g.name && g.name.includes('Druidic Focus') || (g.name && g.name.startsWith('Druidic Focus')))
+                .map(g => g.name) : null;
+    }
+    if (lower.includes('holy symbol')) {
+        return (typeof EQUIPMENT !== 'undefined' && EQUIPMENT.adventuringGear)
+            ? Object.values(EQUIPMENT.adventuringGear)
+                .filter(g => g.name && g.name.includes('Holy Symbol'))
+                .map(g => g.name) : null;
+    }
+    return null;
+}
+
+// Build the HTML for an equipment option (radio + optional sub-select dropdown)
+function buildEquipmentOptionHTML(option, index, optIdx, isFirst) {
+    const subOptions = getEquipmentSubOptions(option);
+    const radioName = `equip-choice-${index}`;
+    const selectId = `equip-sub-${index}-${optIdx}`;
+
+    if (subOptions && subOptions.length > 0) {
+        const selectOptions = subOptions.map(name =>
+            `<option value="${name}">${name}</option>`
+        ).join('');
+        return `
+            <input type="radio" name="${radioName}" value="${subOptions[0]}"
+                   ${isFirst ? 'checked' : ''}
+                   onchange="updateEquipmentList()" data-has-sub="${selectId}">
+            <span class="option-text">${option.trim()}</span>
+            <select class="equip-sub-select" id="${selectId}"
+                    onchange="handleEquipSubSelect(this, '${radioName}')"
+                    ${!isFirst ? 'disabled' : ''}>
+                ${selectOptions}
+            </select>
+        `;
+    }
+
+    return `
+        <input type="radio" name="${radioName}" value="${option.trim()}"
+               ${isFirst ? 'checked' : ''}
+               onchange="updateEquipmentList()">
+        <span class="option-text">${option.trim()}</span>
+    `;
+}
+
+// When a sub-select dropdown changes, update the parent radio's value
+function handleEquipSubSelect(selectEl, radioName) {
+    const radios = document.querySelectorAll(`[name="${radioName}"]`);
+    radios.forEach(r => {
+        if (r.dataset.hasSub === selectEl.id) {
+            r.value = selectEl.value;
+        }
+    });
+    updateEquipmentList();
+}
+
+// When a fixed-line sub-select changes, update the hidden input value
+function handleFixedEquipSubSelect(selectEl, index, originalLine) {
+    const hidden = document.querySelector(`[name="equip-choice-${index}"]`);
+    if (hidden) {
+        // Replace the generic term with the specific selection in the original line
+        hidden.value = originalLine.replace(
+            /any simple weapon|any simple melee weapon|any martial melee weapon|any martial weapon|an arcane focus|arcane focus/i,
+            selectEl.value
+        );
+    }
+    updateEquipmentList();
+}
+
 function initEquipmentSelection() {
     const container = document.getElementById('equipment-choices');
     const cls = CLASSES[character.class];
@@ -916,23 +1011,53 @@ function initEquipmentSelection() {
             options.forEach((option, optIdx) => {
                 const label = document.createElement('label');
                 label.className = 'equipment-option';
-                label.innerHTML = `
-                    <input type="radio" name="equip-choice-${index}" value="${option.trim()}"
-                           ${optIdx === 0 ? 'checked' : ''}
-                           onchange="updateEquipmentList()">
-                    <span class="option-text">${option.trim()}</span>
-                `;
+                label.innerHTML = buildEquipmentOptionHTML(option.trim(), index, optIdx, optIdx === 0);
                 choiceDiv.appendChild(label);
             });
+
+            // Enable/disable sub-selects based on which radio is checked
+            choiceDiv.addEventListener('change', (e) => {
+                if (e.target.type === 'radio') {
+                    const allSelects = choiceDiv.querySelectorAll('.equip-sub-select');
+                    allSelects.forEach(sel => sel.disabled = true);
+                    if (e.target.dataset.hasSub) {
+                        const activeSel = document.getElementById(e.target.dataset.hasSub);
+                        if (activeSel) {
+                            activeSel.disabled = false;
+                            e.target.value = activeSel.value;
+                        }
+                    }
+                    updateEquipmentList();
+                }
+            });
         } else {
-            // Fixed equipment - no choice needed
-            choiceDiv.innerHTML = `
-                <h4 class="equipment-choice-title">Included</h4>
-                <div class="equipment-fixed">
-                    <span class="option-text">${line}</span>
-                    <input type="hidden" name="equip-choice-${index}" value="${line}">
-                </div>
-            `;
+            // Check if fixed equipment has a sub-picker (e.g. "Leather armor, any simple weapon, and two daggers")
+            const subOptions = getEquipmentSubOptions(line);
+            if (subOptions && subOptions.length > 0) {
+                const selectId = `equip-sub-fixed-${index}`;
+                const selectOptions = subOptions.map(name =>
+                    `<option value="${name}">${name}</option>`
+                ).join('');
+                choiceDiv.innerHTML = `
+                    <h4 class="equipment-choice-title">Included</h4>
+                    <div class="equipment-fixed">
+                        <span class="option-text">${line}</span>
+                        <select class="equip-sub-select" id="${selectId}"
+                                onchange="handleFixedEquipSubSelect(this, ${index}, '${line.replace(/'/g, "\\'")}')">
+                            ${selectOptions}
+                        </select>
+                        <input type="hidden" name="equip-choice-${index}" value="${line.replace(/any simple weapon|any simple melee weapon|any martial melee weapon|any martial weapon|an arcane focus|arcane focus/gi, subOptions[0])}">
+                    </div>
+                `;
+            } else {
+                choiceDiv.innerHTML = `
+                    <h4 class="equipment-choice-title">Included</h4>
+                    <div class="equipment-fixed">
+                        <span class="option-text">${line}</span>
+                        <input type="hidden" name="equip-choice-${index}" value="${line}">
+                    </div>
+                `;
+            }
         }
 
         container.appendChild(choiceDiv);

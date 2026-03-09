@@ -1,0 +1,12 @@
+{
+  "name": "dnd-online-server",
+  "version": "1.0.0",
+  "description": "LAN multiplayer server for D&D Online Companion",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.16.0"
+  }
+}

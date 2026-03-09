@@ -1071,6 +1071,37 @@
     text-align: center;
 }
 
+.equip-sub-select {
+    display: block;
+    margin: 6px 0 2px 26px;
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(201, 162, 39, 0.4);
+    border-radius: 6px;
+    color: #f0d050;
+    font-size: 0.88rem;
+    font-family: inherit;
+    cursor: pointer;
+    max-width: 260px;
+    transition: border-color 0.2s;
+}
+
+.equip-sub-select:focus {
+    outline: none;
+    border-color: #c9a227;
+    box-shadow: 0 0 6px rgba(201, 162, 39, 0.3);
+}
+
+.equip-sub-select:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.equip-sub-select option {
+    background: #2a2a3a;
+    color: #e0e0e0;
+}
+
 /* Gold Option */
 .gold-option {
     padding: 20px;
