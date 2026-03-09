@@ -914,16 +914,17 @@ body.mp-active { padding-top: 46px !important; }
             else if (mp.leaveSession) mp.leaveSession();
         }
         localStorage.removeItem('mp_session');
-        // Remove the multiplayer UI overlay instead of reloading the page
-        const bar = document.getElementById('mp-status-bar');
-        if (bar) bar.remove();
-        const chatPanel = document.querySelector('.mp-chat-panel');
-        if (chatPanel) chatPanel.remove();
-        const playersPanel = document.querySelector('.mp-players-panel');
-        if (playersPanel) playersPanel.remove();
-        const dmPanel = document.querySelector('.mp-dm-panel');
-        if (dmPanel) dmPanel.remove();
+        // Remove all multiplayer UI elements
+        ['mp-status-bar', 'mp-chat-panel', 'mp-players-panel', 'mp-dm-panel',
+         'mp-chat-toggle', 'mp-players-toggle', 'mp-dm-fab', 'mp-toast-container'
+        ].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.remove();
+        });
+        document.body.classList.remove('mp-active');
         document.body.style.paddingTop = '';
+        // Remove injected style element
+        if (styleEl && styleEl.parentNode) styleEl.remove();
     }
 
     // ------------------------------------------
@@ -956,7 +957,7 @@ body.mp-active { padding-top: 46px !important; }
         playerListContainer.innerHTML = '';
         if (!players || !players.length) {
             playerListContainer.appendChild(
-                el('div', { style: 'text-align:center;color:var(--mp-text-muted);padding:24px;font-size:0.82rem;' },
+                el('div', { style: 'text-align:center;color:#888;padding:24px;font-size:0.82rem;' },
                     'No players connected')
             );
             return;

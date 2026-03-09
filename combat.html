@@ -1290,6 +1290,7 @@
             if (!combatant) return;
             combatant.hpTemp = Math.max(0, parseInt(value) || 0);
             saveState();
+            render();
             broadcastHpChange(id, combatant.hpCurrent, combatant.hpTemp);
         }
 

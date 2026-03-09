@@ -6,7 +6,7 @@ let secretRollMode = false; // DM secret roll toggle
 // Multiplayer broadcast helper — sends dice roll data if a session is active
 function broadcastDiceRoll(notation, result, rolls, modifier, description) {
     if (window.Multiplayer && window.Multiplayer.getSessionCode()) {
-        const isSecret = secretRollMode && window.Multiplayer.isDM && window.Multiplayer.isDM();
+        const isSecret = secretRollMode && window.Multiplayer.isDM();
         window.Multiplayer.broadcast('dice-roll', {
             notation: notation,
             result: result,
@@ -438,7 +438,7 @@ let roundNumber = 1;
 
 // Broadcast the full initiative state (DM only)
 function broadcastInitiativeState() {
-    if (window.Multiplayer && window.Multiplayer.getSessionCode() && window.Multiplayer.isDM && window.Multiplayer.isDM()) {
+    if (window.Multiplayer && window.Multiplayer.getSessionCode() && window.Multiplayer.isDM()) {
         window.Multiplayer.broadcast('initiative-update', {
             initiative: initiative,
             currentTurn: currentTurn,
@@ -468,7 +468,7 @@ function addToInitiative() {
 
 function removeFromInitiative(id) {
     // Players can only remove if not in a multiplayer session, or if DM
-    if (window.Multiplayer && window.Multiplayer.getSessionCode() && window.Multiplayer.isDM && !window.Multiplayer.isDM()) {
+    if (window.Multiplayer && window.Multiplayer.getSessionCode() && !window.Multiplayer.isDM()) {
         return; // players cannot remove entries
     }
     initiative = initiative.filter(c => c.id !== id);
@@ -479,7 +479,7 @@ function removeFromInitiative(id) {
 
 function renderInitiative() {
     const list = document.getElementById('initiativeList');
-    const isMultiplayerPlayer = window.Multiplayer && window.Multiplayer.getSessionCode() && window.Multiplayer.isDM && !window.Multiplayer.isDM();
+    const isMultiplayerPlayer = window.Multiplayer && window.Multiplayer.getSessionCode() && !window.Multiplayer.isDM();
 
     list.innerHTML = initiative.map((char, index) => `
         <li class="${index === currentTurn ? 'active' : ''}">
@@ -496,7 +496,7 @@ function renderInitiative() {
 }
 
 function clearInitiative() {
-    if (window.Multiplayer && window.Multiplayer.getSessionCode() && window.Multiplayer.isDM && !window.Multiplayer.isDM()) {
+    if (window.Multiplayer && window.Multiplayer.getSessionCode() && !window.Multiplayer.isDM()) {
         return; // players cannot clear
     }
     initiative = [];
@@ -508,7 +508,7 @@ function clearInitiative() {
 
 function nextTurn() {
     if (initiative.length === 0) return;
-    if (window.Multiplayer && window.Multiplayer.getSessionCode() && window.Multiplayer.isDM && !window.Multiplayer.isDM()) {
+    if (window.Multiplayer && window.Multiplayer.getSessionCode() && !window.Multiplayer.isDM()) {
         return; // players cannot advance turn
     }
     currentTurn = (currentTurn + 1) % initiative.length;
@@ -729,7 +729,7 @@ function initMultiplayerListeners() {
 
         // If it's a secret roll, only show to DM tabs
         if (msg.payload.secret) {
-            if (!window.Multiplayer.isDM || !window.Multiplayer.isDM()) return;
+            if (!window.Multiplayer.isDM()) return;
             addToHistory(`[SECRET] ${msg.senderName} rolled ${msg.payload.notation}: ${msg.payload.result}`, { isRemote: true });
         } else {
             addToHistory(`${msg.senderName} rolled ${msg.payload.notation}: ${msg.payload.result}`, { isRemote: true });
@@ -741,7 +741,7 @@ function initMultiplayerListeners() {
         if (msg.senderId === window.Multiplayer.getMyTabId()) return;
 
         // Players accept initiative state from DM
-        if (!window.Multiplayer.isDM || !window.Multiplayer.isDM()) {
+        if (!window.Multiplayer.isDM()) {
             initiative = msg.payload.initiative || [];
             currentTurn = msg.payload.currentTurn || 0;
             roundNumber = msg.payload.roundNumber || 1;

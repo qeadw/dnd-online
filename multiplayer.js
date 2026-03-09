@@ -180,6 +180,7 @@
   let _heartbeatCheckTimer = null;
   let _stateSyncTimer = null;
   let _autosaveTimer = null;
+  let _dmPresenceTimer = null;
 
   /** BroadcastChannel message handlers keyed by type. */
   const _messageHandlers = {};
@@ -279,6 +280,11 @@
   // ---------------------------------------------------------------------------
 
   function registerCoreHandlers() {
+    // Clear any existing handlers to prevent duplicates on rejoin/resume.
+    Object.keys(_messageHandlers).forEach(function (key) {
+      delete _messageHandlers[key];
+    });
+
     // --- DM-side handlers ---------------------------------------------------
 
     on("join-request", function (msg) {
@@ -400,11 +406,13 @@
     });
 
     on("dm-promotion", function (msg) {
-      if (msg.payload.targetTabId !== TAB_ID) return;
-      _role = "dm";
-      sessionStorage.setItem("dnd-role", "dm");
-      _events.emit("promoted-to-dm", {});
-      startDMTimers();
+      // Only the promoted player becomes DM; others just acknowledge.
+      if (msg.payload.newDMTabId === TAB_ID) {
+        _role = "dm";
+        sessionStorage.setItem("dnd-role", "dm");
+        _events.emit("promoted-to-dm", {});
+        startDMTimers();
+      }
     });
   }
 
@@ -485,7 +493,7 @@
           });
         }
       });
-    }, HEARTBEAT_INTERVAL_MS);
+    }, HEARTBEAT_TIMEOUT_MS);
   }
 
   function stopHeartbeatCheck() {
@@ -574,6 +582,10 @@
     stopHeartbeatCheck();
     stopStateSync();
     stopAutosave();
+    if (_dmPresenceTimer) {
+      clearInterval(_dmPresenceTimer);
+      _dmPresenceTimer = null;
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -617,15 +629,22 @@
   let _lastDMSync = 0;
 
   function monitorDMPresence() {
+    // Clear any existing monitor to prevent duplicates.
+    if (_dmPresenceTimer) {
+      clearInterval(_dmPresenceTimer);
+      _dmPresenceTimer = null;
+    }
+
     // Players listen for state-sync to know DM is alive.
     _events.on("state-sync", function () {
       _lastDMSync = now();
     });
 
     // Check periodically.
-    const checkInterval = setInterval(function () {
+    _dmPresenceTimer = setInterval(function () {
       if (_role !== "player" || !_sessionCode) {
-        clearInterval(checkInterval);
+        clearInterval(_dmPresenceTimer);
+        _dmPresenceTimer = null;
         return;
       }
       // If we've been connected for a while and DM hasn't synced...
@@ -651,7 +670,7 @@
       // We are the oldest — self-promote and notify everyone.
       _role = "dm";
       sessionStorage.setItem("dnd-role", "dm");
-      broadcast("dm-promotion", { targetTabId: TAB_ID, newDMName: _playerName });
+      broadcast("dm-promotion", { newDMTabId: TAB_ID, newDMName: _playerName });
       _events.emit("promoted-to-dm", {});
       startDMTimers();
     }
@@ -927,12 +946,12 @@
       });
       const player = _players.get(tabId);
       if (player) {
-        player.status = "kicked";
         _events.emit("player-kicked", {
           tabId: tabId,
           name: player.name,
           reason: reason,
         });
+        _players.delete(tabId);
       }
     },
 
