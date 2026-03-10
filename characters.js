@@ -44,7 +44,12 @@ function loadCharacters() {
 
 // Save characters to localStorage
 function saveCharacters() {
-    localStorage.setItem('dndCharacters', JSON.stringify(characters));
+    try {
+        localStorage.setItem('dndCharacters', JSON.stringify(characters));
+    } catch (e) {
+        console.error('Failed to save characters:', e);
+        alert('Failed to save characters. Storage may be full.');
+    }
 }
 
 // Render the character list

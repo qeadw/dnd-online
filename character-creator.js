@@ -1835,7 +1835,13 @@ function saveCharacter() {
     savedCharacters.push(charData);
 
     // Save to localStorage
-    localStorage.setItem('dndCharacters', JSON.stringify(savedCharacters));
+    try {
+        localStorage.setItem('dndCharacters', JSON.stringify(savedCharacters));
+    } catch (e) {
+        console.error('Failed to save character:', e);
+        alert('Failed to save character. Storage may be full.');
+        return;
+    }
 
     alert('Character saved successfully!');
 

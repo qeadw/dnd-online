@@ -1813,7 +1813,7 @@ const CLASSES = {
         description: "A holy warrior bound to a sacred oath.",
         hitDie: 10,
         primaryAbility: "Strength & Charisma",
-        savingThrows: ["wis", "cha"],
+        savingThrows: ["str", "cha"],
         armorProficiencies: ["All armor", "Shields"],
         weaponProficiencies: ["Simple weapons", "Martial weapons"],
         skillChoices: {
@@ -2041,7 +2041,7 @@ const CLASSES = {
         description: "A warrior who combats threats on the edges of civilization.",
         hitDie: 10,
         primaryAbility: "Dexterity & Wisdom",
-        savingThrows: ["str", "dex"],
+        savingThrows: ["str", "wis"],
         armorProficiencies: ["Light armor", "Medium armor", "Shields"],
         weaponProficiencies: ["Simple weapons", "Martial weapons"],
         skillChoices: {

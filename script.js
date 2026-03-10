@@ -587,7 +587,11 @@ function saveData() {
         }
     });
 
-    localStorage.setItem('dndOnlineData', JSON.stringify(data));
+    try {
+        localStorage.setItem('dndOnlineData', JSON.stringify(data));
+    } catch (e) {
+        console.error('Failed to save data:', e);
+    }
 }
 
 function loadData() {
