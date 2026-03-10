@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Events - D&D Online</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="events.css">
+    <script src="spa-bridge.js"></script>
+</head>
+<body>
+    <div id="multiplayer-overlay"></div>
+    <a href="#main" class="skip-link">Skip to content</a>
+    <header>
+        <h1>D&D Online</h1>
+        <nav class="main-nav">
+            <a href="game-tools.html" class="nav-link">Game Tools</a>
+            <a href="character-creator.html" class="nav-link">Character Creator</a>
+            <a href="characters.html" class="nav-link">My Characters</a>
+            <a href="spells.html" class="nav-link">Spells</a>
+            <a href="monsters.html" class="nav-link">Monsters</a>
+            <a href="monster-builder.html" class="nav-link">Monster Builder</a>
+            <a href="combat.html" class="nav-link">Combat</a>
+            <a href="inventory.html" class="nav-link">Inventory</a>
+            <a href="maps.html" class="nav-link">Maps</a>
+            <a href="events.html" class="nav-link active">Events</a>
+            <a href="session.html" class="nav-link">Session</a>
+        </nav>
+    </header>
+
+    <main id="main" class="events-main">
+        <div class="events-container">
+            <!-- Event Roller Section -->
+            <section class="event-section">
+                <h2>Random Event Roller</h2>
+
+                <div class="event-controls">
+                    <div class="event-type-selector">
+                        <label for="event-type">Event Type:</label>
+                        <select id="event-type" onchange="updateEventOptions()">
+                            <option value="random">Random Event</option>
+                            <option value="encounter">Creature Encounter</option>
+                            <option value="weather">Weather Change</option>
+                            <option value="social">Social Encounter</option>
+                            <option value="discovery">Discovery</option>
+                            <option value="hazard">Environmental Hazard</option>
+                            <option value="custom">Custom Event Pool</option>
+                        </select>
+                    </div>
+
+                    <button class="btn-primary roll-event-btn" onclick="rollEvent()">
+                        Roll Event
+                    </button>
+                </div>
+
+                <!-- Event Result Display -->
+                <div id="event-result" class="event-result" style="display: none;">
+                    <h3 id="event-result-title">Event Result</h3>
+                    <div id="event-result-content"></div>
+                </div>
+            </section>
+
+            <!-- Creature Encounter Settings -->
+            <section id="encounter-settings" class="event-section" style="display: none;">
+                <h2>Creature Encounter Settings</h2>
+
+                <div class="encounter-config">
+                    <div class="config-row">
+                        <div class="config-group">
+                            <label for="cr-min">CR Range:</label>
+                            <div class="cr-range">
+                                <select id="cr-min">
+                                    <option value="0">0</option>
+                                    <option value="0.125">1/8</option>
+                                    <option value="0.25">1/4</option>
+                                    <option value="0.5">1/2</option>
+                                    <option value="1" selected>1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
+                                    <option value="15">15</option>
+                                    <option value="16">16</option>
+                                    <option value="17">17</option>
+                                    <option value="18">18</option>
+                                    <option value="19">19</option>
+                                    <option value="20">20</option>
+                                    <option value="21">21</option>
+                                    <option value="22">22</option>
+                                    <option value="23">23</option>
+                                    <option value="24">24</option>
+                                    <option value="25">25</option>
+                                    <option value="26">26</option>
+                                    <option value="27">27</option>
+                                    <option value="28">28</option>
+                                    <option value="29">29</option>
+                                    <option value="30">30</option>
+                                </select>
+                                <span>to</span>
+                                <select id="cr-max">
+                                    <option value="0">0</option>
+                                    <option value="0.125">1/8</option>
+                                    <option value="0.25">1/4</option>
+                                    <option value="0.5">1/2</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5" selected>5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
+                                    <option value="15">15</option>
+                                    <option value="16">16</option>
+                                    <option value="17">17</option>
+                                    <option value="18">18</option>
+                                    <option value="19">19</option>
+                                    <option value="20">20</option>
+                                    <option value="21">21</option>
+                                    <option value="22">22</option>
+                                    <option value="23">23</option>
+                                    <option value="24">24</option>
+                                    <option value="25">25</option>
+                                    <option value="26">26</option>
+                                    <option value="27">27</option>
+                                    <option value="28">28</option>
+                                    <option value="29">29</option>
+                                    <option value="30">30</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="config-group">
+                            <label for="creature-type">Creature Type:</label>
+                            <select id="creature-type">
+                                <option value="any">Any Type</option>
+                                <option value="Aberration">Aberration</option>
+                                <option value="Beast">Beast</option>
+                                <option value="Celestial">Celestial</option>
+                                <option value="Construct">Construct</option>
+                                <option value="Dragon">Dragon</option>
+                                <option value="Elemental">Elemental</option>
+                                <option value="Fey">Fey</option>
+                                <option value="Fiend">Fiend</option>
+                                <option value="Giant">Giant</option>
+                                <option value="Humanoid">Humanoid</option>
+                                <option value="Monstrosity">Monstrosity</option>
+                                <option value="Ooze">Ooze</option>
+                                <option value="Plant">Plant</option>
+                                <option value="Undead">Undead</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="config-row">
+                        <div class="config-group">
+                            <label for="encounter-mode">Encounter Mode:</label>
+                            <select id="encounter-mode" onchange="updateEncounterMode()">
+                                <option value="random">Random from Filters</option>
+                                <option value="pool">Custom Pool with Weights</option>
+                            </select>
+                        </div>
+
+                        <div class="config-group">
+                            <label for="encounter-count">Number of Creatures:</label>
+                            <select id="encounter-count">
+                                <option value="1">1 Creature</option>
+                                <option value="1d4">1d4 Creatures</option>
+                                <option value="1d6">1d6 Creatures</option>
+                                <option value="2d4">2d4 Creatures</option>
+                                <option value="1d8">1d8 Creatures</option>
+                                <option value="2d6">2d6 Creatures</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Pool Section -->
+                <div id="custom-pool-section" class="custom-pool-section" style="display: none;">
+                    <h3>Custom Creature Pool</h3>
+                    <p class="pool-hint">Add creatures with custom weights (higher weight = more likely)</p>
+
+                    <div class="pool-add-form">
+                        <select id="pool-creature-select">
+                            <option value="">-- Select Creature --</option>
+                        </select>
+                        <input type="number" id="pool-weight" value="1" min="1" max="100" placeholder="Weight">
+                        <button class="btn-secondary" onclick="addToPool()">Add to Pool</button>
+                    </div>
+
+                    <div id="creature-pool" class="creature-pool">
+                        <!-- Pool items will be added here -->
+                    </div>
+
+                    <div class="pool-actions">
+                        <button class="btn-secondary" onclick="clearPool()">Clear Pool</button>
+                        <button class="btn-secondary" onclick="savePool()">Save Pool</button>
+                        <button class="btn-secondary" onclick="loadPool()">Load Pool</button>
+                    </div>
+                </div>
+
+                <!-- Matching Creatures Preview -->
+                <div class="matching-creatures">
+                    <h4>Matching Creatures: <span id="matching-count">0</span></h4>
+                    <div id="matching-list" class="matching-list"></div>
+                </div>
+            </section>
+
+            <!-- Custom Events Section -->
+            <section id="custom-events-section" class="event-section" style="display: none;">
+                <h2>Custom Event Pool</h2>
+
+                <div class="custom-event-add">
+                    <div class="event-input-group">
+                        <label for="custom-event-name">Event Name:</label>
+                        <input type="text" id="custom-event-name" placeholder="Enter event name">
+                    </div>
+                    <div class="event-input-group">
+                        <label for="custom-event-desc">Description:</label>
+                        <textarea id="custom-event-desc" placeholder="Describe the event..."></textarea>
+                    </div>
+                    <div class="event-input-group">
+                        <label for="custom-event-weight">Weight:</label>
+                        <input type="number" id="custom-event-weight" value="1" min="1" max="100">
+                    </div>
+                    <button class="btn-secondary" onclick="addCustomEvent()">Add Event</button>
+                </div>
+
+                <div id="custom-events-list" class="custom-events-list">
+                    <!-- Custom events will be listed here -->
+                </div>
+
+                <div class="pool-actions">
+                    <button class="btn-secondary" onclick="clearCustomEvents()">Clear All</button>
+                    <button class="btn-secondary" onclick="saveCustomEvents()">Save Events</button>
+                    <button class="btn-secondary" onclick="loadCustomEvents()">Load Events</button>
+                </div>
+            </section>
+
+            <!-- Preset Events Reference -->
+            <section class="event-section preset-events">
+                <h2>Preset Event Tables</h2>
+
+                <div class="preset-tabs">
+                    <button class="preset-tab active" data-tab="weather">Weather</button>
+                    <button class="preset-tab" data-tab="social">Social</button>
+                    <button class="preset-tab" data-tab="discovery">Discovery</button>
+                    <button class="preset-tab" data-tab="hazard">Hazards</button>
+                </div>
+
+                <div id="preset-weather" class="preset-content active">
+                    <ul class="preset-list">
+                        <li><strong>Clear Skies:</strong> Perfect traveling weather</li>
+                        <li><strong>Light Rain:</strong> Visibility slightly reduced, tracks easier to follow</li>
+                        <li><strong>Heavy Rain:</strong> Disadvantage on Perception checks, difficult terrain</li>
+                        <li><strong>Thunderstorm:</strong> Loud thunder masks sounds, lightning risk</li>
+                        <li><strong>Fog:</strong> Heavily obscured beyond 30 feet</li>
+                        <li><strong>Snow:</strong> Cold damage risk, tracks visible</li>
+                        <li><strong>Blizzard:</strong> Extreme cold, heavily obscured, difficult terrain</li>
+                        <li><strong>Extreme Heat:</strong> Constitution saves or exhaustion</li>
+                        <li><strong>Strong Winds:</strong> Ranged attacks at disadvantage</li>
+                        <li><strong>Magical Weather:</strong> Roll on wild magic table</li>
+                    </ul>
+                </div>
+
+                <div id="preset-social" class="preset-content">
+                    <ul class="preset-list">
+                        <li><strong>Traveling Merchant:</strong> Sells common goods, may have rare item</li>
+                        <li><strong>Lost Traveler:</strong> Needs directions or escort</li>
+                        <li><strong>Noble Carriage:</strong> Wealthy travelers with guards</li>
+                        <li><strong>Pilgrim Group:</strong> Religious travelers, may offer blessing</li>
+                        <li><strong>Bandits:</strong> Demand toll or attack</li>
+                        <li><strong>Military Patrol:</strong> Guards checking for trouble</li>
+                        <li><strong>Adventuring Party:</strong> Fellow adventurers, may trade info</li>
+                        <li><strong>Fleeing Refugees:</strong> Warn of danger ahead</li>
+                        <li><strong>Mysterious Stranger:</strong> Offers cryptic advice or quest</li>
+                        <li><strong>Festival Procession:</strong> Locals celebrating, may invite party</li>
+                    </ul>
+                </div>
+
+                <div id="preset-discovery" class="preset-content">
+                    <ul class="preset-list">
+                        <li><strong>Hidden Cache:</strong> Small treasure or supplies</li>
+                        <li><strong>Ancient Ruins:</strong> Remnants of old civilization</li>
+                        <li><strong>Natural Spring:</strong> Fresh water, possible healing properties</li>
+                        <li><strong>Abandoned Camp:</strong> Signs of previous travelers</li>
+                        <li><strong>Strange Monument:</strong> Magical or historical significance</li>
+                        <li><strong>Cave Entrance:</strong> Unexplored underground area</li>
+                        <li><strong>Crashed Wagon:</strong> Goods scattered, possible survivors</li>
+                        <li><strong>Mysterious Tracks:</strong> Large creature passed through</li>
+                        <li><strong>Fairy Circle:</strong> Fey crossing, magical effects</li>
+                        <li><strong>Battlefield:</strong> Old combat site, possible loot or undead</li>
+                    </ul>
+                </div>
+
+                <div id="preset-hazard" class="preset-content">
+                    <ul class="preset-list">
+                        <li><strong>Quicksand:</strong> Dexterity save or sink</li>
+                        <li><strong>Rockslide:</strong> Dexterity save or take damage</li>
+                        <li><strong>Sinkhole:</strong> Ground gives way unexpectedly</li>
+                        <li><strong>Poison Plants:</strong> Constitution save vs poison</li>
+                        <li><strong>Swarm of Insects:</strong> Annoying or dangerous</li>
+                        <li><strong>Flash Flood:</strong> Strength save or swept away</li>
+                        <li><strong>Unstable Ground:</strong> Difficult terrain, collapse risk</li>
+                        <li><strong>Magical Dead Zone:</strong> Spells fail temporarily</li>
+                        <li><strong>Wild Magic Surge:</strong> Random magical effect</li>
+                        <li><strong>Hallucinogenic Spores:</strong> Wisdom save or confused</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Event History -->
+            <section class="event-section">
+                <h2>Event History</h2>
+                <div id="event-history" class="event-history">
+                    <p class="empty-history">No events rolled yet</p>
+                </div>
+                <button class="btn-secondary" onclick="clearHistory()">Clear History</button>
+            </section>
+        </div>
+    </main>
+
+    <script src="data/monsters.js"></script>
+    <script src="events.js"></script>
+    <script src="multiplayer.js"></script>
+    <script src="multiplayer-ui.js"></script>
+</body>
+</html>
