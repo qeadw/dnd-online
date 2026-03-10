@@ -241,17 +241,90 @@ function calculateAC(char, abilities) {
     const conMod = abilities.con.mod;
     const wisMod = abilities.wis.mod;
 
-    // Base AC (no armor)
-    let ac = 10 + dexMod;
+    // Get all equipment as lowercase strings for matching
+    let equipment = [];
+    if (char.class && CLASSES[char.class] && CLASSES[char.class].startingEquipment) {
+        equipment = equipment.concat(CLASSES[char.class].startingEquipment);
+    }
+    if (char.background && BACKGROUNDS[char.background] && BACKGROUNDS[char.background].equipment) {
+        equipment = equipment.concat(BACKGROUNDS[char.background].equipment);
+    }
+    if (char.equipment && char.equipment.length > 0) {
+        equipment = equipment.concat(char.equipment);
+    }
+    const equipmentLower = equipment.map(e => (e || '').toLowerCase());
 
-    // Barbarian Unarmored Defense
-    if (char.class === 'barbarian') {
-        ac = 10 + dexMod + conMod;
+    // Check for equipped armor
+    let armorAC = null;
+    let maxDexBonus = null;
+    let hasShield = false;
+
+    // Check for shield
+    if (equipmentLower.some(e => e.includes('shield'))) {
+        hasShield = true;
     }
 
-    // Monk Unarmored Defense
-    if (char.class === 'monk') {
-        ac = 10 + dexMod + wisMod;
+    // Check armor types (from heaviest to lightest)
+    // Heavy Armor (no DEX bonus)
+    if (equipmentLower.some(e => e.includes('plate') && !e.includes('half') && !e.includes('breast'))) {
+        armorAC = 18; maxDexBonus = 0;
+    } else if (equipmentLower.some(e => e.includes('splint'))) {
+        armorAC = 17; maxDexBonus = 0;
+    } else if (equipmentLower.some(e => e.includes('chain mail') || (e.includes('chain') && e.includes('mail')))) {
+        armorAC = 16; maxDexBonus = 0;
+    } else if (equipmentLower.some(e => e.includes('ring mail'))) {
+        armorAC = 14; maxDexBonus = 0;
+    }
+    // Medium Armor (max +2 DEX)
+    else if (equipmentLower.some(e => e.includes('half plate'))) {
+        armorAC = 15; maxDexBonus = 2;
+    } else if (equipmentLower.some(e => e.includes('breastplate'))) {
+        armorAC = 14; maxDexBonus = 2;
+    } else if (equipmentLower.some(e => e.includes('scale mail') || e.includes('scale armor'))) {
+        armorAC = 14; maxDexBonus = 2;
+    } else if (equipmentLower.some(e => e.includes('chain shirt'))) {
+        armorAC = 13; maxDexBonus = 2;
+    } else if (equipmentLower.some(e => e.includes('hide'))) {
+        armorAC = 12; maxDexBonus = 2;
+    }
+    // Light Armor (full DEX)
+    else if (equipmentLower.some(e => e.includes('studded leather'))) {
+        armorAC = 12; maxDexBonus = null;
+    } else if (equipmentLower.some(e => e.includes('leather') && !e.includes('studded'))) {
+        armorAC = 11; maxDexBonus = null;
+    } else if (equipmentLower.some(e => e.includes('padded'))) {
+        armorAC = 11; maxDexBonus = null;
+    }
+
+    let ac;
+
+    if (armorAC !== null) {
+        // Wearing armor
+        const effectiveDex = maxDexBonus !== null ? Math.min(dexMod, maxDexBonus) : dexMod;
+        ac = armorAC + effectiveDex;
+    } else {
+        // Unarmored
+        ac = 10 + dexMod;
+
+        // Barbarian Unarmored Defense (better of normal or unarmored defense)
+        if (char.class === 'barbarian') {
+            ac = Math.max(ac, 10 + dexMod + conMod);
+        }
+
+        // Monk Unarmored Defense
+        if (char.class === 'monk') {
+            ac = Math.max(ac, 10 + dexMod + wisMod);
+        }
+    }
+
+    // Add shield bonus
+    if (hasShield) {
+        ac += 2;
+    }
+
+    // Draconic Resilience (Sorcerer)
+    if (char.class === 'sorcerer' && char.subclass === 'draconic' && armorAC === null) {
+        ac = Math.max(ac, 13 + dexMod + (hasShield ? 2 : 0));
     }
 
     return ac;
