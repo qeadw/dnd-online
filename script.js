@@ -508,7 +508,7 @@ function renderInitiative() {
     list.innerHTML = initiative.map((char, index) => `
         <li class="${index === currentTurn ? 'active' : ''}">
             <span><strong>${char.init}</strong> - ${escapeHtml(char.name)}</span>
-            ${isMultiplayerPlayer ? '' : `<button onclick="removeFromInitiative(${char.id})">X</button>`}
+            ${isMultiplayerPlayer ? '' : `<button onclick="removeFromInitiative('${char.id}')">X</button>`}
         </li>
     `).join('');
 

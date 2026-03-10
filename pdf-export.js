@@ -24,14 +24,63 @@ function calculateHP(char, abilities) {
     const hitDie = cls ? cls.hitDie : 8;
     const conMod = abilities.con ? abilities.con.mod : 0;
     const level = char.level || 1;
-    // Level 1: max hit die + CON mod, subsequent levels: average + CON mod
-    return hitDie + conMod + (level - 1) * (Math.floor(hitDie / 2) + 1 + conMod);
+    // Level 1: max hit die + CON mod (minimum 1), subsequent levels: average + CON mod (minimum 1 per level)
+    const level1HP = Math.max(1, hitDie + conMod);
+    const hpPerLevel = Math.max(1, Math.floor(hitDie / 2) + 1 + conMod);
+    return level1HP + (level - 1) * hpPerLevel;
 }
 
 function calculateAC(char, abilities) {
     const dexMod = abilities.dex ? abilities.dex.mod : 0;
-    // Base AC is 10 + DEX mod (unarmored)
-    return 10 + dexMod;
+    const conMod = abilities.con ? abilities.con.mod : 0;
+    const wisMod = abilities.wis ? abilities.wis.mod : 0;
+
+    // Get equipment for armor detection
+    let equipment = [];
+    const cls = char.class ? CLASSES[char.class] : null;
+    const bg = char.background ? BACKGROUNDS[char.background] : null;
+    if (cls && cls.startingEquipment) equipment = equipment.concat(cls.startingEquipment);
+    if (bg && bg.equipment) equipment = equipment.concat(bg.equipment);
+    if (char.equipment) equipment = equipment.concat(char.equipment);
+    const equipmentLower = equipment.map(e => (e || '').toLowerCase());
+
+    let armorAC = null;
+    let maxDexBonus = null;
+    let hasShield = equipmentLower.some(e => e.includes('shield'));
+
+    // Check armor types
+    if (equipmentLower.some(e => e.includes('plate') && !e.includes('half') && !e.includes('breast'))) {
+        armorAC = 18; maxDexBonus = 0;
+    } else if (equipmentLower.some(e => e.includes('splint'))) {
+        armorAC = 17; maxDexBonus = 0;
+    } else if (equipmentLower.some(e => e.includes('chain mail'))) {
+        armorAC = 16; maxDexBonus = 0;
+    } else if (equipmentLower.some(e => e.includes('half plate'))) {
+        armorAC = 15; maxDexBonus = 2;
+    } else if (equipmentLower.some(e => e.includes('breastplate'))) {
+        armorAC = 14; maxDexBonus = 2;
+    } else if (equipmentLower.some(e => e.includes('scale mail'))) {
+        armorAC = 14; maxDexBonus = 2;
+    } else if (equipmentLower.some(e => e.includes('chain shirt'))) {
+        armorAC = 13; maxDexBonus = 2;
+    } else if (equipmentLower.some(e => e.includes('studded leather'))) {
+        armorAC = 12; maxDexBonus = null;
+    } else if (equipmentLower.some(e => e.includes('leather'))) {
+        armorAC = 11; maxDexBonus = null;
+    }
+
+    let ac;
+    if (armorAC !== null) {
+        const effectiveDex = maxDexBonus !== null ? Math.min(dexMod, maxDexBonus) : dexMod;
+        ac = armorAC + effectiveDex;
+    } else {
+        ac = 10 + dexMod;
+        if (char.class === 'barbarian') ac = Math.max(ac, 10 + dexMod + conMod);
+        if (char.class === 'monk') ac = Math.max(ac, 10 + dexMod + wisMod);
+    }
+
+    if (hasShield) ac += 2;
+    return ac;
 }
 
 function calculateSpeed(char) {

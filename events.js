@@ -372,7 +372,16 @@ function rollDice(diceStr) {
         return parseInt(diceStr) || 1;
     }
 
-    const [numDice, sides] = diceStr.split('d').map(n => parseInt(n));
+    const parts = diceStr.split('d');
+    // Handle "d6" as "1d6", and validate numbers
+    const numDice = parseInt(parts[0]) || 1;
+    const sides = parseInt(parts[1]) || 6;
+
+    // Validate to prevent infinite loops or invalid results
+    if (numDice <= 0 || sides <= 0 || isNaN(numDice) || isNaN(sides)) {
+        return 1;
+    }
+
     let total = 0;
     for (let i = 0; i < numDice; i++) {
         total += Math.floor(Math.random() * sides) + 1;

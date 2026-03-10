@@ -212,14 +212,16 @@ function calculateHP(char, abilities) {
     const level = char.level || 1;
     const conMod = abilities.con.mod;
 
-    // Level 1: Max hit die + CON mod
-    // Additional levels: Average + 1 + CON mod per level
+    // Level 1: Max hit die + CON mod (minimum 1 HP per level per D&D rules)
+    // Additional levels: Average + 1 + CON mod per level (minimum 1)
     const hitDie = cls.hitDie;
-    let hp = hitDie + conMod;
+    let hp = Math.max(1, hitDie + conMod);
 
     if (level > 1) {
         const averageRoll = Math.floor(hitDie / 2) + 1;
-        hp += (averageRoll + conMod) * (level - 1);
+        // Each level must grant at least 1 HP per D&D 5e rules
+        const hpPerLevel = Math.max(1, averageRoll + conMod);
+        hp += hpPerLevel * (level - 1);
     }
 
     // Hill Dwarf bonus
@@ -362,6 +364,12 @@ function calculateSpeed(char) {
 
 // View full character sheet
 function viewCharacter(index) {
+    // Bounds check to prevent accessing invalid character
+    if (index < 0 || index >= characters.length) {
+        console.error('Invalid character index:', index);
+        return;
+    }
+
     currentCharacterIndex = index;
     const char = characters[index];
 
@@ -846,10 +854,11 @@ function renderSpellcasting(char, abilities) {
 
     const slots = (SPELL_SLOTS[slotType] || {})[level] || [0,0,0,0,0,0,0,0,0];
 
-    // Get cantrips known
+    // Get cantrips known (cap level at 20 for array bounds)
     let cantrips = 0;
     if (spellcasting.cantripsKnown) {
-        cantrips = spellcasting.cantripsKnown[level - 1] || 0;
+        const cappedLevel = Math.min(level, 20);
+        cantrips = spellcasting.cantripsKnown[cappedLevel - 1] || 0;
     }
 
     return `
