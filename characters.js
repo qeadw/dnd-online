@@ -672,33 +672,142 @@ function renderBackgroundFeature(char) {
 
 // Render equipment
 function renderEquipment(char) {
-    let equipment = [];
-
-    // Class starting equipment
+    // Get base equipment from class/background
+    let baseEquipment = [];
     if (char.class && CLASSES[char.class] && CLASSES[char.class].startingEquipment) {
-        equipment = equipment.concat(CLASSES[char.class].startingEquipment);
+        baseEquipment = baseEquipment.concat(CLASSES[char.class].startingEquipment);
     }
-
-    // Background equipment
     if (char.background && BACKGROUNDS[char.background] && BACKGROUNDS[char.background].equipment) {
-        equipment = equipment.concat(BACKGROUNDS[char.background].equipment);
+        baseEquipment = baseEquipment.concat(BACKGROUNDS[char.background].equipment);
     }
 
-    // Character's selected equipment
-    if (char.equipment && char.equipment.length > 0) {
-        equipment = equipment.concat(char.equipment);
+    // Character's additional equipment
+    const customEquipment = char.equipment || [];
+
+    if (baseEquipment.length === 0 && customEquipment.length === 0 && !editMode) return '';
+
+    if (editMode) {
+        return `
+            <div class="sheet-section equipment-edit-section">
+                <h3>Equipment</h3>
+                <div class="equipment-add-form">
+                    <select id="equipment-category" onchange="updateEquipmentItems()">
+                        <option value="">-- Select Category --</option>
+                        <option value="weapons">Weapons</option>
+                        <option value="armor">Armor</option>
+                        <option value="adventuringGear">Adventuring Gear</option>
+                        <option value="tools">Tools</option>
+                        <option value="custom">Custom Item</option>
+                    </select>
+                    <select id="equipment-item" style="display:none;">
+                        <option value="">-- Select Item --</option>
+                    </select>
+                    <input type="text" id="custom-equipment-input" placeholder="Enter custom item..." style="display:none;">
+                    <button class="btn-secondary" onclick="addEquipmentItem()">Add</button>
+                </div>
+                ${baseEquipment.length > 0 ? `
+                    <div class="equipment-group">
+                        <h4>Starting Equipment</h4>
+                        <ul class="equipment-list">
+                            ${baseEquipment.map(item => `<li>${escapeHtml(item)}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
+                <div class="equipment-group">
+                    <h4>Additional Equipment</h4>
+                    <ul class="equipment-list editable">
+                        ${customEquipment.length > 0 ? customEquipment.map((item, idx) => `
+                            <li>
+                                ${escapeHtml(item)}
+                                <button class="remove-item-btn" onclick="removeEquipmentItem(${idx})">×</button>
+                            </li>
+                        `).join('') : '<li class="empty-msg">No additional items</li>'}
+                    </ul>
+                </div>
+            </div>
+        `;
     }
 
-    if (equipment.length === 0) return '';
-
+    const allEquipment = [...baseEquipment, ...customEquipment];
     return `
         <div class="sheet-section">
             <h3>Equipment</h3>
             <ul class="equipment-list">
-                ${equipment.map(item => `<li>${item}</li>`).join('')}
+                ${allEquipment.map(item => `<li>${escapeHtml(item)}</li>`).join('')}
             </ul>
         </div>
     `;
+}
+
+// Update equipment item dropdown based on category
+function updateEquipmentItems() {
+    const category = document.getElementById('equipment-category').value;
+    const itemSelect = document.getElementById('equipment-item');
+    const customInput = document.getElementById('custom-equipment-input');
+
+    if (category === 'custom') {
+        itemSelect.style.display = 'none';
+        customInput.style.display = 'block';
+        return;
+    }
+
+    customInput.style.display = 'none';
+
+    if (!category || typeof EQUIPMENT === 'undefined') {
+        itemSelect.style.display = 'none';
+        return;
+    }
+
+    const items = EQUIPMENT[category];
+    if (!items) {
+        itemSelect.style.display = 'none';
+        return;
+    }
+
+    itemSelect.style.display = 'block';
+    itemSelect.innerHTML = '<option value="">-- Select Item --</option>' +
+        Object.values(items).map(item => {
+            const cost = item.cost ? ` (${item.cost.amount} ${item.cost.unit})` : '';
+            return `<option value="${escapeHtml(item.name)}">${escapeHtml(item.name)}${cost}</option>`;
+        }).join('');
+}
+
+// Add equipment item to character
+function addEquipmentItem() {
+    if (currentCharacterIndex === null) return;
+    const char = characters[currentCharacterIndex];
+
+    const category = document.getElementById('equipment-category').value;
+    let itemName = '';
+
+    if (category === 'custom') {
+        itemName = document.getElementById('custom-equipment-input').value.trim();
+        document.getElementById('custom-equipment-input').value = '';
+    } else {
+        itemName = document.getElementById('equipment-item').value;
+    }
+
+    if (!itemName) {
+        alert('Please select or enter an item');
+        return;
+    }
+
+    if (!char.equipment) char.equipment = [];
+    char.equipment.push(itemName);
+    saveCharacters();
+    renderCharacterSheet(char);
+}
+
+// Remove equipment item from character
+function removeEquipmentItem(index) {
+    if (currentCharacterIndex === null) return;
+    const char = characters[currentCharacterIndex];
+
+    if (!char.equipment || index < 0 || index >= char.equipment.length) return;
+
+    char.equipment.splice(index, 1);
+    saveCharacters();
+    renderCharacterSheet(char);
 }
 
 // Render spellcasting section
